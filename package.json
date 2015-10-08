@@ -1,0 +1,15 @@
+{
+  "name": "Chemrtron",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "cho45 <cho45@lowreal.net> (http://www.lowreal.net/)",
+  "license": "MIT",
+  "dependencies": {
+    "glob": "^5.0.15"
+  }
+}
