@@ -25,6 +25,15 @@ window.onload = function () {
 		console.log('onload');
 	};
 
+	window.onkeydown = function (e) {
+		console.log(e);
+		var key = (e.altKey?"Alt-":"")+(e.ctrlKey?"Control-":"")+(e.metaKey?"Meta-":"")+(e.shiftKey?"Shift-":"")+e.key;   
+
+		if (key === 'Meta-l') {
+			input.focus();
+		}
+	};
+
 	var select = document.getElementById('select');
 	select.onchange = function () {
 		var option = select.childNodes[select.selectedIndex];
