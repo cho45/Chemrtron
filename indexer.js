@@ -50,8 +50,14 @@ var Indexer = {
 
 		createIndex : function (params) {
 			var id = params.id;
+
+			// reload indexers
+			Chemr.Index.loadIndexers();
+
+			console.log('CREATE INDEX', id);
 			return Chemr.Index.byId(params.id).
 				then(function (index) {
+				console.log('CREATE INDEX runIndexer', index);
 					return index.runIndexer(function (state, current, total) {
 						ipc.send('indexer', {
 							id : null,

@@ -1,0 +1,22 @@
+{
+  "name": "Chemr",
+  "version": "0.0.0",
+  "authors": [
+    "cho45 <cho45@lowreal.net>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "iron-elements": "PolymerElements/iron-elements#^1.0.0",
+    "paper-elements": "PolymerElements/paper-elements#^1.0.0",
+    "iron-localstorage": "PolymerElements/iron-localstorage#^1.0.0",
+    "sprintf": "~1.0.3",
+    "strftime": "~0.9.2"
+  }
+}

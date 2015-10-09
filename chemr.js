@@ -8,6 +8,7 @@ Chemr.Index = function () { this.init.apply(this, arguments) };
 Chemr.Index.prototype = {
 	init : function (definition) {
 		this.id = definition.id;
+		this.name = definition.name;
 		this.definition = definition;
 		if (!this.definition.item) this.definition.item = function (i) { return i };
 	},
@@ -22,6 +23,7 @@ Chemr.Index.prototype = {
 			var max  = 300;
 			var res  = [];
 			for (var i = 0, item = null; i < max && (item = itr.next()); i++) {
+				console.log(item);
 				res.push(item);
 			}
 
@@ -69,6 +71,10 @@ Chemr.Index.prototype = {
 		return {
 			hasNext : true,
 			next : function () {
+				if (!this.hasNext) {
+					return null;
+				}
+
 				// by mala http://la.ma.la/blog/diary_200604021538.htm
 				var match = q.exec(self.data);
 				if (!match) {
@@ -78,7 +84,12 @@ Chemr.Index.prototype = {
 				var start = self.data.lastIndexOf("\n", match.index) + 1;
 				var tab   = self.data.lastIndexOf("\t", match.index) + 1;
 				var end   = self.data.indexOf("\n", start);
+				if (end === -1) end = self.data.length - 1;
 				q.lastIndex = end + 1;
+
+				if (self.data.length - 1 <= end + 1) {
+					this.hasNext = false;
+				}
 
 				if (start > tab) {
 					return self.data.slice(start, end).split("\t");
@@ -91,14 +102,14 @@ Chemr.Index.prototype = {
 
 	openIndex : function (args) {
 		var self = this;
-		if (!self.data) {
+		if (!self.data || args.reindex) {
 			return Chemr.IPC.request('getIndex', { id : self.id, reindex: args.reindex }).
 				then(function (data) {
 					self.data = "\n" + data + "\n";
 					return self;
 				});
 		} else {
-			return Promise.resolve();
+			return Promise.resolve(self);
 		}
 	},
 
@@ -112,7 +123,7 @@ Chemr.Index.prototype = {
 		progress("init", current, total);
 
 		return this.definition.index.call({
-			fetch : function (url) {
+			fetchDocument : function (url) {
 				console.log('FETCH', url);
 				return new Promise(function (resolve, reject) {
 					progress("fetch.start", current, ++total);
@@ -132,6 +143,47 @@ Chemr.Index.prototype = {
 				});
 			},
 
+			fetchJSON : function (url) {
+				return this.fetchText(url).then(function (string) {
+					return JSON.parse(string);
+				});
+			},
+
+			fetchText : function (url) {
+				return this.fetchAsXHR({ method: 'GET', url: url }).then(function (req) {
+					if (req.status === 200) {
+						return req.responseText;
+					} else {
+						return Promise.reject(req);
+					}
+				});
+			},
+
+			fetchAsXHR : function (opts) {
+				return new Promise(function (resolve, reject) {
+					progress("fetch.start", current, ++total);
+					var req = new XMLHttpRequest();
+					req.overrideMimeType("text/plain; charset=" + document.characterSet);
+					req.open(opts.method, opts.url, true);
+					if (opts.headers) {
+						for (var k in opts.headers) if (opts.headers.hasOwnProperty(k)) {
+							req.setRequestHeader(k, opts.headers[k]);
+						}
+					}
+					req.onreadystatechange = function () {
+						if (req.readyState == 4) {
+							progress("fetch.done", ++current, total);
+							resolve(req);
+						}
+					};
+					req.onerror = function () {
+						progress("fetch.done", ++current, total);
+						reject(req);
+					};
+					req.send(opts.data || null);
+				});
+			},
+
 
 			//		return self.fetch('foobar').then(function (toc) {
 			//			return self.crawl(list, function (url, doc) {
@@ -146,7 +198,7 @@ Chemr.Index.prototype = {
 					if (list.length) {
 						console.log('CRAWL REMAIN', list.length);
 						var url = list.shift();
-						return self.fetch(url).then(function (doc) {
+						return self.fetchDocument(url).then(function (doc) {
 							progress("crawl.progress", ++current, total);
 							callback.call({
 								pushPage : function (url) {
@@ -178,33 +230,36 @@ Chemr.Index.prototype = {
 };
 Chemr.IPC = null;
 
-Chemr.Index.indexers = new Promise(function (resolve, reject) {
-	glob('./indexers/*.js', {}, function (err, files) {
-		if (err) {
-			console.log(err);
-			return;
-		}
+Chemr.Index.loadIndexers = function () {
+	Chemr.Index.indexers = new Promise(function (resolve, reject) {
+		glob(__dirname + '/indexers/*.js', {}, function (err, files) {
+			if (err) {
+				console.log(err);
+				return;
+			}
 
-		var promises = [];
-		for (var i = 0, it; (it = files[i]); i++) {
-			promises.push(new Promise(function (resolve, reject) {
-				fs.readFile(it, "utf-8", function (err, content) {
-					if (err) {
-						console.log(err);
-						resolve(null);
-						return;
-					}
-					var index = new Chemr.Index(eval(content));
-					console.log('Initilized', index.id);
-					resolve(index);
-				});
-			}));
-		}
+			var promises = [];
+			for (var i = 0, it; (it = files[i]); i++) {
+				promises.push(new Promise(function (resolve, reject) {
+					fs.readFile(it, "utf-8", function (err, content) {
+						if (err) {
+							console.log(err);
+							resolve(null);
+							return;
+						}
+						var index = new Chemr.Index(eval(content));
+						console.log('Initilized', index.id);
+						resolve(index);
+					});
+				}));
+			}
 
-		console.log('Loading all indexers');
-		Promise.all(promises).then(resolve);
+			console.log('Loading all indexers');
+			Promise.all(promises).then(resolve);
+		});
 	});
-});
+	return Chemr.Index.indexers;
+};
 
 Chemr.Index.byId = function (id) {
 	return this.indexers.then(function (indexers) {
@@ -215,3 +270,6 @@ Chemr.Index.byId = function (id) {
 		}
 	});
 };
+
+Chemr.Index.loadIndexers();
+

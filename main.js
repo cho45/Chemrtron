@@ -4,6 +4,7 @@ var ipc = require('ipc');
 var fs = require('fs');
 var BrowserWindow = require('browser-window');
 var Channel = require('./channel');
+var config = require('./config');
 
 require('crash-reporter').start();
 
@@ -21,13 +22,32 @@ var Main = {
 
 	ready : function () {
 		var self = this;
+
+		self.main = new BrowserWindow({width: 1280, height: 900});
+		self.main.loadUrl('file://' + __dirname + '/viewer.html');
+		if (config.DEBUG) self.main.openDevTools();
+		self.main.on('closed', function () {
+			self.main = null;
+		});
+
+		ipc.on('viewer', self.handleViewerIPC.bind(self));
+
+		self.openIndexerProcess();
+	},
+
+	openIndexerProcess : function () {
+		var self = this;
+		if (self.indexer) {
+			self.indexer.window.close();
+		}
+
 		self.indexer = new Channel({
 			ready : function () {
 				var self = this;
 				return new Promise(function (resolve, reject) {
-					self.window = new BrowserWindow({width: 800, height: 600, show: true });
+					self.window = new BrowserWindow({width: 800, height: 600, x: 0, y: 0, show: config.DEBUG });
 					self.window.loadUrl('file://' + __dirname + '/indexer.html');
-					self.window.openDevTools();
+					if (config.DEBUG) self.window.openDevTools();
 					self.window.webContents.on('did-finish-load', resolve);
 				});
 			},
@@ -45,15 +65,6 @@ var Main = {
 				self.main.webContents.send('viewer', args);
 			}
 		});
-
-		self.main = new BrowserWindow({width: 1280, height: 900});
-		self.main.loadUrl('file://' + __dirname + '/viewer.html');
-		self.main.openDevTools();
-		self.main.on('closed', function () {
-			self.main = null;
-		});
-
-		ipc.on('viewer', self.handleViewerIPC.bind(self));
 	},
 
 	handleViewerIPC : function (e, args) {

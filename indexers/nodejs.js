@@ -4,7 +4,7 @@ indexer = {
 
 	index : function () {
 		var self = this;
-		return self.fetch("https://nodejs.org/docs/latest/api/index.html").then(function (document) {
+		return self.fetchDocument("https://nodejs.org/docs/latest/api/index.html").then(function (document) {
 			var links = Array.prototype.map.call(document.querySelectorAll('#apicontent a'), function (i) {
 				return i.href;
 			});

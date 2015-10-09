@@ -3,7 +3,7 @@ indexer = {
 	name: 'ECMAScript 3rd JA',
 
 	index : function (page, document) {
-		return this.fetch("http://www2u.biglobe.ne.jp/~oz-07ams/2002/ecma262r3/fulltoc.html").then(function (document) {
+		return this.fetchDocument("http://www2u.biglobe.ne.jp/~oz-07ams/2002/ecma262r3/fulltoc.html").then(function (document) {
 			var ret = "";
 			var anchors  = $X(".//dt/a", document, Array);
 			var index    = new Array(anchors.length);

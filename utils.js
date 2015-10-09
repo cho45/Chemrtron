@@ -1,26 +1,3 @@
-var http = function (opts) {
-	return new Promise(function (resolve, reject) {
-		var req = new XMLHttpRequest();
-		req.overrideMimeType("text/plain; charset=" + document.characterSet);
-		req.open(opts.method, opts.url, true);
-		if (opts.headers) {
-			for (var k in opts.headers) if (opts.headers.hasOwnProperty(k)) {
-				req.setRequestHeader(k, opts.headers[k]);
-			}
-		}
-		req.onreadystatechange = function () {
-			if (req.readyState == 4) resolve(req);
-		};
-		req.onerror = function () {
-			reject(req);
-		};
-		req.send(opts.data || null);
-	});
-};
-http.get   = function (url)       { return http({method:"get",  url:url}) };
-http.post  = function (url, data) { return http({method:"post", url:url, data:data, headers:{"Content-Type":"application/x-www-form-urlencoded"}}) };
-
-
 function escapeHTML (t) {
 	return t.replace(/[&<>]/g, function (_) { return {'&':'&amp;','<':'&lt;','>':'&gt;'}[_] });
 }

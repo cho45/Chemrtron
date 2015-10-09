@@ -21,9 +21,29 @@ Chemr.IPC = new Channel({
 
 window.onload = function () {
 	var frame = document.getElementById('frame');
-	frame.onload = function () {
-		console.log('onload');
-	};
+	console.log(frame);
+	frame.addEventListener('dom-ready', function (e) {
+		console.log('frame.dom-ready');
+	});
+	frame.addEventListener('did-finish-load', function (e) {
+		console.log('frame is onloaded');
+	});
+	frame.addEventListener('did-start-loading', function (e) {
+		console.log('start spinner');
+//		frame.executeJavaScript('(' +(function() {
+//			var scale = 0.75;
+//			var zoom  = 1/scale * 100;
+//			var style = document.createElement('style');
+//			style.textContent = "html { width: " + zoom + "%; transform: scale(" + scale + "); transform-origin: left top; }";
+//			document.body.appendChild(style);
+//		}).toString()+ ')()');
+	});
+	frame.addEventListener('did-stop-loading', function (e) {
+		console.log('stop spinner');
+	});
+	frame.addEventListener('console-message', function(e) {
+		console.log('[WebView]', e.message);
+	});
 
 	window.onkeydown = function (e) {
 		console.log(e);
