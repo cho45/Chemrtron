@@ -23,7 +23,6 @@ Chemr.Index.prototype = {
 			var max  = 300;
 			var res  = [];
 			for (var i = 0, item = null; i < max && (item = itr.next()); i++) {
-				console.log(item);
 				res.push(item);
 			}
 

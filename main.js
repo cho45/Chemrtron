@@ -3,7 +3,7 @@ var app =  require('app');
 var ipc = require('ipc');
 var fs = require('fs');
 var BrowserWindow = require('browser-window');
-var Channel = require('./channel');
+var Channel = require('./src/channel');
 var config = require('./config');
 
 require('crash-reporter').start();

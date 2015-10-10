@@ -1,6 +1,6 @@
 var remote = require('remote');
 var ipc = require('ipc');
-var Channel = require('./channel');
+var Channel = require('./src/channel');
 
 Polymer({
 	is: "chemr-viewer",
