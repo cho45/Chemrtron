@@ -17,9 +17,21 @@ Polymer({
 		},
 
 		settings : {
-			type: Object
+			type: Object,
+			value: {}
+		},
+
+		settingsTabSelected: {
+			type: Number,
+			value: 1
 		}
 	},
+
+	observers: [
+		"settingsChanged(settings.*)",
+		"settingsChanged(settings.indexers.*)",
+		"settingsChanged(indexers.*)"
+	],
 
 	ready: function() {
 		var self = this;
@@ -42,6 +54,8 @@ Polymer({
 				}
 			}
 		});
+
+		self.openDialog(self.$.settings);
 	},
 
 	attached: function() {
@@ -154,16 +168,6 @@ Polymer({
 				}
 			}, 0);
 		};
-
-		Chemr.Index.indexers.then(function (indexers) {
-			self.set('indexers', indexers);
-			self.async(function () {
-				if (self.settings.lastSelected) {
-					self.$$('[data-indexer-id="' + self.settings.lastSelected + '"]').click();
-				}
-				self.$.input.value = self.settings.lastQuery || "";
-			}, 10);
-		});
 	},
 
 	firstLetter: function (str) {
@@ -255,9 +259,32 @@ Polymer({
 
 	initializeDefaultSettings : function () {
 		this.settings = {
+			enabled: [],
+			developerMode: false,
+
 			lastQuery: "",
 			lastSelected: null
 		};
+	},
+
+	loadedSettings : function () {
+		var self = this;
+		self.settingsChanged({});
+
+		Chemr.Index.indexers.then(function (indexers) {
+			for (var i = 0, it; (it = indexers[i]); i++) {
+				console.log(self.settings);
+				it.enabled = self.settings.enabled.indexOf(it.id) !== -1;
+			}
+
+			self.set('indexers', indexers);
+			self.async(function () {
+				if (self.settings.lastSelected) {
+					self.$$('[data-indexer-id="' + self.settings.lastSelected + '"]').click();
+				}
+				self.$.input.value = self.settings.lastQuery || "";
+			}, 10);
+		});
 	},
 
 	handleIndexerProgress : function (progress) {
@@ -270,5 +297,43 @@ Polymer({
 			self.$.toastProgress.duration = 0xffffff;
 		}
 		self.$.toastProgress.show();
+	},
+
+	openDialog : function (dialog) {
+		var self = this;
+		dialog.open();
+		dialog.style.visibility = 'hidden';
+		self.async(function() {
+			dialog.refit();
+			dialog.style.visibility = 'visible';
+		}, 10);
+	},
+
+	onSettingButtonTap : function () {
+		var self = this;
+		self.openDialog(self.$.settings);
+	},
+
+	settingsChanged : function (change) {
+		var self = this;
+		if (!self.settings) return;
+		// console.log('settingsChanged', change);
+		document.title = self.settings.developerMode? "ｷﾒｪwwwww" : "Chemr";
+
+		if (change.path) {
+			if (change.path.match(/^indexers\.(\d+)\.enabled/)) {
+				var indexer = self.indexers[RegExp.$1];
+
+				var current = self.settings.enabled || [];
+				var enabled = current.concat(indexer.id).reduce(function (r, i) {
+					if (r.indexOf(i) === -1) {
+						r.push(i);
+					}
+					return r;
+				}, []);
+
+				self.set('settings.enabled', enabled);
+			}
+		}
 	}
 });

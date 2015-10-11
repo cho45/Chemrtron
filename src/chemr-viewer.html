@@ -59,7 +59,7 @@
 			background: var(--paper-blue-grey-50);
 			transition: width 0.2s linear;
 			position: absolute;
-			z-index: 99;
+			z-index: 2;
 			width: 72px;
 		}
 
@@ -173,6 +173,16 @@
 		#container #webviewContainer #webviewToolbar:hover {
 			margin-top: 0;
 		}
+
+		#settings iron-pages {
+			position: relative;
+			height: 300px;
+		}
+
+		#settings .page {
+			@apply(--layout-fit);
+			padding: 16px;
+		}
 	</style>
 
 	<template>
@@ -181,22 +191,24 @@
 				<div class="fit layout vertical">
 					<paper-menu class="flex">
 						<template is="dom-repeat" items="{{indexers}}">
-							<paper-icon-item data-indexer-id$="{{item.id}}" on-tap="selectIndex">
-								<div class="index-icon" item-icon>{{firstLetter(item.name)}}</div>
-								<paper-item-body>
-									<div>{{item.name}}</div>
-								</paper-item-body>
-								<paper-menu-button>
-									<paper-icon-button icon="settings" class="dropdown-trigger"></paper-icon-button>
-									<paper-menu class="dropdown-content" selectable="none">
-										<paper-item on-tap="reindex">Reindex</paper-item>
-									</paper-menu>
-								</paper-menu-button>
-							</paper-icon-item>
+							<template is="dom-if" if="{{item.enabled}}">
+								<paper-icon-item data-indexer-id$="{{item.id}}" on-tap="selectIndex">
+									<div class="index-icon" item-icon>{{firstLetter(item.name)}}</div>
+									<paper-item-body>
+										<div>{{item.name}}</div>
+									</paper-item-body>
+									<paper-menu-button>
+										<paper-icon-button icon="settings" class="dropdown-trigger"></paper-icon-button>
+										<paper-menu class="dropdown-content" selectable="none">
+											<paper-item on-tap="reindex">Reindex</paper-item>
+										</paper-menu>
+									</paper-menu-button>
+								</paper-icon-item>
+							</template>
 						</template>
 					</paper-menu>
 					<div style="text-align: center; height: 72px">
-						<paper-icon-button icon="settings"></paper-icon-button>
+						<paper-icon-button icon="settings" on-tap="onSettingButtonTap"></paper-icon-button>
 					</div>
 				</div>
 			</div>
@@ -230,9 +242,37 @@
 		<paper-toast id="toastProgress" duration="3000" style="z-index: 1000">
 			<paper-progress id="toastProgressProgress" style="width: 100%; margin: 8px 0;"></paper-progress>
 		</paper-toast>
+
+		<paper-dialog id="settings" modal style="width: 100%; max-width: 900px;">
+			<h2>Settings</h2>
+			<paper-tabs selected="{{settingsTabSelected}}">
+				<paper-tab>General</paper-tab>
+				<paper-tab>Indexers</paper-tab>
+			</paper-tabs>
+			<iron-pages selected="{{settingsTabSelected}}">
+				<div class="page">
+					<paper-checkbox checked="{{settings.developerMode}}">Developer mode</paper-checkbox>
+				</div>
+
+				<div class="page">
+					<paper-menu>
+					<template is="dom-repeat" items="{{indexers}}">
+						<paper-icon-item>
+							<paper-checkbox item-icon checked="{{item.enabled}}"></paper-checkbox>
+							<div class="flex">{{item.name}}</div>
+						</paper-icon-item>
+					</template>
+					</paper-menu>
+				</div>
+			</iron-pages>
+			<div class="buttons">
+				<paper-button dialog-dismiss>Close</paper-button>
+			</div>
+		</paper-dialog>
 		
 		<iron-localstorage name="chemer-viewer-settings"
 			value="{{settings}}"
+			on-iron-localstorage-load="loadedSettings"
 			on-iron-localstorage-load-empty="initializeDefaultSettings"
 			></iron-localstorage>
 	</template>
