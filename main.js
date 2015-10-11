@@ -103,6 +103,21 @@ var Main = {
 			return this.indexer.request('echo', params);
 		},
 
+		debug : function (params) {
+			var self = this;
+			console.log('ipc debug', params);
+			if (params.debug) {
+				self.main.openDevTools();
+				self.indexer.window.openDevTools();
+				self.indexer.window.show();
+			} else {
+				self.main.closeDevTools();
+				self.indexer.window.closeDevTools();
+				self.indexer.window.hide();
+			}
+			return Promise.resolve();
+		},
+
 		getIndex : function (params) {
 			var self = this;
 

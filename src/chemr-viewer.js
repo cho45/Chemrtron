@@ -33,7 +33,7 @@ Polymer({
 		"settingsChanged(indexers.*)"
 	],
 
-	ready: function() {
+	created : function () {
 		var self = this;
 		Chemr.IPC = new Channel({
 			recv : function (callback) {
@@ -55,6 +55,10 @@ Polymer({
 			}
 		});
 
+	},
+
+	ready: function() {
+		var self = this;
 		self.openDialog(self.$.settings);
 
 		var indexListOpened = false;
@@ -330,7 +334,13 @@ Polymer({
 		var self = this;
 		if (!self.settings) return;
 		// console.log('settingsChanged', change);
-		document.title = self.settings.developerMode? "ｷﾒｪwwwww" : "Chemr";
+		if (self.settings.developerMode) {
+			document.title = "ｷﾒｪwwwww";
+			Chemr.IPC.request('debug', { debug: true });
+		} else {
+			document.title = "Chemr";
+			Chemr.IPC.request('debug', { debug: false });
+		}
 
 		if (change.path) {
 			if (change.path.match(/^indexers\.(\d+)\.enabled/)) {
