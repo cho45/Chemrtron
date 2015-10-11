@@ -59,7 +59,7 @@ Polymer({
 
 	ready: function() {
 		var self = this;
-		self.openDialog(self.$.settings);
+		// self.openDialog(self.$.settings);
 
 		var indexListOpened = false;
 		self.$.indexList.onmouseenter = function () {

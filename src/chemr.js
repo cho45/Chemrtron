@@ -116,117 +116,130 @@ Chemr.Index.prototype = {
 	runIndexer : function (progress) {
 		if (!progress) progress = function () {};
 
-		var current = 0;
-		var total = 1;
+		var context = new Chemr.Index.IndexerContext(this.id, progress);
 
-		progress("init", current, total);
-
-		return this.definition.index.call({
-			fetchDocument : function (url) {
-				console.log('FETCH', url);
-				return new Promise(function (resolve, reject) {
-					progress("fetch.start", current, ++total);
-
-					var iframe = document.createElement('iframe');
-					// enable sandbox
-					iframe.sandbox = "";
-					document.body.appendChild(iframe);
-					iframe.onload = function () {
-						console.log('iframe DOMContentLoaded');
-						var document = iframe.contentDocument;
-						resolve(document);
-						iframe.parentNode.removeChild(iframe);
-						progress("fetch.done", ++current, total);
-					};
-					iframe.src = url;
-				});
-			},
-
-			fetchJSON : function (url) {
-				return this.fetchText(url).then(function (string) {
-					return JSON.parse(string);
-				});
-			},
-
-			fetchText : function (url) {
-				return this.fetchAsXHR({ method: 'GET', url: url }).then(function (req) {
-					if (req.status === 200) {
-						return req.responseText;
-					} else {
-						return Promise.reject(req);
-					}
-				});
-			},
-
-			fetchAsXHR : function (opts) {
-				return new Promise(function (resolve, reject) {
-					progress("fetch.start", current, ++total);
-					var req = new XMLHttpRequest();
-					req.overrideMimeType("text/plain; charset=" + document.characterSet);
-					req.open(opts.method, opts.url, true);
-					if (opts.headers) {
-						for (var k in opts.headers) if (opts.headers.hasOwnProperty(k)) {
-							req.setRequestHeader(k, opts.headers[k]);
-						}
-					}
-					req.onreadystatechange = function () {
-						if (req.readyState == 4) {
-							progress("fetch.done", ++current, total);
-							resolve(req);
-						}
-					};
-					req.onerror = function () {
-						progress("fetch.done", ++current, total);
-						reject(req);
-					};
-					req.send(opts.data || null);
-				});
-			},
-
-
-			//		return self.fetch('foobar').then(function (toc) {
-			//			return self.crawl(list, function (url, doc) {
-			//			});
-			//		});
-			crawl: function (list, callback) {
-				var self = this;
-				var index = [];
-				total += list.length;
-				progress("crawl.start", current, total);
-				function _crawl() {
-					if (list.length) {
-						console.log('CRAWL REMAIN', list.length);
-						var url = list.shift();
-						return self.fetchDocument(url).then(function (doc) {
-							progress("crawl.progress", ++current, total);
-							callback.call({
-								pushPage : function (url) {
-									total++;
-									progress("crawl.progress", current, ++total);
-									list.push(url);
-								},
-
-								pushIndex : function (name, url) {
-									index.push(name + "\t" + url);
-								}
-							}, url, doc);
-
-							return _crawl();
-						});
-					} else {
-						return Promise.resolve(index.join("\n"));
-					}
-				}
-
-				return _crawl();
-			}
-		}).
+		return this.definition.index.call(context, [ context ]).
 		then(function (data) {
-			progress("done", ++current, total);
+			context.done();
 			return data;
 		});
 	}
 };
+Chemr.Index.IndexerContext = function () { this.init.apply(this, arguments) };
+Chemr.Index.IndexerContext.prototype = {
+	init : function (id, progress) {
+		this.id = id;
+		this.progress = progress;
+		this.current = 0;
+		this.total = 1;
+		this.progress("init", this.current, this.total);
+	},
+
+	fetchDocument : function (url) {
+		var self = this;
+		console.log('FETCH', url);
+		return new Promise(function (resolve, reject) {
+			self.progress("fetch.start", self.current, ++self.total);
+
+			var iframe = document.createElement('iframe');
+			// enable sandbox
+			iframe.sandbox = "";
+			document.body.appendChild(iframe);
+			iframe.onload = function () {
+				console.log('iframe DOMContentLoaded');
+				var document = iframe.contentDocument;
+				resolve(document);
+				iframe.parentNode.removeChild(iframe);
+				self.progress("fetch.done", ++self.current, self.total);
+			};
+			iframe.src = url;
+		});
+	},
+
+	fetchJSON : function (url) {
+		return this.fetchText(url).then(function (string) {
+			return JSON.parse(string);
+		});
+	},
+
+	fetchText : function (url) {
+		return this.fetchAsXHR({ method: 'GET', url: url }).then(function (req) {
+			if (req.status === 200) {
+				return req.responseText;
+			} else {
+				return Promise.reject(req);
+			}
+		});
+	},
+
+	fetchAsXHR : function (opts) {
+		return new Promise(function (resolve, reject) {
+			self.progress("fetch.start", self.current, ++self.total);
+			var req = new XMLHttpRequest();
+			req.overrideMimeType("text/plain; charset=" + document.characterSet);
+			req.open(opts.method, opts.url, true);
+			if (opts.headers) {
+				for (var k in opts.headers) if (opts.headers.hasOwnProperty(k)) {
+					req.setRequestHeader(k, opts.headers[k]);
+				}
+			}
+			req.onreadystatechange = function () {
+				if (req.readyState == 4) {
+					self.progress("fetch.done", ++self.current, self.total);
+					resolve(req);
+				}
+			};
+			req.onerror = function () {
+				self.progress("fetch.done", ++self.current, self.total);
+				reject(req);
+			};
+			req.send(opts.data || null);
+		});
+	},
+
+
+	//		return self.fetch('foobar').then(function (toc) {
+	//			return self.crawl(list, function (url, doc) {
+	//			});
+	//		});
+	crawl: function (list, callback) {
+		var self = this;
+		var index = [];
+		self.total += list.length;
+		self.progress("crawl.start", self.current, self.total);
+		function _crawl() {
+			if (list.length) {
+				console.log('CRAWL REMAIN', list.length);
+				var url = list.shift();
+				return self.fetchDocument(url).then(function (doc) {
+					self.progress("crawl.progress", ++self.current, self.total);
+					callback.call({
+						pushPage : function (url) {
+							total++;
+							self.progress("crawl.progress", self.current, ++self.total);
+							list.push(url);
+						},
+
+						pushIndex : function (name, url) {
+							index.push(name + "\t" + url);
+						}
+					}, url, doc);
+
+					return _crawl();
+				});
+			} else {
+				return Promise.resolve(index.join("\n"));
+			}
+		}
+
+		return _crawl();
+	},
+
+	done : function () {
+		this.progress("done", ++this.current, this.total);
+	}
+};
+
 Chemr.IPC = null;
 
 Chemr.Index.loadIndexers = function () {
