@@ -63,7 +63,7 @@
 			width: 72px;
 		}
 
-		#container #indexList:hover > div {
+		#container #indexList.open > div {
 			position: absolute;
 			width: 20em;
 			@apply(--shadow-elevation-4dp);
@@ -96,8 +96,8 @@
 			opacity: 0;
 		}
 
-		#container #indexList:hover paper-item-body ,
-		#container #indexList:hover paper-menu-button {
+		#container #indexList.open paper-item-body ,
+		#container #indexList.open paper-menu-button {
 			width: auto;
 			margin: 0 16px 0 0;
 			padding: 8px;

@@ -56,6 +56,18 @@ Polymer({
 		});
 
 		self.openDialog(self.$.settings);
+
+		var indexListOpened = false;
+		self.$.indexList.onmouseenter = function () {
+			indexListOpened = true;
+			self.debounce('indexListHover', function () {
+				self.toggleClass('open', indexListOpened, self.$.indexList);
+			}, 1000);
+		};
+		self.$.indexList.onmouseleave = function () {
+			indexListOpened = false;
+			self.toggleClass('open', indexListOpened, self.$.indexList);
+		};
 	},
 
 	attached: function() {
