@@ -62,7 +62,7 @@ Polymer({
 			indexListOpened = true;
 			self.debounce('indexListHover', function () {
 				self.toggleClass('open', indexListOpened, self.$.indexList);
-			}, 1000);
+			}, 3000);
 		};
 		self.$.indexList.onmouseleave = function () {
 			indexListOpened = false;
@@ -337,14 +337,23 @@ Polymer({
 				var indexer = self.indexers[RegExp.$1];
 
 				var current = self.settings.enabled || [];
-				var enabled = current.concat(indexer.id).reduce(function (r, i) {
+				if (change.value) {
+					current.push(indexer.id);
+				} else {
+					current = current.filter(function (i) {
+						return i !== indexer.id;
+					});
+				}
+				current = current.reduce(function (r, i) {
 					if (r.indexOf(i) === -1) {
 						r.push(i);
 					}
 					return r;
 				}, []);
 
-				self.set('settings.enabled', enabled);
+				console.log(self.settings);
+				self.set('settings.enabled', current);
+				// self.$.storage.save();
 			}
 		}
 	}
