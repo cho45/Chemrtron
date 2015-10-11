@@ -255,14 +255,12 @@
 				</div>
 
 				<div class="page">
-					<paper-menu>
 					<template is="dom-repeat" items="{{indexers}}">
 						<paper-icon-item>
 							<paper-checkbox item-icon checked="{{item.enabled}}"></paper-checkbox>
 							<div class="flex">{{item.name}}</div>
 						</paper-icon-item>
 					</template>
-					</paper-menu>
 				</div>
 			</iron-pages>
 			<div class="buttons">
