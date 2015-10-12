@@ -12,6 +12,25 @@ Features
  * Create index on-demand
  * Same incremental search user interface to all document
 
+Development
+===========
+
+### Install Electron
+
+Chemrtron is built with Electron.
+
+	npm -g install electron-prebuilt
+
+### Clone Repository
+
+	git clone https://github.com/cho45/Chemrtron.git
+
+
+### Launch
+
+	cd Chemrtron
+	electron .
+
 
 Indexer
 ======
