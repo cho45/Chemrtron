@@ -1,7 +1,7 @@
 Chemrtron
 =========
 
-A document viewer.
+A document viewer; fuzzy match incremental search.
 
 
 Features
@@ -14,7 +14,10 @@ Features
 Indexer
 ======
 
-./indexer/*.js
+## Search Path
+
+ 1. ~/.chemer/indexers/*.js
+ 2. ./indexer/*.js
 
 
 ## Indexer definition
@@ -28,8 +31,16 @@ Unique id of this indexer.
 
 Display name of this indexer;
 
+### `item` function(item: Object) => Object
 
-### `index` function() => Promise&lt;String&gt;
+Callback of item called when item will be shown.
+
+### `beforeSearch` function(query: string) => string
+
+A function for query translator.
+
+
+### `index` function(ctx: IndexerContext) : Promise&lt;String&gt;
 
 A function which returns Promise instance of index data.
 
@@ -41,28 +52,19 @@ Index data is following format:
 
 Created index data is cached under ./cache as a file.
 
-### `item` function(item: Object) => Object
+## `index` context APIs
 
-Callback of item called when item will be shown.
+### `pushIndex(name, url)`
 
-### `beforeSearch` function(query: string) => string
+### `fetchDocument(url) : Promise<HTMLDocument>`
 
-A function for query translator.
+### `fetchJSON(url) : Promise<Object>`
+
+### `fetchText(url) : Promise<string>`
+
+### `fetchAsXHR(opts) : Promise<XMLHttpRequest>`
+
+### `crawl(list: Array<string | object>, callback: function (url, doc: HTMLDocument):void)`
 
 
-## `index` APIs
-
-### `http()` `http.get()` `http.post()`
-
-A wrapper for XMLHttpRequest.
-
-### `this.fetch(url: string) => Promise<HTMLDocument>`
-
-Get the url and create HTMLDocument.
-
-### `this.crawl(list: Array<string>, callback: function (url: string, document: HTMLDocument)`
-
-#### `this.pushIndex(name, value)`
-
-#### `this.pushPage(url)`
 

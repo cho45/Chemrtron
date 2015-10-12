@@ -1,6 +1,7 @@
 var remote = require('remote');
 var glob = remote.require('glob');
 var fs = remote.require('fs');
+var os = remote.require('os');
 
 var Chemr = {};
 
@@ -141,7 +142,14 @@ Chemr.Index.IndexerContext.prototype = {
 
 	pushIndex: function (name, url) {
 		if (!url) url = "";
-		this.index[this.index.length] = name + "\t" + url + "\n";
+		name = name.replace(/\s+/g, ' ');
+		var line = name + "\t" + url + "\n";
+		for (var i = 0, len = this.index.length; i < len; i++) {
+			if (this.index[i] === line) {
+				return;
+			}
+		}
+		this.index[this.index.length] = line;
 	},
 
 	finalize : function () {
@@ -158,13 +166,35 @@ Chemr.Index.IndexerContext.prototype = {
 			// enable sandbox
 			iframe.sandbox = "";
 			document.body.appendChild(iframe);
-			iframe.onload = function () {
+			var timer = setTimeout(function () {
+				reject('timeout');
+			}, 30 * 1000);
+			var ready = function () {
+				clearTimeout(timer);
 				console.log('iframe DOMContentLoaded');
 				var document = iframe.contentDocument;
 				resolve(document);
 				iframe.parentNode.removeChild(iframe);
 				self.progress("fetch.done", ++self.current, self.total);
+
+				// fire at once
+				ready = function () {};
 			};
+
+			setTimeout(function check () {
+				var document = iframe.contentDocument;
+				if (
+					document &&
+					document.URL && 
+					document.URL.indexOf("about:") !== 0 &&
+					document.readyState === "interactive"
+				) {
+					return ready();
+				}
+				setTimeout(check, 1);
+			}, 1);
+
+			iframe.onload = ready;
 			iframe.src = url;
 		});
 	},
@@ -220,17 +250,22 @@ Chemr.Index.IndexerContext.prototype = {
 		var self = this;
 		self.total += list.length;
 		self.progress("crawl.start", self.current, self.total);
+		var seen = {};
 		function _crawl() {
 			if (list.length) {
 				console.log('CRAWL REMAIN', list.length);
 				var url = list.shift();
-				return self.fetchDocument(url).then(function (doc) {
+				var req =  (typeof url === 'string') ? url : url.url;
+				return self.fetchDocument(req).then(function (doc) {
 					self.progress("crawl.progress", ++self.current, self.total);
 					callback.call({
 						pushPage : function (url) {
-							total++;
-							self.progress("crawl.progress", self.current, ++self.total);
-							list.push(url);
+							if (!seen[url]) {
+								seen[url] = true;
+								self.total++;
+								self.progress("crawl.progress", self.current, ++self.total);
+								list.push(url);
+							}
 						}
 					}, url, doc);
 
@@ -250,35 +285,49 @@ Chemr.Index.IndexerContext.prototype = {
 Chemr.IPC = null;
 
 Chemr.Index.loadIndexers = function () {
-	Chemr.Index.indexers = new Promise(function (resolve, reject) {
-		glob(__dirname + '/indexers/*.js', {}, function (err, files) {
-			if (err) {
-				console.log(err);
-				return;
-			}
+	var loadFiles = function (target) {
+		return new Promise(function (resolve, reject) {
+			glob(target, {}, function (err, files) {
+				if (err) {
+					console.log(err);
+					return;
+				}
 
-			var promises = [];
-			files.forEach(function (it) {
-				promises.push(new Promise(function (resolve, reject) {
-					fs.readFile(it, "utf-8", function (err, content) {
-						if (err) {
-							console.log(err);
-							resolve(null);
-							return;
-						}
-						var index = new Chemr.Index(eval(content + "\n//# sourceURL=" + it));
-						console.log('Initilized', index.id);
-						resolve(index);
-					});
-				}));
+				var promises = [];
+				files.forEach(function (it) {
+					promises.push(new Promise(function (resolve, reject) {
+						fs.readFile(it, "utf-8", function (err, content) {
+							if (err) {
+								console.log(err);
+								resolve(null);
+								return;
+							}
+							var index = new Chemr.Index(eval(content + "\n//# sourceURL=" + it));
+							console.log('Initilized', index.id);
+							resolve(index);
+						});
+					}));
+				});
+
+				Promise.all(promises).then(resolve);
 			});
-
-			console.log('Loading all indexers');
-			Promise.all(promises).then(resolve);
 		});
-	});
-	return Chemr.Index.indexers;
+	};
+
+	console.log('Loading all indexers');
+	Chemr.Index.indexers = Promise.resolve([]).
+		then(function (ret) {
+			return loadFiles(os.homedir() + "/.chemr/indexers/*.js").then(function (a) {
+				return ret.concat(a);
+			});
+		}).
+		then(function (ret) {
+			return loadFiles(__dirname + '/indexers/*.js').then(function (a) {
+				return ret.concat(a);
+			});
+		});
 };
+
 
 Chemr.Index.byId = function (id) {
 	return this.indexers.then(function (indexers) {

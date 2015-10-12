@@ -9,26 +9,15 @@ var Indexer = {
 	_indexersById: {}
 };
 
-glob('./indexers/*.js', {}, function (err, files) {
+glob('/usr/share/man/man?/*', {}, function (err, files) {
 	if (err) {
 		console.log(err);
 		return;
 	}
 
 	for (var i = 0, it; (it = files[i]); i++) {
-		var indexer = require(it);
-		Indexer.indexers.push(indexer);
-		if (indexer.init) {
-			indexer.init();
-		}
-		Indexer._indexersById[indexer.id] = indexer;
-		console.log('Indexer', indexer.name, indexer.id, 'is initialized');
+		console.log(it);
 	}
 
 });
 
-module.exports = Indexer;
-
-// indexer はクロスオリジン特権が必要
-// indexer はサンドボックス化されたウィンドウが必要
-//
