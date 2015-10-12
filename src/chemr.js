@@ -118,8 +118,11 @@ Chemr.Index.prototype = {
 
 		var context = new Chemr.Index.IndexerContext(this.id, progress);
 
-		return this.definition.index.call(context, [ context ]).
+		return this.definition.index.call(context, context).
 		then(function (data) {
+			if (!data) {
+				data = context.finalize();
+			}
 			context.done();
 			return data;
 		});
@@ -129,10 +132,20 @@ Chemr.Index.IndexerContext = function () { this.init.apply(this, arguments) };
 Chemr.Index.IndexerContext.prototype = {
 	init : function (id, progress) {
 		this.id = id;
+		this.index = [];
 		this.progress = progress;
 		this.current = 0;
 		this.total = 1;
 		this.progress("init", this.current, this.total);
+	},
+
+	pushIndex: function (name, url) {
+		if (!url) url = "";
+		this.index[this.index.length] = name + "\t" + url + "\n";
+	},
+
+	finalize : function () {
+		return this.index.join('');
 	},
 
 	fetchDocument : function (url) {
@@ -173,6 +186,7 @@ Chemr.Index.IndexerContext.prototype = {
 	},
 
 	fetchAsXHR : function (opts) {
+		var self = this;
 		return new Promise(function (resolve, reject) {
 			self.progress("fetch.start", self.current, ++self.total);
 			var req = new XMLHttpRequest();
@@ -204,7 +218,6 @@ Chemr.Index.IndexerContext.prototype = {
 	//		});
 	crawl: function (list, callback) {
 		var self = this;
-		var index = [];
 		self.total += list.length;
 		self.progress("crawl.start", self.current, self.total);
 		function _crawl() {
@@ -218,17 +231,11 @@ Chemr.Index.IndexerContext.prototype = {
 							total++;
 							self.progress("crawl.progress", self.current, ++self.total);
 							list.push(url);
-						},
-
-						pushIndex : function (name, url) {
-							index.push(name + "\t" + url);
 						}
 					}, url, doc);
 
 					return _crawl();
 				});
-			} else {
-				return Promise.resolve(index.join("\n"));
 			}
 		}
 
@@ -251,7 +258,7 @@ Chemr.Index.loadIndexers = function () {
 			}
 
 			var promises = [];
-			for (var i = 0, it; (it = files[i]); i++) {
+			files.forEach(function (it) {
 				promises.push(new Promise(function (resolve, reject) {
 					fs.readFile(it, "utf-8", function (err, content) {
 						if (err) {
@@ -259,12 +266,12 @@ Chemr.Index.loadIndexers = function () {
 							resolve(null);
 							return;
 						}
-						var index = new Chemr.Index(eval(content));
+						var index = new Chemr.Index(eval(content + "\n//# sourceURL=" + it));
 						console.log('Initilized', index.id);
 						resolve(index);
 					});
 				}));
-			}
+			});
 
 			console.log('Loading all indexers');
 			Promise.all(promises).then(resolve);

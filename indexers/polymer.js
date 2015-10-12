@@ -2,15 +2,12 @@ indexer = {
 	id: 'polymer',
 	name: 'Polymer Elements',
 
-	index : function () {
-		return this.fetchJSON('https://elements.polymer-project.org/catalog.json').
+	index : function (ctx) {
+		return ctx.fetchJSON('https://elements.polymer-project.org/catalog.json').
 		then(function (data) {
-			var index = "";
 			for (var i = 0, it; (it = data.elements[i]); i++) {
-				console.log(it);
-				index += it.name + "\t\n";
+				ctx.pushIndex(it.name);
 			}
-			return index;
 		});
 	},
 

@@ -216,7 +216,7 @@ Polymer({
 				self.$.input.placeholder = index.name;
 				return index.openIndex({ reindex: false }) ;
 			}).
-			catch(function (error) { alert(error) });
+			catch(function (error) { alert(error.stack) });
 		self.set('index', index);
 		self.set('settings.lastSelected', id);
 		self.$.input.value = "";
@@ -243,7 +243,10 @@ Polymer({
 
 		var index = Chemr.Index.byId(id).
 			then(function (index) { return index.openIndex({ reindex: true }) }).
-			catch(function (error) { alert(error) });
+			catch(function (error) {
+				console.log('Error while reindex', error);
+				alert(error.stack);
+			});
 
 		// set after reindex completed
 		index.then(function () {

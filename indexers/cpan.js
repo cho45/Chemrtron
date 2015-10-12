@@ -2,17 +2,15 @@ indexer = {
 	id: 'cpan',
 	name: 'CPAN',
 
-	index : function () {
+	index : function (ctx) {
 		console.log('fetch http://www.cpan.org/modules/02packages.details.txt');
-		return this.fetchText('http://www.cpan.org/modules/02packages.details.txt').
+		return ctx.fetchText('http://www.cpan.org/modules/02packages.details.txt').
 		then(function (str) {
 			var reg = /^([a-z0-9:_]*?[a-z0-9_])\s+/img;
-			var index = "";
 			while (reg.exec(str)) {
-				index += RegExp.$1 + "\t\n";
+				ctx.pushIndex(RegExp.$1);
 			}
 			console.log('done');
-			return index;
 		});
 	},
 

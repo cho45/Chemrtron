@@ -5,6 +5,7 @@ var fs = require('fs');
 var BrowserWindow = require('browser-window');
 var Channel = require('./src/channel');
 var config = require('./config');
+var serializeError = require('./src/utils').serializeError;
 
 require('crash-reporter').start();
 
@@ -90,7 +91,7 @@ var Main = {
 				result: result
 			});
 		}, function (error) {
-			console.log('Error', serializeError(error));
+			// console.log('Error', serializeError(error));
 			e.sender.send('viewer', {
 				id: args.id,
 				error: serializeError(error)

@@ -48,10 +48,15 @@ function $X (exp, context, type /* want type */) {
 
 
 function serializeError (e) {
-	console.log('serializeError', e, e.stack);
-	var stack = e.stack;
-	return {
-		name : String(e),
-		stack : e.stack
-	};
+	if (e instanceof Error) {
+		var stack = e.stack;
+		return {
+			name : String(e),
+			stack : e.stack
+		};
+	} else {
+		return e;
+	}
 }
+
+this.serializeError = serializeError;

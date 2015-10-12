@@ -2,9 +2,8 @@ indexer = {
 	id: 'mdn',
 	name: 'MDN',
 
-	index : function () {
+	index : function (ctx) {
 		var self = this;
-		var index = "";
 
 		function _search(url) {
 			console.log('MDN search', url);
@@ -13,14 +12,14 @@ indexer = {
 				console.log('MDN search', results.page, results.pages);
 
 				for (var i = 0, it; (it = results.documents[i]); i++) {
-					index += it.title + "\t" + it.slug + "\n";
+					ctx.pushIndex(it.title, it.slug);
 				}
 
 				if (results.next) {
 					return _search(results.next);
 				} else {
 					// all done
-					return index;
+					return;
 				}
 			});
 		}
