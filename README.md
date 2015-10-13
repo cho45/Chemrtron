@@ -38,7 +38,7 @@ Indexer
 ## Search Path
 
  1. ~/.chemer/indexers/*.js
- 2. ./indexer/*.js
+ 2. ./indexers/*.js
 
 
 ## Indexer definition
