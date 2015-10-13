@@ -193,29 +193,27 @@
 				<div class="fit layout vertical">
 					<div class="flex relative">
 						<paper-menu class="fit" style="overflow: hidden; direction: rtl; background: transparent">
-							<template is="dom-repeat" items="{{indexers}}">
-								<template is="dom-if" if="{{item.enabled}}">
-									<paper-icon-item data-indexer-id$="{{item.id}}" on-tap="selectIndex" style="direction: ltr">
-										<div class="index-icon" item-icon>
-											<template is="dom-if" if="{{item.icon}}">
-												<iron-image style="width: 100%; height: 100%; background: #fff" sizing="contain" src="{{item.icon}}"></iron-image>
-											</template>
-											<template is="dom-if" if="{{!item.icon}}">
-												<div>{{firstLetter(item.name)}}</div>
-											</template>
-										</div>
+							<template is="dom-repeat" items="{{selectedIndexers}}">
+								<paper-icon-item data-indexer-id$="{{item.id}}" on-tap="selectIndex" style="direction: ltr">
+									<div class="index-icon" item-icon>
+										<template is="dom-if" if="{{item.icon}}">
+											<iron-image style="width: 100%; height: 100%; background: #fff" sizing="contain" src="{{item.icon}}"></iron-image>
+										</template>
+										<template is="dom-if" if="{{!item.icon}}">
+											<div>{{firstLetter(item.name)}}</div>
+										</template>
+									</div>
 
-										<paper-item-body>
-											<div>{{item.name}}</div>
-										</paper-item-body>
-										<paper-menu-button>
-											<paper-icon-button icon="settings" class="dropdown-trigger"></paper-icon-button>
-											<paper-menu class="dropdown-content" selectable="none">
-												<paper-item on-tap="reindex">Reindex</paper-item>
-											</paper-menu>
-										</paper-menu-button>
-									</paper-icon-item>
-								</template>
+									<paper-item-body>
+										<div>{{item.name}}</div>
+									</paper-item-body>
+									<paper-menu-button>
+										<paper-icon-button icon="settings" class="dropdown-trigger"></paper-icon-button>
+										<paper-menu class="dropdown-content" selectable="none">
+											<paper-item on-tap="reindex">Reindex</paper-item>
+										</paper-menu>
+									</paper-menu-button>
+								</paper-icon-item>
 							</template>
 						</paper-menu>
 					</div>

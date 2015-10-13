@@ -19,6 +19,11 @@ Polymer({
 			value: []
 		},
 
+		selectedIndexers : {
+			type: Array,
+			computed: 'computeSelectedIndexers(indexers, settings.enabled)'
+		},
+
 		settings : {
 			type: Object,
 			value: {}
@@ -65,20 +70,18 @@ Polymer({
 		// self.openDialog(self.$.about);
 
 		var indexListOpened = false;
-//		self.$.indexList.onmouseenter = function () {
-//			indexListOpened = true;
-//			self.debounce('indexListHover', function () {
-//				self.toggleClass('open', indexListOpened, self.$.indexList);
-//			}, 3000);
-//		};
+		self.$.indexList.oncontextmenu = function (e) {
+			indexListOpened = true;
+			self.toggleClass('open', indexListOpened, self.$.indexList);
+		};
 		self.$.indexList.ondblclick = function () {
 			indexListOpened = true;
 			self.toggleClass('open', indexListOpened, self.$.indexList);
 		};
-//		self.$.indexList.onmouseleave = function () {
-//			indexListOpened = false;
-//			self.toggleClass('open', indexListOpened, self.$.indexList);
-//		};
+		self.$.indexList.onmouseleave = function () {
+			indexListOpened = false;
+			self.toggleClass('open', indexListOpened, self.$.indexList);
+		};
 
 		var scrollTarget = self.$.indexList.querySelector('paper-menu');
 		self.$.indexList.onwheel = function (e) {
@@ -397,6 +400,18 @@ Polymer({
 		e.stopPropagation();
 		var link = e.target.href;
 		require('shell').openExternal(link);
+	},
+
+	computeSelectedIndexers : function () {
+		var self = this;
+		var map = {};
+		for (var i = 0, it; (it = self.indexers[i]); i++) {
+			if (map[it.id]) continue;
+			map[it.id] = it;
+		}
+		return self.settings.enabled.map(function (id) {
+			return map[id];
+		});
 	},
 
 	initMenu : function () {
