@@ -182,19 +182,17 @@ Polymer({
 			}
 		};
 
-		self.$.select.onchange = function () {
+		self.$.select.addEventListener('selected-changed', function () {
 			self.debounce('load', function () {
-				var option = select.childNodes[select.selectedIndex];
-				var url = option.value;
+				var url = self.$.select.selectedItem.value;
 				console.log('load', url);
 				frame.stop();
 				frame.src = url;
 			}, 500);
-		};
+		});
 
 		self.$.input.inputElement.onkeydown = function (e) {
 			var key = (e.altKey?"Alt-":"")+(e.ctrlKey?"Control-":"")+(e.metaKey?"Meta-":"")+(e.shiftKey?"Shift-":"")+e.key;   
-			var select = self.$.select;
 			var input = self.$.input.inputElement;
 
 			if (key === 'Enter') {
@@ -203,16 +201,12 @@ Polymer({
 			if (key === 'Control-n' || key === 'ArrowDown') {
 				e.preventDefault();
 
-				var option = select.childNodes[select.selectedIndex + 1]; // no warnings
-				if (option) option.selected = true;
-				select.onchange();
+				self.$.select.selectNext();
 			} else
 			if (key === 'Control-p' || key === 'ArrowUp') {
 				e.preventDefault();
 
-				var option = select.childNodes[select.selectedIndex - 1]; // no warnings
-				if (option) option.selected = true;
-				select.onchange();
+				self.$.select.selectPrevious();
 			} else
 			if (key === 'Control-u') {
 				e.preventDefault();
@@ -222,9 +216,9 @@ Polymer({
 				e.preventDefault();
 
 				// complete common match
-				var option = select.childNodes[select.selectedIndex + 1]; // no warnings
+				var option = self.$.select.firstChild;
 				if (option) {
-					input.value = option.title;
+					input.value = option.textContent;
 				}
 			}
 
@@ -314,18 +308,16 @@ Polymer({
 			self.set('settings.lastQuery', self.$.input.value);
 			index.search(self.$.input.value).then(function (res) {
 				self.$.select.innerHTML = '';
+				self.$.select.selected = -1;
 				for (var i = 0, len = res.length; i < len; i++) {
 					var item = res[i];
-					var option = document.createElement('option');
-					option.className = "chemr-viewer";
-					option.innerHTML = item[2] + (Chemr.DEBUG ? '<div class="info">[' + item.score + '] ' + item[1] + '</div>' : '');
-					option.value     = item[1];
-					option.title     = item[0];
-					self.$.select.add(option, null);
+					var div = document.createElement('div');
+					div.className = "chemr-viewer";
+					div.innerHTML = item[2] + (Chemr.DEBUG ? '<div class="info">[' + item.score + '] ' + item[1] + '</div>' : '');
+					div.value     = item[1];
+					div.title     = item[0];
+					self.$.select.appendChild(div);
 				}
-
-//				self.$.select.childNodes[0].selected = true;
-//				self.$.select.onchange();
 			});
 		});
 	},
