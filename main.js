@@ -107,14 +107,17 @@ var Main = {
 		debug : function (params) {
 			var self = this;
 			console.log('ipc debug', params);
-			if (params.debug) {
-				self.main.openDevTools();
-				self.indexer.window.openDevTools();
-				self.indexer.window.show();
-			} else {
-				self.main.closeDevTools();
-				self.indexer.window.closeDevTools();
-				self.indexer.window.hide();
+			if (config.DEBUG != params.debug) {
+				if (params.debug) {
+					self.main.openDevTools();
+					self.indexer.window.openDevTools();
+					self.indexer.window.show();
+				} else {
+					self.main.closeDevTools();
+					self.indexer.window.closeDevTools();
+					self.indexer.window.hide();
+				}
+				config.DEBUG = params.debug;
 			}
 			return Promise.resolve();
 		},

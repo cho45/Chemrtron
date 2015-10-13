@@ -1,6 +1,9 @@
 var remote = require('remote');
 var ipc = require('ipc');
 var Channel = require('./src/channel');
+var app = remote.require('app');
+var Menu = remote.require('menu');
+var MenuItem = remote.require('menu-item');
 
 Polymer({
 	is: "chemr-viewer",
@@ -38,7 +41,7 @@ Polymer({
 		Chemr.IPC = new Channel({
 			recv : function (callback) {
 				ipc.on('viewer', function (args) {
-					console.log('[viewer]', args);
+					// console.log('[viewer]', args);
 					callback(args);
 				});
 			},
@@ -48,13 +51,12 @@ Polymer({
 			},
 
 			notification : function (args) {
-				console.log(args);
+				// console.log(args);
 				if (args.result && args.result.type === 'progress') {
 					self.handleIndexerProgress(args.result);
 				}
 			}
 		});
-
 	},
 
 	ready: function() {
@@ -68,10 +70,22 @@ Polymer({
 				self.toggleClass('open', indexListOpened, self.$.indexList);
 			}, 3000);
 		};
+		self.$.indexList.ondblclick = function () {
+			indexListOpened = true;
+			self.toggleClass('open', indexListOpened, self.$.indexList);
+		};
 		self.$.indexList.onmouseleave = function () {
 			indexListOpened = false;
 			self.toggleClass('open', indexListOpened, self.$.indexList);
 		};
+
+		var scrollTarget = self.$.indexList.querySelector('paper-menu');
+		self.$.indexList.onwheel = function (e) {
+			var delta = e.deltaY;
+			scrollTarget.scrollTop += delta;
+		};
+
+		self.initMenu();
 	},
 
 	attached: function() {
@@ -251,6 +265,8 @@ Polymer({
 		// set after reindex completed
 		index.then(function () {
 			self.set('index', index);
+			// reload index
+			search();
 		});
 	},
 
@@ -278,7 +294,7 @@ Polymer({
 
 	initializeDefaultSettings : function () {
 		this.settings = {
-			enabled: [],
+			enabled: ['mdn', 'cpan'],
 			developerMode: false,
 
 			lastQuery: "",
@@ -288,6 +304,11 @@ Polymer({
 
 	loadedSettings : function () {
 		var self = this;
+
+		if (!self.settings.enabled) {
+			self.settings.enabled = [];
+		}
+
 		self.settingsChanged({});
 
 		Chemr.Index.indexers.then(function (indexers) {
@@ -308,7 +329,7 @@ Polymer({
 
 	handleIndexerProgress : function (progress) {
 		var self = this;
-		self.$.toastProgress.text = "Reindex... " + progress.state + " [" + progress.current + "/" + progress.total + "] (" + Math.round(progress.current / progress.total * 100) + "%)";
+		self.$.toastProgress.text = "Reindex... " + progress.id + " : " + progress.state + " [" + progress.current + "/" + progress.total + "] (" + Math.round(progress.current / progress.total * 100) + "%)";
 		self.$.toastProgressProgress.value = Math.round(progress.current / progress.total * 100);
 		if (progress.state === 'done') {
 			self.$.toastProgress.duration = 3000;
@@ -366,8 +387,162 @@ Polymer({
 
 				console.log(self.settings);
 				self.set('settings.enabled', current);
-				// self.$.storage.save();
 			}
 		}
+	},
+
+	initMenu : function () {
+		var self = this;
+		var template = [
+			{
+				label: 'Edit',
+				submenu: [
+					{
+						label: 'Undo',
+						accelerator: 'CmdOrCtrl+Z',
+						role: 'undo'
+					},
+					{
+						label: 'Redo',
+						accelerator: 'Shift+CmdOrCtrl+Z',
+						role: 'redo'
+					},
+					{
+						type: 'separator'
+					},
+					{
+						label: 'Cut',
+						accelerator: 'CmdOrCtrl+X',
+						role: 'cut'
+					},
+					{
+						label: 'Copy',
+						accelerator: 'CmdOrCtrl+C',
+						role: 'copy'
+					},
+					{
+						label: 'Paste',
+						accelerator: 'CmdOrCtrl+V',
+						role: 'paste'
+					},
+					{
+						label: 'Select All',
+						accelerator: 'CmdOrCtrl+A',
+						role: 'selectall'
+					}
+				]
+			},
+			{
+				label: 'View',
+				submenu: [
+					{
+						label: 'Reload',
+						accelerator: 'CmdOrCtrl+R',
+						click: function(item, focusedWindow) {
+							if (focusedWindow) focusedWindow.reload();
+						}
+					},
+					{
+						label: 'Toggle Full Screen',
+						accelerator: (process.platform == 'darwin') ? 'Ctrl+Command+F' : 'F11',
+						click: function (item, focusedWindow) {
+							if (focusedWindow) focusedWindow.setFullScreen(!focusedWindow.isFullScreen());
+						}
+					},
+					{
+						label: 'Toggle Developer Tools',
+						accelerator: (process.platform == 'darwin') ? 'Alt+Command+I' : 'Ctrl+Shift+I',
+						click: function (item, focusedWindow) {
+							self.set('settings.developerMode', !self.settings.developerMode);
+						}
+					}
+				]
+			},
+			{
+				label: 'Window',
+				role: 'window',
+				submenu: [
+					{
+						label: 'Minimize',
+						accelerator: 'CmdOrCtrl+M',
+						role: 'minimize'
+					},
+					{
+						label: 'Close',
+						accelerator: 'CmdOrCtrl+W',
+						role: 'close'
+					}
+				]
+			},
+			{
+				label: 'Help',
+				role: 'help',
+				submenu: [
+					{
+						label: 'GitHub Repository',
+						click: function() { require('shell').openExternal('https://github.com/cho45/Chemrtron') }
+					}
+				]
+			}
+		];
+
+		if (process.platform == 'darwin') {
+			var name = app.getName();
+			template.unshift({
+				label: name,
+				submenu: [
+					{
+						label: 'About ' + name,
+						role: 'about'
+					},
+					{
+						type: 'separator'
+					},
+					{
+						label: 'Services',
+						role: 'services',
+						submenu: []
+					},
+					{
+						type: 'separator'
+					},
+					{
+						label: 'Hide ' + name,
+						accelerator: 'Command+H',
+						role: 'hide'
+					},
+					{
+						label: 'Hide Others',
+						accelerator: 'Command+Shift+H',
+						role: 'hideothers'
+					},
+					{
+						label: 'Show All',
+						role: 'unhide'
+					},
+					{
+						type: 'separator'
+					},
+					{
+						label: 'Quit',
+						accelerator: 'Command+Q',
+						click: function() { app.quit(); }
+					}
+				]
+			});
+
+			// Window menu.
+			template[3].submenu.push(
+				{
+					type: 'separator'
+				},
+				{
+					label: 'Bring All to Front',
+					role: 'front'
+				}
+			);
+		}
+
+		Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 	}
 });

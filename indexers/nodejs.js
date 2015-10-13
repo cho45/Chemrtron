@@ -1,6 +1,7 @@
 indexer = {
 	id: 'nodejs',
 	name: 'Node.js',
+	icon: 'https://nodejs.org/static/images/logos/js-black.svg',
 
 	index : function (ctx) {
 		console.log(ctx);

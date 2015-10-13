@@ -77,15 +77,39 @@ Created index data is cached under ./cache as a file.
 
 ### `pushIndex(name, url)`
 
-### `fetchDocument(url) : Promise<HTMLDocument>`
+`pushIndex` add specified index to current context index.
+
+You does not return any value from a promise returned from `index()`. Chemr will generate index string from current context index.
+
+### `fetchDocument(url, opts: Object) : Promise<HTMLDocument>`
+
+`fetchDocument` fetches a URL and create HTMLDocument.
+
+Specified URL is loaded to sandboxed iframe (scripting is disabled).
+
+You may encounter with error when the target URL issues `X-Frame-Options` header.
+This is restriction of iframe. You can ignore that error with specifing `srcdoc: true` option to `opts`.
+
+With `srcdoc: true` option, `fetchDocument` fetches a URL by `fetchText` and set its result to iframe's `srcdoc` attribute and
+append `<base>` element with target URL to `document.head`.
+This means `document.URL` is not more usable (this may be `about:srcdoc`). But you can load URLs which uses `X-Frame-Options`.
 
 ### `fetchJSON(url) : Promise<Object>`
 
+`fetchJSON` fetches a URL by `fetchText()` and parse with `JSON.parse`.
+
 ### `fetchText(url) : Promise<string>`
+
+`fetchText` fetches a URL and just resolves with its `responseText`.
 
 ### `fetchAsXHR(opts) : Promise<XMLHttpRequest>`
 
+`fetchAsXHR` is raw method for `fetch*`.
+
 ### `crawl(list: Array<string | object>, callback: function (url, doc: HTMLDocument):void)`
 
+`crawl` can crawl specified `list` which is array of URLs and call `callback` with its document.
+
+`callback` function is called with special `this` object which has `pushPage(url)` method. `pushPage(url)` adds to `url` to current crawl queue.
 
 

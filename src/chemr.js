@@ -10,6 +10,7 @@ Chemr.Index.prototype = {
 	init : function (definition) {
 		this.id = definition.id;
 		this.name = definition.name;
+		this.icon = definition.icon;
 		this.definition = definition;
 		if (!this.definition.item) this.definition.item = function (i) { return i };
 	},
@@ -119,7 +120,7 @@ Chemr.Index.prototype = {
 
 		var context = new Chemr.Index.IndexerContext(this.id, progress);
 
-		return this.definition.index.call(context, context).
+		var promise = this.definition.index.call(context, context).
 		then(function (data) {
 			if (!data) {
 				data = context.finalize();
@@ -127,6 +128,10 @@ Chemr.Index.prototype = {
 			context.done();
 			return data;
 		});
+
+		promise.indexerContext = context;
+
+		return promise;
 	}
 };
 Chemr.Index.IndexerContext = function () { this.init.apply(this, arguments) };
@@ -137,30 +142,46 @@ Chemr.Index.IndexerContext.prototype = {
 		this.progress = progress;
 		this.current = 0;
 		this.total = 1;
+		this.canceled = false;
 		this.progress("init", this.current, this.total);
 	},
 
 	pushIndex: function (name, url) {
 		if (!url) url = "";
+		// console.log('pushIndex', name, url);
 		name = name.replace(/\s+/g, ' ');
 		var line = name + "\t" + url + "\n";
-		for (var i = 0, len = this.index.length; i < len; i++) {
-			if (this.index[i] === line) {
-				return;
-			}
-		}
 		this.index[this.index.length] = line;
 	},
 
-	finalize : function () {
-		return this.index.join('');
+	cancel : function () {
+		this.canceled = true;
 	},
 
-	fetchDocument : function (url) {
+	finalize : function () {
+		var ret = [];
+		var index = this.index;
+		var seen = {};
+		for (var i = 0, len = index.length; i < len; i++) {
+			var item = index[i];
+			if (!seen[i]) {
+				seen[i] = true;
+				ret[ret.length] = item;
+			}
+		}
+		return ret.join('');
+	},
+
+	fetchDocument : function (url, opts) {
 		var self = this;
+		if (self.canceled) return Promise.reject('canceled');
+
+		if (!opts) opts = {};
 		console.log('FETCH', url);
 		return new Promise(function (resolve, reject) {
-			self.progress("fetch.start", self.current, ++self.total);
+			if (!opts.selfProgress) {
+				self.progress("fetch.start", self.current, ++self.total);
+			}
 
 			var iframe = document.createElement('iframe');
 			// enable sandbox
@@ -173,9 +194,19 @@ Chemr.Index.IndexerContext.prototype = {
 				clearTimeout(timer);
 				console.log('iframe DOMContentLoaded');
 				var document = iframe.contentDocument;
+
+				if (opts.srcdoc) {
+					// use url instead of about:srcdoc
+					var base = document.createElement('base');
+					base.href = url;
+					document.head.appendChild(base);
+				}
+
 				resolve(document);
 				iframe.parentNode.removeChild(iframe);
-				self.progress("fetch.done", ++self.current, self.total);
+				if (!opts.selfProgress) {
+					self.progress("fetch.done", ++self.current, self.total);
+				}
 
 				// fire at once
 				ready = function () {};
@@ -187,7 +218,7 @@ Chemr.Index.IndexerContext.prototype = {
 					document &&
 					document.URL && 
 					document.URL.indexOf("about:") !== 0 &&
-					document.readyState === "interactive"
+					document.readyState === "interactive" // interactive means DOMContentLoaded is fired
 				) {
 					return ready();
 				}
@@ -195,7 +226,14 @@ Chemr.Index.IndexerContext.prototype = {
 			}, 1);
 
 			iframe.onload = ready;
-			iframe.src = url;
+			if (opts.srcdoc) {
+				// load to about:srcdoc for ignore x-frame-options
+				self.fetchText(url).then(function (text) {
+					iframe.srcdoc = text;
+				});
+			} else {
+				iframe.src = url;
+			}
 		});
 	},
 
@@ -217,6 +255,7 @@ Chemr.Index.IndexerContext.prototype = {
 
 	fetchAsXHR : function (opts) {
 		var self = this;
+		if (self.canceled) return Promise.reject('canceled');
 		return new Promise(function (resolve, reject) {
 			self.progress("fetch.start", self.current, ++self.total);
 			var req = new XMLHttpRequest();
@@ -252,25 +291,29 @@ Chemr.Index.IndexerContext.prototype = {
 		self.progress("crawl.start", self.current, self.total);
 		var seen = {};
 		function _crawl() {
+			if (self.canceled) return Promise.reject('canceled');
+
 			if (list.length) {
 				console.log('CRAWL REMAIN', list.length);
 				var url = list.shift();
 				var req =  (typeof url === 'string') ? url : url.url;
-				return self.fetchDocument(req).then(function (doc) {
+				if (seen[req]) {
 					self.progress("crawl.progress", ++self.current, self.total);
-					callback.call({
-						pushPage : function (url) {
-							if (!seen[url]) {
-								seen[url] = true;
-								self.total++;
+					return _crawl();
+				} else {
+					seen[req] = true;
+					return self.fetchDocument(req, { selfProgress: true }).then(function (doc) {
+						self.progress("crawl.progress", ++self.current, self.total);
+						callback.call({
+							pushPage : function (url) {
 								self.progress("crawl.progress", self.current, ++self.total);
 								list.push(url);
 							}
-						}
-					}, url, doc);
+						}, url, doc);
 
-					return _crawl();
-				});
+						return _crawl();
+					});
+				}
 			}
 		}
 

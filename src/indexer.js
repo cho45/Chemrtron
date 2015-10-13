@@ -1,6 +1,5 @@
 // indexer window process execute:
 //   * create index
-//   * save index to file
 //   * emit event around index creation
 
 var config = require('remote').require('./config');

@@ -1,6 +1,7 @@
 indexer = {
 	id: 'mdn',
 	name: 'MDN',
+	icon: 'https://mdn.mozillademos.org/files/6457/mdn_logo_only_color.png',
 
 	index : function (ctx) {
 		var self = this;
