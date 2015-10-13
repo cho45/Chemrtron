@@ -79,7 +79,7 @@ Created index data is cached under ./cache as a file.
 
 `pushIndex` add specified index to current context index.
 
-You does not return any value from a promise returned from `index()`. Chemr will generate index string from current context index.
+You do not return any value from a promise returned from `index()`. Chemr will generate index string from current context index.
 
 ### `fetchDocument(url, opts: Object) : Promise<HTMLDocument>`
 
