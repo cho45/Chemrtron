@@ -18,10 +18,9 @@ Chemr.Index.prototype = {
 	search : function (query) {
 		var self = this;
 		var convert  = self.definition.beforeSearch || function (a) { return a.replace(/\s+/g, '.*?') };
-		query    = convert(query);
 
 		return new Promise(function (resolve, reject) {
-			var itr  = self.createSearchIterator(query);
+			var itr  = self.createSearchIterator(convert(query));
 			var max  = 300;
 			var res  = [];
 			for (var i = 0, item = null; i < max && (item = itr.next()); i++) {
@@ -29,34 +28,38 @@ Chemr.Index.prototype = {
 			}
 
 			// scoring and sort
-			var regex = new RegExp('(' + query.replace(/\s+/, ' ').split('').map(function (c) {
-				return c.replace(/\W/g,'\\$&').replace(/\\ /g, '.*?');
-			}).join(')?.*?(') + ')?', 'i');
+			var regex = new RegExp(query.replace(/\s+/g, '').split('').map(function (c) {
+				c = c.replace(/\W/g,'\\$&');
+				return '([^' + c + ']*)(' + c + ')?';
+			}).join(''), 'i');
 
 			res = res.
-				map(function (i) {
-					var str   = i[0];
-					var match = regex.exec(str);
-					if (match) {
-						var score = Math.abs(str.length - (match.length - 1));
-
-						var t = "";
-						for (var j = 0, k = 1, len = str.length; j < len; j++) {
-							if (str[j] == match[k]) {
-								t += '<b>' + escapeHTML(str[j]) + '</b>';
-								k++;
-							} else {
-								t += escapeHTML(str[j]);
+				map(function (item) {
+					var str   = item[0];
+					var matched = regex.exec(str);
+					if (matched) {
+						var matchCount = 0;
+						var formatted = '';
+						for (var i = 1, len = matched.length; i < len; i += 2) {
+							if (matched[i]) {
+								formatted += escapeHTML(matched[i]);
+							}
+							if (matched[i+1]) {
+								matchCount++;
+								formatted += '<b>' + escapeHTML(matched[i+1]) + '</b>';
 							}
 						}
-						t += escapeHTML(str.slice(j));
-						i[2] = t;
-						i.score = score;
+						formatted += escapeHTML(str.slice(matched[0].length));
+
+						var score = str.length - matchCount;
+
+						item[2] = formatted;
+						item.score = score;
 					} else {
-						i[2] = i[0];
-						i.score = str.length * 100;
+						item[2] = item[0];
+						item.score = str.length * 100;
 					}
-					return self.definition.item(i);
+					return self.definition.item(item);
 				}).
 				sort(function (a, b) {
 					return a.score - b.score;

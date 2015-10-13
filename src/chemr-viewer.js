@@ -313,7 +313,7 @@ Polymer({
 					var item = res[i];
 					var div = document.createElement('div');
 					div.className = "chemr-viewer";
-					div.innerHTML = item[2] + (Chemr.DEBUG ? '<div class="info">[' + item.score + '] ' + item[1] + '</div>' : '');
+					div.innerHTML = item[2] + (self.settings.developerMode ? '<div class="info">[' + item.score + '] ' + item[1] + '</div>' : '');
 					div.value     = item[1];
 					div.title     = item[0];
 					self.$.select.appendChild(div);
