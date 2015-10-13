@@ -125,6 +125,40 @@ Polymer({
 		frame.addEventListener('console-message', function(e) {
 			console.log('[WebView]', e.message);
 		});
+		frame.addEventListener('contextmenu', function(e) {
+			console.log('webview contextmenu', e);
+			var menu = Menu.buildFromTemplate([
+				{
+					label: 'Back',
+					click: function () {
+						frame.goBack();
+					}
+				},
+				{
+					label: 'Forward',
+					click: function () {
+						frame.goForward();
+					}
+				},
+				{
+					type: 'separator'
+				},
+				{
+					label: 'Copy',
+					role: 'copy'
+				},
+				{
+					type: 'separator'
+				},
+				{
+					label: 'Open in Browser',
+					click: function () {
+						require('shell').openExternal(frame.src);
+					}
+				}
+			]);
+			menu.popup(remote.getCurrentWindow());
+		});
 		self.frame = frame;
 
 		window.onkeydown = function (e) {
