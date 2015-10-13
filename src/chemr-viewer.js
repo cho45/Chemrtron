@@ -62,22 +62,23 @@ Polymer({
 	ready: function() {
 		var self = this;
 		// self.openDialog(self.$.settings);
+		// self.openDialog(self.$.about);
 
 		var indexListOpened = false;
-		self.$.indexList.onmouseenter = function () {
-			indexListOpened = true;
-			self.debounce('indexListHover', function () {
-				self.toggleClass('open', indexListOpened, self.$.indexList);
-			}, 3000);
-		};
+//		self.$.indexList.onmouseenter = function () {
+//			indexListOpened = true;
+//			self.debounce('indexListHover', function () {
+//				self.toggleClass('open', indexListOpened, self.$.indexList);
+//			}, 3000);
+//		};
 		self.$.indexList.ondblclick = function () {
 			indexListOpened = true;
 			self.toggleClass('open', indexListOpened, self.$.indexList);
 		};
-		self.$.indexList.onmouseleave = function () {
-			indexListOpened = false;
-			self.toggleClass('open', indexListOpened, self.$.indexList);
-		};
+//		self.$.indexList.onmouseleave = function () {
+//			indexListOpened = false;
+//			self.toggleClass('open', indexListOpened, self.$.indexList);
+//		};
 
 		var scrollTarget = self.$.indexList.querySelector('paper-menu');
 		self.$.indexList.onwheel = function (e) {
@@ -391,6 +392,13 @@ Polymer({
 		}
 	},
 
+	openLinkInBrowser : function (e) {
+		e.preventDefault();
+		e.stopPropagation();
+		var link = e.target.href;
+		require('shell').openExternal(link);
+	},
+
 	initMenu : function () {
 		var self = this;
 		var template = [
@@ -493,7 +501,9 @@ Polymer({
 				submenu: [
 					{
 						label: 'About ' + name,
-						role: 'about'
+						click: function () {
+							self.openDialog(self.$.about);
+						}
 					},
 					{
 						type: 'separator'

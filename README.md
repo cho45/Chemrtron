@@ -1,9 +1,11 @@
-Chemrtron
-=========
+Chemr
+=====
 
 A document viewer; fuzzy match incremental search.
 
 <img src="https://dl.dropboxusercontent.com/u/673746/Screenshots/2015-10-13%2000.16.28.png"/>
+
+Chemrtron is Chemr on Electron.
 
 
 Features
@@ -113,3 +115,7 @@ This means `document.URL` is not more usable (this may be `about:srcdoc`). But y
 `callback` function is called with special `this` object which has `pushPage(url)` method. `pushPage(url)` adds to `url` to current crawl queue.
 
 
+LICENSE
+=======
+
+MIT: http://cho45.github.com/mit-license

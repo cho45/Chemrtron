@@ -279,6 +279,26 @@
 				<paper-button dialog-dismiss>Close</paper-button>
 			</div>
 		</paper-dialog>
+
+		<paper-dialog id="about" modal style="width: 600px;">
+			<h2>About</h2>
+			<div class="layout horizontal">
+				<div class="flex">
+					<h1>Chemr [kimeeˑ]</h1>
+					<div>
+						<span style="color: #666">(Chemrtron)</span>
+					</div>
+				</div>
+				<div class="flex">
+					<p>Copyright &copy; cho45 2015</p>
+					<p><a href="https://github.com/cho45/Chemrtron" on-tap="openLinkInBrowser">https://github.com/cho45/Chemrtron</a></p>
+					<p>License: <a href="http://cho45.github.io/mit-license" on-tap="openLinkInBrowser">MIT</a></p>
+				</div>
+			</div>
+			<div class="buttons">
+				<paper-button dialog-dismiss>Close</paper-button>
+			</div>
+		</paper-dialog>
 		
 		<iron-localstorage id="storage" name="chemer-viewer-settings"
 			value="{{settings}}"
