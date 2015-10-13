@@ -409,9 +409,14 @@ Polymer({
 			if (map[it.id]) continue;
 			map[it.id] = it;
 		}
-		return self.settings.enabled.map(function (id) {
-			return map[id];
-		});
+
+		var ret = [];
+		for (var i = 0, len = self.settings.enabled.length; i < len; i++) {
+			var id = self.settings.enabled[i];
+			if (!map[id]) continue;
+			ret.push(map[id]);
+		}
+		return ret;
 	},
 
 	initMenu : function () {
