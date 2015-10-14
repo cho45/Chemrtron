@@ -29,6 +29,11 @@ Polymer({
 			value: {}
 		},
 
+		currentProgresses : {
+			type: Array,
+			value: []
+		},
+
 		settingsTabSelected: {
 			type: Number,
 			value: 1
@@ -184,6 +189,7 @@ Polymer({
 
 		self.$.select.addEventListener('selected-changed', function () {
 			self.debounce('load', function () {
+				if (!self.$.select.selectedItem) return;
 				var url = self.$.select.selectedItem.value;
 				console.log('load', url);
 				frame.stop();
@@ -298,7 +304,7 @@ Polymer({
 		index.then(function () {
 			self.set('index', index);
 			// reload index
-			search();
+			self.search();
 		});
 	},
 
@@ -343,7 +349,6 @@ Polymer({
 
 		Chemr.Index.indexers.then(function (indexers) {
 			for (var i = 0, it; (it = indexers[i]); i++) {
-				console.log(self.settings);
 				it.enabled = self.settings.enabled.indexOf(it.id) !== -1;
 			}
 
@@ -359,14 +364,45 @@ Polymer({
 
 	handleIndexerProgress : function (progress) {
 		var self = this;
-		self.$.toastProgress.text = "Reindex... " + progress.id + " : " + progress.state + " [" + progress.current + "/" + progress.total + "] (" + Math.round(progress.current / progress.total * 100) + "%)";
-		self.$.toastProgressProgress.value = Math.round(progress.current / progress.total * 100);
+
+		var byId = 'byId-' + progress.id;
+
+		var current = findCurrent();
+		if (current === null) {
+			current = self.currentProgresses.length;
+			self.push('currentProgresses', {
+				id: progress.id,
+				text : "",
+				percent: 0
+			});
+		}
+
+		self.set('currentProgresses.' + current + '.text', "Reindex... " + progress.id + " : " + progress.state + " [" + progress.current + "/" + progress.total + "] (" + Math.round(progress.current / progress.total * 100) + "%)");
+		self.set('currentProgresses.' + current + '.percent', Math.round(progress.current / progress.total * 100));
 		if (progress.state === 'done') {
-			self.$.toastProgress.duration = 3000;
+			self.async(function () {
+				self.splice('currentProgresses', findCurrent(), 1);
+				console.log('[done] self.currentProgresses', self.currentProgresses);
+
+				if (!self.currentProgresses.length) {
+					self.$.toastProgress.hide();
+				}
+			}, 3000);
 		} else {
 			self.$.toastProgress.duration = 0xffffff;
 		}
 		self.$.toastProgress.show();
+
+		function findCurrent () {
+			var current = null;
+			for (var i = 0, len = self.currentProgresses.length; i < len; i++) {
+				if (self.currentProgresses[i].id === progress.id) {
+					current = i;
+					break;
+				}
+			}
+			return current;
+		}
 	},
 
 	openDialog : function (dialog) {

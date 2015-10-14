@@ -255,7 +255,12 @@
 		</div>
 
 		<paper-toast id="toastProgress" duration="3000" style="z-index: 1000">
-			<paper-progress id="toastProgressProgress" style="width: 100%; margin: 8px 0;"></paper-progress>
+			<template is="dom-repeat" items="{{currentProgresses}}">
+				<div title="{{item.id}}">
+					<span class="label">{{item.text}}</span>
+					<paper-progress value="{{item.percent}}" style="width: 100%; margin: 8px 0;"></paper-progress>
+				</div>
+			</template>
 		</paper-toast>
 
 		<paper-dialog id="settings" modal style="width: 100%; max-width: 900px;">
