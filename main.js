@@ -151,7 +151,10 @@ var Main = {
 						console.log('INDEXED', data.length);
 						return new Promise(function (resolve, reject) {
 							console.log('WRITE INDEX TO', filename);
-							fs.writeFile(filename, data, 'utf8', function (err) {
+							var meta = "\x01" + JSON.stringify({
+								created: new Date().getTime()
+							}) + "\n";
+							fs.writeFile(filename, meta + data, 'utf8', function (err) {
 								if (err) return reject(err);
 								resolve(data);
 							});

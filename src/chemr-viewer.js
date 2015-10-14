@@ -2,6 +2,8 @@ var remote = require('remote');
 var ipc = require('ipc');
 var Channel = require('./src/channel');
 var app = remote.require('app');
+var fs = remote.require('fs');
+var config = remote.require('./config');
 var Menu = remote.require('menu');
 var MenuItem = remote.require('menu-item');
 
@@ -37,6 +39,17 @@ Polymer({
 		settingsTabSelected: {
 			type: Number,
 			value: 1
+		},
+
+		version: {
+			type: String,
+			readonly: true,
+			value: config.version
+		},
+
+		credits: {
+			type: String,
+			value: ''
 		}
 	},
 
@@ -236,10 +249,6 @@ Polymer({
 				}
 			}, 0);
 		};
-	},
-
-	firstLetter: function (str) {
-		return str.charAt(0).toUpperCase();
 	},
 
 	detached: function() {
@@ -584,6 +593,9 @@ Polymer({
 					{
 						label: 'About ' + name,
 						click: function () {
+							self.generateCredits().then(function (credits) {
+								self.set('credits', credits);
+							});
 							self.openDialog(self.$.about);
 						}
 					},
@@ -646,5 +658,26 @@ Polymer({
 		}
 
 		Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+	},
+
+	generateCredits : function () {
+		var ret = fs.readFileSync(path.join(__dirname, 'CREDITS'), 'utf8');
+		ret += '\n\n';
+		return Chemr.Index.indexers.then(function (indexers) {
+			for (var i = 0, len = indexers.length; i < len; i++) {
+				var index = indexers[i];
+				var copyright = index.definition.copyright || '';
+				if (copyright) {
+					ret += '## Indexer ' + index.name + ' (' + index.id + ')\n';
+					ret += copyright + '\n\n';
+				}
+			}
+			return ret;
+		});
+	},
+
+	iconStyleFor : function (item) {
+		console.log('iconStyleFor', item);
+		return 'font-size: 12px; text-overflow: ellipsis; width: 100%; height: 100%; background: ' + (item.definition.color || '#333');
 	}
 });

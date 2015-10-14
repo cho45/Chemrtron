@@ -1,9 +1,9 @@
 indexer = {
 	id: 'arduino',
 	name: 'Arduino',
+	color: '#00979C',
 
 	index : function (ctx) {
-		console.log("Arduino");
 		return ctx.crawl([
 			"https://www.arduino.cc/en/Reference/HomePage",
 			"https://www.arduino.cc/en/Reference/Libraries"

@@ -1,7 +1,6 @@
 indexer = {
 	id: 'cpan',
 	name: 'CPAN',
-	icon: 'http://st.pimg.net/tucs/img/cpan_banner.png',
 
 	index : function (ctx) {
 		console.log('fetch http://www.cpan.org/modules/02packages.details.txt');

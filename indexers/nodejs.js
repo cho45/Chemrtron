@@ -2,6 +2,7 @@ indexer = {
 	id: 'nodejs',
 	name: 'Node.js',
 	icon: 'https://nodejs.org/static/images/logos/js-black.svg',
+	copyright: 'The JS [HEX] Logo is owned by Joyent, Inc.\nhttps://nodejs.org/en/about/resources/',
 
 	index : function (ctx) {
 		console.log(ctx);

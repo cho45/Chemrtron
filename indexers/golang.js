@@ -2,6 +2,7 @@ indexer = {
 	id: 'golang',
 	name: 'Go',
 	icon: 'https://golang.org/doc/gopher/pkg.png',
+	copyright: 'The Go gopher was designed by Renee French. (http://reneefrench.blogspot.com/)\nThe design is licensed under the Creative Commons 3.0 Attributions license.\nRead this article for more details: https://blog.golang.org/gopher',
 
 	index : function (ctx) {
 		return ctx.fetchDocument('https://golang.org/ref/spec').then(function (document) {

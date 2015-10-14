@@ -1,6 +1,7 @@
 indexer = {
 	id: 'elasticsearch',
 	name: 'Elasticsearch',
+	color: '#31beb1',
 
 	index : function (ctx) {
 		return ctx.fetchDocument('https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html').then(function (document) {

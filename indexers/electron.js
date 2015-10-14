@@ -1,7 +1,7 @@
 indexer = {
 	id: 'electron',
 	name: 'Electron',
-	icon: 'http://electron.atom.io/images/favicon.ico',
+	color: '#45828E',
 
 	index : function (ctx) {
 		return ctx.fetchDocument('http://electron.atom.io/docs/v0.33.0/').then(function (document) {

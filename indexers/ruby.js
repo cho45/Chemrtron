@@ -1,7 +1,7 @@
 indexer = {
 	id: 'ruby',
 	name: 'Ruby',
-	icon: 'https://www.ruby-lang.org/images/header-ruby-logo.png',
+	color: '#CC342D',
 
 	index : function (ctx) {
 		return ctx.fetchDocument('http://docs.ruby-lang.org/en/2.2.0/table_of_contents.html').then(function (document) {

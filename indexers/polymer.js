@@ -1,7 +1,7 @@
 indexer = {
 	id: 'polymer',
 	name: 'Polymer Elements',
-	icon: 'https://blog.polymer-project.org/images/logos/p-logo.png',
+	color: '#E91E63',
 
 	index : function (ctx) {
 		return ctx.fetchJSON('https://elements.polymer-project.org/catalog.json').

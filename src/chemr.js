@@ -111,7 +111,15 @@ Chemr.Index.prototype = {
 		if (!self.data || args.reindex) {
 			return Chemr.IPC.request('getIndex', { id : self.id, reindex: args.reindex }).
 				then(function (data) {
-					self.data = "\n" + data + "\n";
+					if (data.charCodeAt(0) === 0x01) {
+						var firstLF = data.indexOf('\n');
+						self.meta = JSON.parse(data.substring(1, firstLF));
+						self.data = data.substring(firstLF);
+					} else {
+						self.meta = null;
+						self.data = "\n" + data + "\n";
+					}
+					console.log('openIndex', self.data.length, 'meta', self.meta);
 					return self;
 				});
 		} else {

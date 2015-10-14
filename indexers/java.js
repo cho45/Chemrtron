@@ -1,6 +1,7 @@
 indexer = {
 	id: 'javase',
 	name: 'Java SE',
+	color: '#5382A1',
 
 	index : function (ctx) {
 		var hrefs = [];
