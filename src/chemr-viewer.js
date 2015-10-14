@@ -591,6 +591,16 @@ Polymer({
 						type: 'separator'
 					},
 					{
+						label: 'Preferences\u2026',
+						accelerator: 'Command+,',
+						click: function() {
+							self.openDialog(self.$.settings);
+						}
+					},
+					{
+						type: 'separator'
+					},
+					{
 						label: 'Services',
 						role: 'services',
 						submenu: []
