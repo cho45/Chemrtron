@@ -1,7 +1,9 @@
 var remote = require('remote');
 var glob = remote.require('glob');
+var path = remote.require('path');
 var fs = remote.require('fs');
 var os = remote.require('os');
+var config = remote.require('./config');
 
 var Chemr = {};
 
@@ -363,7 +365,7 @@ Chemr.Index.loadIndexers = function () {
 	console.log('Loading all indexers');
 	Chemr.Index.indexers = Promise.resolve([]).
 		then(function (ret) {
-			return loadFiles(os.homedir() + "/.chemr/indexers/*.js").then(function (a) {
+			return loadFiles(path.join(config.indexerPath, '*.js')).then(function (a) {
 				return ret.concat(a);
 			});
 		}).

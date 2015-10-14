@@ -156,7 +156,7 @@ Polymer({
 					type: 'separator'
 				},
 				{
-					label: 'Open in Browser',
+					label: 'Open in Browser\u2026',
 					click: function () {
 						require('shell').openExternal(frame.src);
 					}
@@ -569,7 +569,7 @@ Polymer({
 				role: 'help',
 				submenu: [
 					{
-						label: 'GitHub Repository',
+						label: 'GitHub Repository\u2026',
 						click: function() { require('shell').openExternal('https://github.com/cho45/Chemrtron') }
 					}
 				]

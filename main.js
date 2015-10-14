@@ -2,16 +2,23 @@
 var app =  require('app');
 var ipc = require('ipc');
 var fs = require('fs');
+var os = require('os');
+var path = require('path');
 var BrowserWindow = require('browser-window');
 var Channel = require('./src/channel');
 var config = require('./config');
 var serializeError = require('./src/utils').serializeError;
+var mkdirp = require('mkdirp');
 
 require('crash-reporter').start();
 
 var Main = {
 	init : function () {
 		var self = this;
+
+		mkdirp.sync(config.cachePath);
+		mkdirp.sync(config.indexerPath);
+
 		app.on('window-all-closed', function() {
 			if (process.platform != 'darwin') {
 				app.quit();
@@ -125,7 +132,7 @@ var Main = {
 		getIndex : function (params) {
 			var self = this;
 
-			var filename = __dirname + '/cache/' + params.id + '.dat';
+			var filename = path.join(config.cachePath, params.id + '.dat');
 
 			return new Promise(function (resolve, reject) {
 				if (!params.reindex) {
