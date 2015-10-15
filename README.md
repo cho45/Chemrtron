@@ -3,7 +3,7 @@ Chemr
 
 A document viewer; fuzzy match incremental search.
 
-<img src="https://lh3.googleusercontent.com/vRJOf7nORdMYVN8TfnwcCKHIPEG4YlZ5p-YVG6FV0m9WLUpAAczi1J69RZITkuBBcdNmCSfR5EOM-apfGjbzIHPERF7U5V48Th17NRfcHbUCZ6VZbddX3NmqLucSGKiNhBuRHusWDNV4m98PPnzxVmKs3VbjnJsPPUX-H9AqNTvD8KjudL12ocbG7Lv3pO08oxLxEq9WbEP2sCuqFM_78nJ8v1kuVROJHJckmhPOQRnyrZsOnqFQtBH75-bEs-gJO7qF-rCvi1huqE-3BAF7iRe58DqFDxpMhbEz0j9ecKjR6gTf3LSCKKAIhlLoiONZbctR3u2CrCPrg6jp9eTHgro6j-vqDRqDkh6Hth00V8DwiohjHtNjvYYbdnKZLwaxze0YsLugf_Qeglo40uAyQzTZi52hvbJwRstjdH8-QveGJP-bMBdyReVKFmqCK8Fx9Tc-p1Xw0xXQOOta8AhwRPJl2LNTglGVcK6Uispktvw6eaC_JAUlq6V9jys6p-c1WITF4VPbGeqXsW0yfUNteyKoO52WhOSEGWn2tudgFNqG=w800-h563-no"/>
+<img src="https://lh3.googleusercontent.com/By0PBtaUWg_JYeBDlSKKtl34gRuL_ac3Xm-qqhXvIfSbTMh-jv1E77a4ehgk3n7Tp97doSTE8J0oSi-ft-8xLbfinG51GWwrPkeRzhQ5oMSKXyz6Jo1F_VwBxYsamN85JAdysWGm9WKtm73rcB-hUtJGCkCtrStEHJW4LmfjbcGix_E7Z9EIt-Ew-Fni1QAkgcs6_-KZ9goztbx3rRJOlQO9GPGKViS8xE-O6_8kTqpQY31JP4mYoJ9SpqEKrdeNIKwLly1yZoqe9jQoYAuBM5afzpoo_64wslLnlETdnLC0MeV4O4-4Iby1TAzOpY-vYy_pb5CCxvoI8sBU0Zt4rqH5_JT53DfY2jF1mtDxjXsAnyI6SMWbpz77luL7qMWxW-RNEFy0JsFrvhh5X6J0VeX2UVit7VJtSxwxG_9rTp53VtgkoB4L4G6dPDfiUJVninYewsUCNY0dngcS1K7Tfbe955Y0XdctHq038D6tV3QdvW5hNkGuI3qPlTj1VNjJhRfb-MnExy_fwr_oIaXm9-8Pkp9d7W6tu9Vy30ANj8fa=w600-h419-no"/>
 
 Chemrtron is Chemr on Electron.
 
@@ -118,6 +118,25 @@ CONTRIBUTING
 ============
 
 See <a href="CONTRIBUTING.md">CONTRIBUTING.md</a>
+
+
+ARCHITECTURE
+============
+
+Chemrtron has 2 browser window (by Electron).
+One of them is main viewer window and another one is for indexing window which is hidden.
+
+The indexing window is shown under development mode which is switched by settings or menu (View -> Toggle Developer Tools).
+
+A main window and an indexing window is communicate with IPC via Electron main process. (there is no direct connection between them)
+
+RELEASING
+=========
+
+ 1. Updaste `ChangeLog`
+ 2. Edit `VERSION` file to increment version
+ 3. `git commit -a` and `git push` to uploaded to github
+ 4. `make release` creates packages, tag origin/master and upload packages to github releases.
 
 LICENSE
 =======
