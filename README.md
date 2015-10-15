@@ -114,8 +114,13 @@ This means `document.URL` is not more usable (this may be `about:srcdoc`). But y
 
 `callback` function is called with special `this` object which has `pushPage(url)` method. `pushPage(url)` adds to `url` to current crawl queue.
 
+CONTRIBUTING
+============
+
+See <a href="CONTRIBUTING.md">CONTRIBUTING.md</a>
 
 LICENSE
 =======
 
 MIT: http://cho45.github.com/mit-license
+
