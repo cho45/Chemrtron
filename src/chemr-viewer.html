@@ -88,6 +88,10 @@
 			background: #fff;
 		}
 
+		#container #indexList  paper-icon-item.sortable-chosen {
+			background: #666;
+		}
+
 		#container #indexList paper-item-body ,
 		#container #indexList paper-menu-button {
 			transition: all 0.2s linear;
@@ -320,6 +324,7 @@
 	</template>
 </dom-module>
 
+<script>window['Sortable'] = require("./bower_components/Sortable/Sortable.js")</script>
 <script src="../lib/keyboard.js"></script>
 <script src="utils.js"></script>
 <script src="chemr.js"></script>

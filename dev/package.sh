@@ -8,33 +8,46 @@ cd $ROOT
 version=$(cat VERSION);
 echo "Create version: v$version"
 
+rm -r build
+mkdir -p build/releases
+
 ### OS X
 
-rm -r build
-electron-packager . Chemr \
-	--app-bundle-id=net.lowreal.Chemr \
-	--helper-bundle-id=net.lowreal.ChemrHelper \
-	--out build \
-	--platform=darwin \
-	--arch=x64 \
-	--version=0.33.6 \
-	--app-version=$version
+if [ x$SKIP_OSX != x1 ]; then
+	electron-packager . Chemr \
+		--icon=assets/osx/icon.icns \
+		--app-bundle-id=net.lowreal.Chemr \
+		--helper-bundle-id=net.lowreal.ChemrHelper \
+		--out build \
+		--platform=darwin \
+		--arch=x64 \
+		--version=0.33.6 \
+		--app-version=$version
 
-rm Chemr-$version.dmg
-hdiutil create \
-	-ov -srcfolder build/Chemr-darwin-x64 -fs HFS+ -format UDBZ \
-	-volname "Chemr" build/Chemr-$version-darwin-x64.dmg
+	electron-builder \
+		build/Chemr-darwin-x64/Chemr.app \
+		--platform=osx \
+		--out=build/releases \
+		--config=installer.json
+fi
 
-rm -rf build/Chemr-darwin-x64
 
 ### Windows
 
-#electron-packager . Chemr \
-#	--out build \
-#	--asar \
-#	--platform=win32 \
-#	--arch=x64 \
-#	--version=0.33.6 \
-#	--version-string.ProductName="Chemr" \
-#	--app-version=$version
-#
+if [ x$SKIP_WIN != x1 ]; then
+	electron-packager . Chemr \
+		--out build \
+		--icon=assets/win/icon.ico \
+		--asar \
+		--platform=win32 \
+		--arch=ia32 \
+		--version=0.33.6 \
+		--version-string.ProductName="Chemr" \
+		--app-version=$version
+
+	electron-builder \
+		build/Chemr-win32-ia32 \
+		--platform=win \
+		--out=build/releases \
+		--config=installer.json
+fi

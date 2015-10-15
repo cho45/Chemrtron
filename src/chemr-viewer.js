@@ -102,6 +102,14 @@ Polymer({
 		};
 
 		var scrollTarget = self.$.indexList.querySelector('paper-menu');
+		var sortable = Sortable.create(scrollTarget.querySelector('.selectable-content'), {
+			animation: 150,
+			scroll: scrollTarget,
+
+			onUpdate: function (e) {
+				self.splice('settings.enabled', e.newIndex, 0, self.splice('settings.enabled', e.oldIndex, 1)[0]);
+			}
+		});
 		self.$.indexList.onwheel = function (e) {
 			var delta = e.deltaY;
 			scrollTarget.scrollTop += delta;
@@ -122,6 +130,9 @@ Polymer({
 				self.index.then(function (index) {
 					if (index.definition.CSS) {
 						frame.insertCSS(index.definition.CSS());
+					}
+					if (index.definition.JS) {
+						frame.executeJavaScript(index.definition.JS(), false);
 					}
 				});
 			}
