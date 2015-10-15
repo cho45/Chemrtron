@@ -22,6 +22,7 @@ if [ x$SKIP_OSX != x1 ]; then
 		--platform=darwin \
 		--arch=x64 \
 		--version=0.33.6 \
+		--ignore=build \
 		--app-version=$version
 
 	electron-builder \
@@ -43,6 +44,7 @@ if [ x$SKIP_WIN != x1 ]; then
 		--arch=ia32 \
 		--version=0.33.6 \
 		--version-string.ProductName="Chemr" \
+		--ignore=build \
 		--app-version=$version
 
 	electron-builder \
