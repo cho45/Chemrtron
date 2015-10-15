@@ -39,7 +39,6 @@ if [ x$SKIP_WIN != x1 ]; then
 	electron-packager . Chemr \
 		--out build \
 		--icon=assets/win/icon.ico \
-		--asar \
 		--platform=win32 \
 		--arch=ia32 \
 		--version=0.33.6 \
