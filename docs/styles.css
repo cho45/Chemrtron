@@ -1,0 +1,166 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto:400,100,500,700|Roboto+Mono);
+
+html,
+body {
+	font-family: 'Roboto', sans-serif;
+	font-size: 16px;
+	line-height: 1.33;
+	margin: 0;
+	padding: 0;
+	color: #555;
+	font-weight: 400;
+	text-align: justify;
+	-webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	text-rendering: optimizeLegibility;
+	font-weight: 100;
+	color: #000;
+}
+
+h2 {
+	font-size: 45px;
+}
+
+h3 {
+	font-size: 24px;
+}
+
+code {
+	font-family: "Roboto Mono", monospace;
+	font-size: 80%;
+}
+
+a:link {
+	text-decoration: underline;
+	color: #447fae;
+}
+
+a:visited {
+	color: #447fae;
+}
+
+a:hover {
+	text-decoration: none;
+}
+
+.list {
+	display: flex;
+}
+
+.list > section {
+	flex: 1;
+	margin-right: 16px;
+}
+
+.list > section:last-child {
+	margin-right: 0;
+}
+
+html {
+}
+
+body {
+	max-width: 900px;
+	margin: 0 auto;
+}
+
+header {
+	text-rendering: optimizeLegibility;
+	text-align: center;
+	margin: 112px 0;
+}
+
+header h1 {
+	font-weight: 700;
+	font-size: 112px;
+	margin: 0;
+}
+
+header .desc {
+	font-weight: 100;
+	font-size: 34px;
+}
+
+nav {
+	margin: 50px 0;
+}
+
+nav ul {
+	display: flex;
+	list-style: none;
+	text-align: center;
+	padding: 0;
+	margin: 0;
+}
+
+nav ul li {
+	flex: 1;
+}
+
+nav ul li a:link ,
+nav ul li a:visited {
+	display: block;
+	margin: 8px;
+	padding: 8px;
+	background: #efefef;
+	color: #333;
+	transition: all 0.2s;
+	text-decoration: none;
+	border-bottom: 1px solid #fff;
+}
+
+nav ul li a:hover {
+	background: #fff;
+	color: #000;
+	border-bottom: 1px solid #000;
+}
+
+main {
+	padding: 8px;
+}
+
+main > section {
+	margin: 0 0 112px 0;
+}
+
+main #overview img {
+	max-width: 100%;
+	width: 100%;
+	border: 1px solid #ccc;
+	box-sizing: border-box;
+}
+
+main #screenshots img {
+	max-width: 100%;
+	width: 100%;
+	border: 1px solid #ccc;
+	box-sizing: border-box;
+}
+
+main #indexers .list {
+	display: flex;
+	flex-wrap: wrap;
+	margin: 0 -8px;
+}
+
+main #indexers .list a:link {
+	display: block;
+	min-width: 10em;
+	padding: 8px;
+	margin: 8px;
+	flex: 1;
+	text-decoration: none;
+	transition: all 0.2s;
+	border-bottom: 1px solid #fff;
+}
+
+main #indexers .list a:hover {
+	color: #000;
+	border-bottom: 1px solid #000;
+}
+
+footer {
+	padding: 8px;
+}
