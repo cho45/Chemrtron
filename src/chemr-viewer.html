@@ -295,13 +295,18 @@
 		<paper-dialog id="about" modal style="width: 600px;">
 			<h2>About</h2>
 			<div class="layout horizontal">
-				<div class="flex">
-					<h1>Chemr [kimeeˑ]</h1>
-					<div>
-						<span style="color: #666">v<span>{{version}}</span> (Chemrtron)</span>
+				<div class="flex relative">
+					<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+						<img src="../assets/chemr-assets/icon_128x128.png"/>
 					</div>
 				</div>
 				<div class="flex">
+					<h1>
+						Chemr [kimeeˑ]
+					</h1>
+					<div>
+						<span style="color: #666">v<span>{{version}}</span> (Chemrtron)</span>
+					</div>
 					<p>Copyright &copy; cho45 2015</p>
 					<p><a href="https://github.com/cho45/Chemrtron" on-tap="openLinkInBrowser">https://github.com/cho45/Chemrtron</a></p>
 					<p>License: <a href="http://cho45.github.io/mit-license" on-tap="openLinkInBrowser">MIT</a></p>
