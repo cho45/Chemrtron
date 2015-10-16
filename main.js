@@ -9,6 +9,8 @@ var Channel = require('./src/channel');
 var config = require('./config');
 var serializeError = require('./src/utils').serializeError;
 var mkdirp = require('mkdirp');
+var globalShortcut = require('global-shortcut');
+
 
 require('crash-reporter').start();
 
@@ -26,6 +28,7 @@ var Main = {
 		});
 
 		app.on('ready', self.ready.bind(self));
+		app.on('will-quit', self.willQuit.bind(self));
 	},
 
 	ready : function () {
@@ -40,7 +43,25 @@ var Main = {
 
 		ipc.on('viewer', self.handleViewerIPC.bind(self));
 
+
+		try {
+			var ret = globalShortcut.register('alt+space', function() {
+				console.log('globalShortcut');
+				self.main.focus();
+			});
+			if (!ret) {
+				console.log('registration failed');
+			}
+		} catch (e) {
+			console.log(e);
+		}
+
 		self.openIndexerProcess();
+	},
+
+	willQuit : function () {
+		var self = this;
+		globalShortcut.unregisterAll();
 	},
 
 	openIndexerProcess : function () {
