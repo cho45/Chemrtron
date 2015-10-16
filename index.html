@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Chemr [Chemrtron]: A Online Documentation Browser with Indexers.</title>
+		<meta charset="utf-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+		<script src="bower_components/js-polyfills/polyfill.min.js"></script>
+		<link rel="stylesheet" href="styles.css">
+	</head>
+	<body>
+		<header>
+			<h1>Chemr</h1>
+			<div class="desc">A Online Documentation Browser with Indexers.</div>
+		</header>
+
+		<nav>
+			<ul>
+				<li><a href="#overview">Overview</a></li>
+				<li><a href="#screenshots">Screenshots</a></li>
+				<li><a href="#download">Download</a></li>
+				<li><a href="#indexers">Including Indexers</a></li>
+			</ul>
+		</nav>
+
+
+		<main role="main">
+			<section id="overview">
+				<h2>Overview</h2>
+				<div class="list">
+					<section>
+						<h3>Incremental Search</h3>
+						<img src="img/incremental.png"/>
+						<p>
+							Chemr has fuzzy matched incremental search.
+							You can query any old how.
+						</p>
+					</section>
+					<section>
+						<h3>On-demand Indexers</h3>
+						<img src="img/indexer.png"/>
+						<p>
+							Chemr includes indexing system for generating index.
+							You can index any web sites on your demand.
+						</p>
+					</section>
+					<section>
+						<h3>Built on Electron</h3>
+						<img src="img/builtonelectron.png"/>
+						<p>
+							Chemr is developed with standard web technologies: HTML, CSS, JavaScript.
+							So you can modify this very easily.
+						</p>
+					</section>
+				</div>
+			</section>
+
+			<section id="screenshots">
+				<h2>Screenshots</h2>
+				<div class="list">
+					<section>
+						<h3>OS X</h3>
+						<img src="img/osx.png"/>
+					</section>
+					<section>
+						<h3>Windows</h3>
+						<img src="img/win.png"/>
+					</section>
+				</div>
+			</section>
+
+			<section id="download">
+				<h2>Download</h2>
+				<a href="https://github.com/cho45/Chemrtron/releases">Download from github releases.</a>
+			</section>
+
+			<section id="indexers">
+				<h2>Including Indexers</h2>
+				<div class="list">
+					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/android.js">Android</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/arduino.js">Arduino</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/cpan.js">CPAN</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/ecma-262-3rd-ja.js">ECMAScript 3rd JA</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/elasticsearch.js">Elasticsearch</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/electron.js">Electron</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/golang.js">Go</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/html.js">HTML Standard</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/ios.js">iOS Developer Library</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/java.js">Java SE</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/mac.js">Mac Developer Library</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/mdn.js">MDN</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/mysql.js">MySQL</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/nodejs.js">Node.js</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/opengl.js">OpenGL</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/perl6.js">Perl6</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/php.js">PHP</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/polymer.js">Polymer Elements</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/ruby.js">Ruby</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/sqlite.js">SQLite</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/syoboi.js">しょぼいカレンダー</a>
+				</div>
+				<p>Or you can write new indexer easily.</p>
+			</section>
+
+
+			<!-- section>
+				<h2>Contributors</h2>
+
+				<script src="githubapi.js" data-api="repos/cho45/Chemrtron/contributors?">
+					<div class="contributors">
+						<% for (var i = 0, it; (it = data[i]); i++) { %>
+						<a href="http://github.com/<%= it.login %>" class="contributor">
+							<img src="<%= it.avatar_url %>" width="24" height="24"/>
+							<%= it.login %>
+						</a>
+						<% } %>
+					</div>
+				</script>
+			</section -->
+		</main>
+
+		<footer>
+			by cho45 &lt;<a href="http://www.lowreal.net">cho45@lowreal.net</a>&gt;
+		</footer>
+
+
+		<a href="https://github.com/cho45/Chemrtron"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
+	</body>
+</html>
