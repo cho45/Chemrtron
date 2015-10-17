@@ -229,10 +229,17 @@ Polymer({
 			if (key === 'Enter') {
 				e.preventDefault();
 				if (!input.value) {
+					var data = '';
+					for (var i = 0, it; (it = self.selectedIndexers[i]); i++) {
+						data += it.name + '\t' + it.id + '\n';
+					}
+					self.searchIndexIndex = new Chemr.Index({});
+					self.searchIndexIndex.data = '\n' + data;
 					self.$.indexSearchInput.value = '';
 					self.openDialog(self.$.indexSearch);
 					self.async(function () {
 						self.$.indexSearchInput.inputElement.focus();
+						self.searchIndex();
 					}, 10);
 				}
 			} else 
@@ -299,32 +306,9 @@ Polymer({
 			setTimeout(function () {
 				if (input.prevValue !== input.value) {
 					input.prevValue = input.value;
-					searchIndex();
+					self.searchIndex();
 				}
 			}, 0);
-
-			function searchIndex() {
-				var data = '';
-				for (var i = 0, it; (it = self.selectedIndexers[i]); i++) {
-					data += it.name + '\t' + it.id + '\n';
-				}
-				var index = new Chemr.Index({});
-				index.data = '\n' + data;
-
-				index.search(input.value).then(function (res) {
-					select.innerHTML = '';
-					select.selected = 0;
-					for (var i = 0, len = res.length; i < len; i++) {
-						var item = res[i];
-						var div = document.createElement('div');
-						div.className = "chemr-viewer";
-						div.innerHTML = item[2] + (self.settings.developerMode ? '<div class="info">[' + item.score + '] ' + item[1] + '</div>' : '');
-						div.value     = item[1];
-						div.title     = item[0];
-						select.appendChild(div);
-					}
-				});
-			}
 		};
 	},
 
@@ -411,6 +395,25 @@ Polymer({
 					self.$.select.appendChild(div);
 				}
 			});
+		});
+	},
+
+	searchIndex : function () {
+		var self = this;
+		var input = self.$.indexSearchInput.inputElement;
+		var select = self.$.indexSearchSelect;
+		self.searchIndexIndex.search(input.value).then(function (res) {
+			select.innerHTML = '';
+			select.selected = 0;
+			for (var i = 0, len = res.length; i < len; i++) {
+				var item = res[i];
+				var div = document.createElement('div');
+				div.className = "chemr-viewer";
+				div.innerHTML = item[2] + (self.settings.developerMode ? '<div class="info">[' + item.score + '] ' + item[1] + '</div>' : '');
+				div.value     = item[1];
+				div.title     = item[0];
+				select.appendChild(div);
+			}
 		});
 	},
 

@@ -209,7 +209,7 @@
 				display: none;
 			};
 			--paper-input-container: {
-				padding: 8px;
+				padding: 0;
 			};
 			--paper-input-container-input: {
 				@apply(--paper-font-title);
@@ -231,6 +231,7 @@
 		}
 
 		#indexSearch iron-selector > div {
+			margin: 0 24px;
 			padding: 8px;
 			@apply(--paper-font-common-nowrap);
 		}
@@ -315,14 +316,12 @@
 			</template>
 		</paper-toast>
 
-		<paper-dialog id="indexSearch" modal style="width: 600px; height: 50%">
+		<paper-dialog id="indexSearch" class="layout vertical" modal style="width: 600px; height: 50%">
 			<h2>Select Index</h2>
-			<div class="layout vertical" style="padding: 0 18px; height: 100%">
-				<paper-input placeholder="Input" autocomplete="off" id="indexSearchInput"></paper-input>
-				<div class="flex relative">
-					<div class="fit">
-						<iron-selector id="indexSearchSelect"></iron-selector>
-					</div>
+			<paper-input placeholder="Input" autocomplete="off" id="indexSearchInput"></paper-input>
+			<div class="flex relative">
+				<div class="fit">
+					<iron-selector id="indexSearchSelect"></iron-selector>
 				</div>
 			</div>
 		</paper-dialog>
