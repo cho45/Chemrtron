@@ -86,6 +86,7 @@ Polymer({
 		var self = this;
 		// self.openDialog(self.$.settings);
 		// self.openDialog(self.$.about);
+		// self.openDialog(self.$.indexSearch);
 
 		var indexListOpened = false;
 		self.$.indexList.oncontextmenu = function (e) {
@@ -227,6 +228,13 @@ Polymer({
 
 			if (key === 'Enter') {
 				e.preventDefault();
+				if (!input.value) {
+					self.$.indexSearchInput.value = '';
+					self.openDialog(self.$.indexSearch);
+					self.async(function () {
+						self.$.indexSearchInput.inputElement.focus();
+					}, 10);
+				}
 			} else 
 			if (key === 'Control-n' || key === 'ArrowDown') {
 				e.preventDefault();
@@ -259,6 +267,64 @@ Polymer({
 					self.search();
 				}
 			}, 0);
+		};
+
+		self.$.indexSearchInput.inputElement.onkeydown = function (e) {
+			var key = (e.altKey?"Alt-":"")+(e.ctrlKey?"Control-":"")+(e.metaKey?"Meta-":"")+(e.shiftKey?"Shift-":"")+e.key;   
+			var input = self.$.indexSearchInput.inputElement;
+			var select = self.$.indexSearchSelect;
+
+			if (key === 'Enter') {
+				e.preventDefault();
+				if (!select.selectedItem) return;
+				var id = select.selectedItem.value;
+				self.$$('[data-indexer-id="' + id + '"]').click();
+				self.$.indexSearch.close();
+			} else 
+			if (key === 'Control-n' || key === 'ArrowDown') {
+				e.preventDefault();
+
+				select.selectNext();
+			} else
+			if (key === 'Control-p' || key === 'ArrowUp') {
+				e.preventDefault();
+
+				select.selectPrevious();
+			} else
+			if (key === 'Control-u') {
+				e.preventDefault();
+				input.value = "";
+			}
+
+			setTimeout(function () {
+				if (input.prevValue !== input.value) {
+					input.prevValue = input.value;
+					searchIndex();
+				}
+			}, 0);
+
+			function searchIndex() {
+				var data = '';
+				for (var i = 0, it; (it = self.selectedIndexers[i]); i++) {
+					data += it.name + '\t' + it.id + '\n';
+				}
+				var index = new Chemr.Index({});
+				index.data = '\n' + data;
+
+				index.search(input.value).then(function (res) {
+					select.innerHTML = '';
+					select.selected = 0;
+					for (var i = 0, len = res.length; i < len; i++) {
+						var item = res[i];
+						var div = document.createElement('div');
+						div.className = "chemr-viewer";
+						div.innerHTML = item[2] + (self.settings.developerMode ? '<div class="info">[' + item.score + '] ' + item[1] + '</div>' : '');
+						div.value     = item[1];
+						div.title     = item[0];
+						select.appendChild(div);
+					}
+				});
+			}
 		};
 	},
 

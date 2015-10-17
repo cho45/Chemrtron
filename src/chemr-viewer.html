@@ -195,6 +195,54 @@
 			@apply(--layout-fit);
 			padding: 16px;
 		}
+
+		#indexSearch {
+		}
+
+		#indexSearch paper-input {
+			/*
+			--paper-input-container-color: #cccccc;
+			--paper-input-container-focus-color: #ffffff;
+			--paper-input-container-input-color: #ffffff;
+			*/
+			--paper-font-caption: {
+				display: none;
+			};
+			--paper-input-container: {
+				padding: 8px;
+			};
+			--paper-input-container-input: {
+				@apply(--paper-font-title);
+				font-weight: normal;
+			};
+		}
+
+		#indexSearch iron-selector {
+			display: block;
+			width: 100%;
+			height: 100%;
+			outline: none;
+			box-shadow: none;
+			background: transparent;
+			border: none;
+			overflow-y: auto;
+			-webkit-appearance: none;
+			@apply(--paper-font-subhead);
+		}
+
+		#indexSearch iron-selector > div {
+			padding: 8px;
+			@apply(--paper-font-common-nowrap);
+		}
+
+		#indexSearch iron-selector > div:nth-child(odd) {
+			background: var(--paper-grey-100);
+		}
+
+		#indexSearch iron-selector > div.iron-selected {
+			background: var(--paper-grey-600);
+			color: #fff;
+		}
 	</style>
 
 	<template>
@@ -266,6 +314,18 @@
 				</div>
 			</template>
 		</paper-toast>
+
+		<paper-dialog id="indexSearch" modal style="width: 600px; height: 50%">
+			<h2>Select Index</h2>
+			<div class="layout vertical" style="padding: 0 18px; height: 100%">
+				<paper-input placeholder="Input" autocomplete="off" id="indexSearchInput"></paper-input>
+				<div class="flex relative">
+					<div class="fit">
+						<iron-selector id="indexSearchSelect"></iron-selector>
+					</div>
+				</div>
+			</div>
+		</paper-dialog>
 
 		<paper-dialog id="settings" modal style="width: 100%; max-width: 900px;">
 			<h2>Settings</h2>
