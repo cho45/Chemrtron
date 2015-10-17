@@ -111,18 +111,45 @@ nav ul li a:visited {
 	border-bottom: 1px solid #fff;
 }
 
-nav ul li a:hover {
-	background: #fff;
-	color: #000;
-	border-bottom: 1px solid #000;
+nav ul li a[href='#overview'] {
+	background: #00bcd4;
+	color: #fff;
 }
 
+nav ul li a[href='#screenshots'] {
+	background: #e91e63;
+	color: #fff;
+}
+
+nav ul li a[href='#download'] {
+	background: #8bc34a;
+	color: #fff;
+}
+
+nav ul li a[href='#indexers'] {
+	background: #00bcd4;
+	color: #fff;
+}
+
+nav ul li a:hover {
+	background: #fff !important;
+	color: #000 !important;
+	border-bottom: 1px solid #000;
+}
 main {
 	padding: 8px;
 }
 
 main > section {
 	margin: 0 0 112px 0;
+}
+
+main > section > h2 {
+	border-bottom: 1px solid #000;
+}
+
+main #overview > h2 {
+	border-bottom: 1px solid #00bcd4;
 }
 
 main #overview img {
@@ -132,11 +159,23 @@ main #overview img {
 	box-sizing: border-box;
 }
 
+main #screenshots > h2 {
+	border-bottom: 1px solid #e91e63;
+}
+
 main #screenshots img {
 	max-width: 100%;
 	width: 100%;
 	border: 1px solid #ccc;
 	box-sizing: border-box;
+}
+
+main #download > h2 {
+	border-bottom: 1px solid #8bc34a;
+}
+
+main #indexers > h2 {
+	border-bottom: 1px solid #00bcd4;
 }
 
 main #indexers .list {
@@ -163,4 +202,6 @@ main #indexers .list a:hover {
 
 footer {
 	padding: 8px;
+	text-align: center;
+	border-top: 1px solid #ccc;
 }
