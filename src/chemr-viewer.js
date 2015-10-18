@@ -198,6 +198,9 @@ Polymer({
 			if (key === 'Meta-l' || key === 'Control-l') {
 				self.$.input.inputElement.focus();
 			} else
+			if (key === 'Meta-Enter' || key === 'Control-Enter') {
+				self.openIndexSelectDialog();
+			} else
 			if (key === 'Meta-[') {
 				self.back();
 				frame.goBack();
@@ -229,18 +232,7 @@ Polymer({
 			if (key === 'Enter') {
 				e.preventDefault();
 				if (!input.value) {
-					var data = '';
-					for (var i = 0, it; (it = self.selectedIndexers[i]); i++) {
-						data += it.name + '\t' + it.id + '\n';
-					}
-					self.searchIndexIndex = new Chemr.Index({});
-					self.searchIndexIndex.data = '\n' + data;
-					self.$.indexSearchInput.value = '';
-					self.openDialog(self.$.indexSearch);
-					self.async(function () {
-						self.$.indexSearchInput.inputElement.focus();
-						self.searchIndex();
-					}, 10);
+					self.openIndexSelectDialog();
 				}
 			} else 
 			if (key === 'Control-n' || key === 'ArrowDown') {
@@ -738,6 +730,22 @@ Polymer({
 		}
 
 		Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+	},
+
+	openIndexSelectDialog : function () {
+		var self = this;
+		var data = '';
+		for (var i = 0, it; (it = self.selectedIndexers[i]); i++) {
+			data += it.name + '\t' + it.id + '\n';
+		}
+		self.searchIndexIndex = new Chemr.Index({});
+		self.searchIndexIndex.data = '\n' + data;
+		self.$.indexSearchInput.value = '';
+		self.openDialog(self.$.indexSearch);
+		self.async(function () {
+			self.$.indexSearchInput.inputElement.focus();
+			self.searchIndex();
+		}, 10);
 	},
 
 	generateCredits : function () {
