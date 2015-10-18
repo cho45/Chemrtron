@@ -589,6 +589,8 @@ Polymer({
 
 	initMenu : function () {
 		var self = this;
+		var name = app.getName();
+
 		var template = [
 			{
 				label: 'Edit',
@@ -683,7 +685,6 @@ Polymer({
 		];
 
 		if (process.platform == 'darwin') {
-			var name = app.getName();
 			template.unshift({
 				label: name,
 				submenu: [
@@ -750,6 +751,39 @@ Polymer({
 				{
 					label: 'Bring All to Front',
 					role: 'front'
+				}
+			);
+		} else {
+			template.unshift({
+				label: 'App',
+				submenu: [
+					{
+						label: 'Preferences\u2026',
+						accelerator: 'Command+,',
+						click: function() {
+							self.openDialog(self.$.settings);
+						}
+					},
+					{
+						type: 'separator'
+					},
+					{
+						label: 'Quit',
+						accelerator: 'Command+Q',
+						click: function() { app.quit(); }
+					}
+				]
+			});
+
+			template[template.length-1].submenu.push(
+				{
+					label: 'About ' + name,
+					click: function () {
+						self.generateCredits().then(function (credits) {
+							self.set('credits', credits);
+						});
+						self.openDialog(self.$.about);
+					}
 				}
 			);
 		}
