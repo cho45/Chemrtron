@@ -26,6 +26,11 @@ Polymer({
 			computed: 'computeSelectedIndexers(indexers, settings.enabled)'
 		},
 
+		currentLocation : {
+			type: String,
+			value: ''
+		},
+
 		settings : {
 			type: Object,
 			value: {}
@@ -123,7 +128,6 @@ Polymer({
 		var self = this;
 
 		var frame = document.getElementById('frame');
-		console.log(frame);
 		frame.addEventListener('load-commit', function (e) {
 			if (e.isMainFrame) {
 				console.log('frame.load-commit');
@@ -139,18 +143,36 @@ Polymer({
 			}
 		});
 		frame.addEventListener('dom-ready', function (e) {
+			self.set('currentLocation', frame.getUrl());
 			console.log('frame.dom-ready');
 		});
 		frame.addEventListener('did-finish-load', function (e) {
 			console.log('frame is onloaded');
 		});
+		frame.addEventListener('did-fail-load', function (e) {
+			console.log('did-fail-load');
+		});
 		frame.addEventListener('did-start-loading', function (e) {
-			console.log('start spinner');
 			self.$.progress.indeterminate = true;
 		});
 		frame.addEventListener('did-stop-loading', function (e) {
 			console.log('stop spinner');
 			self.$.progress.indeterminate = false;
+		});
+//		frame.addEventListener('did-get-response-details', function (e) {
+//			console.log('did-get-response-details', e);
+//		});
+		frame.addEventListener('did-get-redirect-request', function (e) {
+			console.log('did-get-redirect-request', e);
+			if (e.isMainFrame) {
+				self.set('currentLocation', e.newUrl);
+			}
+		});
+		frame.addEventListener('page-title-set', function (e) {
+			console.log('page-title-set', e);
+		});
+		frame.addEventListener('page-favicon-updated', function (e) {
+			console.log('page-favicon-updated', e);
 		});
 		frame.addEventListener('console-message', function(e) {
 			console.log('[WebView]', e.message);
@@ -223,6 +245,7 @@ Polymer({
 				var url = self.$.select.selectedItem.value;
 				console.log('load', url);
 				frame.stop();
+				self.set('currentLocation', url);
 				frame.src = url;
 			}, 500);
 		});
