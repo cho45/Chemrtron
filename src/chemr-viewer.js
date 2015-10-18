@@ -162,13 +162,15 @@ Polymer({
 					label: 'Back',
 					click: function () {
 						frame.goBack();
-					}
+					},
+					enabled: frame.canGoBack()
 				},
 				{
 					label: 'Forward',
 					click: function () {
 						frame.goForward();
-					}
+					},
+					enabled: frame.canGoForward()
 				},
 				{
 					type: 'separator'
