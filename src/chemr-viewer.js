@@ -195,7 +195,7 @@ Polymer({
 			var key = (e.altKey?"Alt-":"")+(e.ctrlKey?"Control-":"")+(e.metaKey?"Meta-":"")+(e.shiftKey?"Shift-":"")+e.key;   
 			console.log(key);
 
-			if (key === 'Meta-l') {
+			if (key === 'Meta-l' || key === 'Control-l') {
 				self.$.input.inputElement.focus();
 			} else
 			if (key === 'Meta-[') {
