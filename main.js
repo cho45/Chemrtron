@@ -137,7 +137,12 @@ var Main = {
 
 			globalShortcut.unregisterAll();
 			if (settings.globalShortcut) {
-				var key = settings.globalShortcut.replace(/Meta/, 'Super').replace(/ \+ /g, '+');
+				var key = settings.globalShortcut.
+					replace(/Meta/, 'Super').
+					replace(/Key(.)/, '$1').
+					replace(/Digit(.)/, '$1').
+					replace(/Arrow([^ ]+)/, '$1').
+					replace(/ \+ /g, '+');
 				console.log('globalShortcut.register', key);
 				try {
 					var ret = globalShortcut.register(key, function() {
