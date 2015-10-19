@@ -224,15 +224,15 @@ Polymer({
 			if (key === 'Meta-Enter' || key === 'Control-Enter') {
 				self.openIndexSelectDialog();
 			} else
-			if (key === 'Meta-[') {
+			if (key === 'Meta-[' || key === 'Control-[') {
 				self.back();
 				frame.goBack();
 			} else
-			if (key === 'Meta-]') {
+			if (key === 'Meta-]' || key === 'Control-]') {
 				self.forward();
 				frame.goForward();
 			} else
-			if (key.match(/^Meta-(\d)$/)) {
+			if (key.match(/^(?:Meta|Alt)-(\d)$/)) {
 				var number = +RegExp.$1 - 1;
 				self.querySelectorAll('[data-indexer-id]')[number].click();
 			}
@@ -677,6 +677,10 @@ Polymer({
 				label: 'Help',
 				role: 'help',
 				submenu: [
+					{
+						label: 'Online Help\u2026',
+						click: function() { require('shell').openExternal('http://cho45.github.io/Chemrtron/') }
+					},
 					{
 						label: 'GitHub Repository\u2026',
 						click: function() { require('shell').openExternal('https://github.com/cho45/Chemrtron') }
