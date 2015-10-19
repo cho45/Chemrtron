@@ -19,6 +19,19 @@ h1, h2, h3, h4, h5, h6 {
 	color: #000;
 }
 
+table {
+	line-height: 2;
+}
+
+table tr:nth-child(odd) {
+	background: #efefef;
+}
+
+table th,
+table td {
+	padding: 8px;
+}
+
 h2 {
 	font-size: 45px;
 }
@@ -126,7 +139,7 @@ nav ul li a[href='#download'] {
 	color: #fff;
 }
 
-nav ul li a[href='#indexers'] {
+nav ul li a[href='#usage'] {
 	background: #00bcd4;
 	color: #fff;
 }
@@ -145,7 +158,7 @@ main > section {
 }
 
 main > section > h2 {
-	border-bottom: 1px solid #000;
+	border-bottom: 1px solid #666;
 }
 
 main #overview > h2 {
@@ -174,7 +187,7 @@ main #download > h2 {
 	border-bottom: 1px solid #8bc34a;
 }
 
-main #indexers > h2 {
+main #usage > h2 {
 	border-bottom: 1px solid #00bcd4;
 }
 
