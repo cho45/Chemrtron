@@ -130,6 +130,21 @@ The indexing window is shown under development mode which is switched by setting
 
 A main window and an indexing window is communicate with IPC via Electron main process. (there is no direct connection between them)
 
+BUILD Chemr YOURSELF
+====================
+
+Install requirements:
+
+	npm install -g electrol-packager
+	npm install -g electron-builder
+
+Build:
+
+	./dev/package.sh 
+
+output to ./build/releases
+
+
 RELEASING
 =========
 

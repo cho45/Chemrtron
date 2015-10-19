@@ -50,6 +50,13 @@
 			background: #fff;
 		}
 
+		kbd {
+			-moz-user-select: text;
+			-webkit-user-select: text;
+			-ms-user-select: text;
+			@apply(--paper-font-common-code);
+		}
+
 		#container {
 			width: 100%;
 			height: 100%;
@@ -254,6 +261,11 @@
 			background: var(--paper-grey-600);
 			color: #fff;
 		}
+
+		#toastProgress {
+			left: auto;
+			right: 12px;
+		}
 	</style>
 
 	<template>
@@ -357,6 +369,9 @@
 				</div>
 
 				<div class="page" style="overflow-y: auto">
+					<p>Custom indexers are loaded from 
+						<kbd>{{config.indexerPath}}</kbd>
+					</p>
 					<template is="dom-repeat" items="{{indexers}}">
 						<paper-icon-item>
 							<paper-checkbox item-icon checked="{{item.enabled}}"></paper-checkbox>
@@ -383,7 +398,7 @@
 						Chemr [kimeeˑ]
 					</h1>
 					<div>
-						<span style="color: #666">v<span>{{version}}</span> (Chemrtron)</span>
+						<span style="color: #666">v<span>{{config.version}}</span> (Chemrtron)</span>
 					</div>
 					<p>Copyright &copy; cho45 2015</p>
 					<p><a href="https://github.com/cho45/Chemrtron" on-tap="openLinkInBrowser">https://github.com/cho45/Chemrtron</a></p>

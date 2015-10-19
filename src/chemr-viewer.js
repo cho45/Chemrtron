@@ -46,10 +46,9 @@ Polymer({
 			value: 1
 		},
 
-		version: {
-			type: String,
-			readonly: true,
-			value: config.version
+		config : {
+			type: Object,
+			value: config
 		},
 
 		credits: {
@@ -443,6 +442,7 @@ Polymer({
 			lastQuery: "",
 			lastSelected: null
 		};
+		this.loadedSettings();
 	},
 
 	loadedSettings : function () {

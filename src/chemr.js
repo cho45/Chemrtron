@@ -343,6 +343,7 @@ Chemr.IPC = null;
 Chemr.Index.loadIndexers = function () {
 	var loadFiles = function (target) {
 		return new Promise(function (resolve, reject) {
+			console.log('glob from', target);
 			glob(target, {}, function (err, files) {
 				if (err) {
 					console.log(err);
