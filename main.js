@@ -43,19 +43,6 @@ var Main = {
 
 		ipc.on('viewer', self.handleViewerIPC.bind(self));
 
-
-		try {
-			var ret = globalShortcut.register('alt+space', function() {
-				console.log('globalShortcut');
-				self.main.focus();
-			});
-			if (!ret) {
-				console.log('registration failed');
-			}
-		} catch (e) {
-			console.log(e);
-		}
-
 		self.openIndexerProcess();
 	},
 
@@ -132,11 +119,11 @@ var Main = {
 			return this.indexer.request('echo', params);
 		},
 
-		debug : function (params) {
+		settings: function (settings) {
 			var self = this;
-			console.log('ipc debug', params);
-			if (config.DEBUG != params.debug) {
-				if (params.debug) {
+			console.log(settings);
+			if (config.DEBUG != settings.developerMode) {
+				if (settings.developerMode) {
 					self.main.openDevTools();
 					self.indexer.window.openDevTools();
 					self.indexer.window.show();
@@ -145,8 +132,26 @@ var Main = {
 					self.indexer.window.closeDevTools();
 					self.indexer.window.hide();
 				}
-				config.DEBUG = params.debug;
+				config.DEBUG = settings.developerMode;
 			}
+
+			globalShortcut.unregisterAll();
+			if (settings.globalShortcut) {
+				var key = settings.globalShortcut.replace(/Meta/, 'Super').replace(/ \+ /g, '+');
+				console.log('globalShortcut.register', key);
+				try {
+					var ret = globalShortcut.register(key, function() {
+						console.log('globalShortcut');
+						self.main.focus();
+					});
+					if (!ret) {
+						console.log('registration failed');
+					}
+				} catch (e) {
+					console.log(e);
+				}
+			}
+
 			return Promise.resolve();
 		},
 

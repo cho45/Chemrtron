@@ -33,6 +33,8 @@
 <link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../bower_components/paper-toolbar/paper-toolbar.html">
 
+<link rel="import" href="input-shortcutkey.html"/>
+
 <dom-module id="chemr-viewer">
 	<style is="custom-style">
 		:host {
@@ -342,8 +344,16 @@
 				<paper-tab>Indexers</paper-tab>
 			</paper-tabs>
 			<iron-pages selected="{{settingsTabSelected}}">
-				<div class="page">
-					<paper-checkbox checked="{{settings.developerMode}}">Developer mode</paper-checkbox>
+				<div class="page layout horizontal">
+					<div class="flex">
+						<paper-input-container always-float-label>
+							<label>Global Shortcut</label>
+							<input-shortcutkey class="paper-input-input" value="{{settings.globalShortcut}}"></input-shortcutkey>
+						</paper-input-container>
+					</div>
+					<div class="flex">
+						<paper-checkbox checked="{{settings.developerMode}}">Developer mode</paper-checkbox>
+					</div>
 				</div>
 
 				<div class="page" style="overflow-y: auto">

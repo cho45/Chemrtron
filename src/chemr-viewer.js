@@ -436,6 +436,7 @@ Polymer({
 
 	initializeDefaultSettings : function () {
 		this.settings = {
+			globalShortcut: 'Alt + Space',
 			enabled: ['mdn', 'cpan'],
 			developerMode: false,
 
@@ -532,11 +533,11 @@ Polymer({
 		// console.log('settingsChanged', change);
 		if (self.settings.developerMode) {
 			document.title = "ｷﾒｪwwwww";
-			Chemr.IPC.request('debug', { debug: true });
 		} else {
 			document.title = "Chemr";
-			Chemr.IPC.request('debug', { debug: false });
 		}
+
+		Chemr.IPC.request('settings', self.settings);
 
 		if (change.path) {
 			if (change.path.match(/^indexers\.(\d+)\.enabled/)) {
