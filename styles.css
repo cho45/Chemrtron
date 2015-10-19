@@ -161,6 +161,10 @@ main > section > h2 {
 	border-bottom: 1px solid #666;
 }
 
+main > section > section {
+	margin: 0 0 56px 0;
+}
+
 main #overview > h2 {
 	border-bottom: 1px solid #00bcd4;
 }
