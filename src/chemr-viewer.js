@@ -678,8 +678,15 @@ Polymer({
 				role: 'help',
 				submenu: [
 					{
-						label: 'Online Help\u2026',
-						click: function() { require('shell').openExternal('http://cho45.github.io/Chemrtron/') }
+						label: 'Report issue\u2026',
+						click: function() { require('shell').openExternal('https://github.com/cho45/Chemrtron/issues') }
+					},
+					{
+						label: 'Chemr Help',
+						click: function() { require('shell').openExternal('http://cho45.github.io/Chemrtron/#usage') }
+					},
+					{
+						type: 'separator'
 					},
 					{
 						label: 'GitHub Repository\u2026',
