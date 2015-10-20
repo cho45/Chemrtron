@@ -58,6 +58,10 @@ a:hover {
 	text-decoration: none;
 }
 
+div.img {
+	text-align: center;
+}
+
 .list {
 	display: flex;
 }
