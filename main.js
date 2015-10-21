@@ -34,7 +34,7 @@ var Main = {
 	ready : function () {
 		var self = this;
 
-		self.main = new BrowserWindow({width: 1280, height: 900});
+		self.main = new BrowserWindow({width: 1440, height: 900});
 		self.main.loadUrl('file://' + __dirname + '/viewer.html');
 		if (config.DEBUG) self.main.openDevTools();
 		self.main.on('closed', function () {

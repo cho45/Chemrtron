@@ -25,6 +25,13 @@ if [ x$SKIP_OSX != x1 ]; then
 		--ignore=build \
 		--app-version=$version
 
+	cd build/Chemr-mas-x64
+
+	ruby -i -anal -e 'puts gsub(/com.github.electron/, "net.lowreal.Chemr").gsub(/Electron/, "Chemr")' Chemr.app/Contents/Frameworks/Chemr\ Helper\ EH.app/Contents/Info.plist
+	ruby -i -anal -e 'puts gsub(/com.github.electron/, "net.lowreal.Chemr").gsub(/Electron/, "Chemr")' Chemr.app/Contents/Frameworks/Chemr\ Helper\ NP.app/Contents/Info.plist
+
+	cd $ROOT
+
 	# Name of your app.
 	APP="Chemr"
 	# The path of you app to sign.
@@ -32,8 +39,8 @@ if [ x$SKIP_OSX != x1 ]; then
 	# The path to the location you want to put the signed package.
 	RESULT_PATH="build/releases/Chemr.pkg"
 	# The name of certificates you requested.
-	APP_KEY="3rd Party Mac Developer Application: Company Name (APPIDENTITY)"
-	INSTALLER_KEY="3rd Party Mac Developer Installer: Company Name (APPIDENTITY)"
+	APP_KEY="3rd Party Mac Developer Application: Hirofumi Watanabe (877L5ULMT9)"
+	INSTALLER_KEY="3rd Party Mac Developer Installer: Hirofumi Watanabe (877L5ULMT9)"
 
 	FRAMEWORKS_PATH="$APP_PATH/Contents/Frameworks"
 
@@ -69,10 +76,14 @@ if [ x$SKIP_WIN != x1 ]; then
 		--arch=ia32 \
 		--version=0.34.0 \
 		--version-string.ProductName="Chemr" \
+		--version-string.ProductVersion="$version" \
 		--ignore=build \
 		--app-version=$version
 
-	electron-builder \
+	cp dev/Chemr.exe.manifest build/Chemr-win32-ia32/
+	cp dev/installer.nsi.tpl node_modules/electron-builder/templates/installer.nsi.tpl
+
+	./node_modules/.bin/electron-builder \
 		build/Chemr-win32-ia32 \
 		--platform=win \
 		--out=build/releases \

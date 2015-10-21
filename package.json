@@ -12,5 +12,8 @@
   "dependencies": {
     "glob": "^5.0.15",
     "mkdirp": "^0.5.1"
+  },
+  "devDependencies": {
+    "electron-builder": "^2.0.2"
   }
 }
