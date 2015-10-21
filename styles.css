@@ -205,7 +205,8 @@ main #indexers .list {
 	margin: 0 -8px;
 }
 
-main #indexers .list a:link {
+main #indexers .list a:link ,
+main #indexers .list a:visited {
 	display: block;
 	min-width: 10em;
 	padding: 8px;
