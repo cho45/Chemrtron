@@ -84,6 +84,10 @@ Polymer({
 				}
 			}
 		});
+
+		window['debug'] = function () {
+			self.$.frame.openDevTools();
+		};
 	},
 
 	ready: function() {
@@ -212,6 +216,24 @@ Polymer({
 			]);
 			menu.popup(remote.getCurrentWindow());
 		});
+		self.Content = new Channel({
+			recv : function (callback) {
+				frame.addEventListener('ipc-message', function (e) {
+					if (e.channel === 'content') {
+						callback(e.args[0]);
+					}
+				});
+			},
+
+			send : function (args) {
+				frame.send('content', args);
+			},
+
+			notification : function (args) {
+				console.log(args);
+			}
+		});
+		window['Content'] = self.Content;
 		self.frame = frame;
 
 		window.onkeydown = function (e) {
