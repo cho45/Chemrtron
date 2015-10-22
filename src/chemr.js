@@ -109,7 +109,7 @@ Chemr.Index.prototype = {
 	openIndex : function (args) {
 		var self = this;
 		if (!self.data || args.reindex) {
-			return Chemr.IPC.request('getIndex', { id : self.id, reindex: args.reindex }).
+			return Chemr.IPC.request('getIndex', { id : self.id, reindex: args.reindex, docset: self.definition.docset }).
 				then(function (data) {
 					if (data.charCodeAt(0) === 0x01) {
 						var firstLF = data.indexOf('\n');
@@ -352,29 +352,81 @@ Chemr.Index.loadIndexers = function () {
 
 				var promises = [];
 				files.forEach(function (it) {
-					promises.push(new Promise(function (resolve, reject) {
-						fs.readFile(it, "utf-8", function (err, content) {
-							if (err) {
-								console.log(err);
-								resolve(null);
-								return;
-							}
-							var index = new Chemr.Index(eval(content + "\n//# sourceURL=" + it));
-							console.log('Initilized', index.id);
-							resolve(index);
-						});
-					}));
+					if (it.match(/\.js$/)) {
+						promises.push(fromIndexerDefinition(it));
+					} else 
+					if (it.match(/\.docset$/)) {
+						promises.push(fromDocset(it));
+					} else {
+					}
 				});
 
 				Promise.all(promises).then(resolve);
 			});
 		});
+
+		function fromIndexerDefinition (it) {
+			return new Promise(function (resolve, reject) {
+				fs.readFile(it, "utf-8", function (err, content) {
+					if (err) {
+						console.log(err);
+						resolve(null);
+						return;
+					}
+					var index = new Chemr.Index(eval(content + "\n//# sourceURL=" + it));
+					console.log('Initilized', index.id);
+					resolve(index);
+				});
+			});
+		}
+
+		function fromDocset (docset) {
+			console.log('Load from docset: ', docset);
+			return new Promise(function (resolve, reject) {
+				var info = path.join(docset, 'Contents/Info.plist');
+				fs.readFile(info, "utf-8", function (err, content) {
+					if (err) {
+						console.log(err);
+						resolve(null);
+						return;
+					}
+
+					//<key>CFBundleIdentifier</key>
+					//<string>nodejs</string>
+					//<key>CFBundleName</key>
+					//<string>Node.js</string>
+					var matchId = content.match(/<key>CFBundleIdentifier<\/key>\s*<string>([^<]+)<\/string>/);
+					var matchName = content.match(/<key>CFBundleName<\/key>\s*<string>([^<]+)<\/string>/);
+
+					if (!matchId || !matchName) {
+						console.log('Failed to get id/name from', docset, matchId, matchName);
+						resolve(null);
+						return;
+					}
+
+					resolve(new Chemr.Index({
+						id: matchId[1],
+						name: matchName[1],
+						docset: docset,
+						item: function (item) {
+							item[1] = docset + '/Contents/Resources/Documents/' + item[1];
+							return item;
+						}
+					}));
+				});
+			});
+		}
 	};
 
 	console.log('Loading all indexers');
 	Chemr.Index.indexers = Promise.resolve([]).
 		then(function (ret) {
 			return loadFiles(path.join(config.indexerPath, '*.js')).then(function (a) {
+				return ret.concat(a);
+			});
+		}).
+		then(function (ret) {
+			return loadFiles(path.join(config.docsetsPath, '*.docset')).then(function (a) {
 				return ret.concat(a);
 			});
 		}).
