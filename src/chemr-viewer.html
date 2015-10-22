@@ -195,6 +195,36 @@
 			margin-top: 0;
 		}
 
+		#container #webviewContainer #contentFindBox {
+			position: absolute; 
+			top: -100px;
+			right: 0;
+			z-index: 99; 
+			max-width: 500px;
+			padding: 8px;
+			background: var(--paper-blue-grey-50);
+			transition: all 0.2s linear;
+		}
+
+		#container #webviewContainer #contentFindBox.active {
+			top: 0;
+		}
+
+		#container #webviewContainer #contentFindBox paper-input {
+			background: #fff;
+			padding: 8px;
+
+			--paper-font-caption: {
+				display: none;
+			};
+			--paper-input-container: {
+				padding: 0;
+			};
+			--paper-input-container-input: {
+				font-weight: normal;
+			};
+		}
+
 		#settings paper-tabs {
 			--paper-tabs-selection-bar-color: var(--paper-cyan-500);
 		}
@@ -322,9 +352,16 @@
 						<paper-icon-button icon="icons:arrow-forward" on-tap="forward"></paper-icon-button>
 						<div class="flex" style="height: 40px; line-height: 40px; overflow: hidden; text-overflow: ellipsis;">{{currentLocation}}</div>
 						<paper-progress id="progress" style="width: 100%"></paper-progress>
+						<div style="width: 100%; position: relative">
+							<div id="contentFindBox" class="layout horizontal" style="">
+								<paper-input class="flex" placeholder="Find" autocomplete="off" id="contentFind"></paper-input>
+								<paper-icon-button icon="icons:expand-less" on-tap="contentFindPrev"></paper-icon-button>
+								<paper-icon-button icon="icons:expand-more" on-tap="contentFindNext"></paper-icon-button>
+							</div>
+						</div>
 					</div>
 					<div class="flex relative" style="background: #333">
-						<webview class="fit" src="about:blank" id="frame" partition="persist:guest"></webview>
+						<webview class="fit" src="about:blank" id="frame" partition="persist:guest" preload="src/content.js"></webview>
 					</div>
 				</div>
 			</div>

@@ -54,13 +54,19 @@ Polymer({
 		credits: {
 			type: String,
 			value: ''
+		},
+
+		contentFindActive: {
+			type: Boolean,
+			value: false
 		}
 	},
 
 	observers: [
 		"settingsChanged(settings.*)",
 		"settingsChanged(settings.indexers.*)",
-		"settingsChanged(indexers.*)"
+		"settingsChanged(indexers.*)",
+		"contentFindActiveChanged(contentFindActive)"
 	],
 
 	created : function () {
@@ -84,6 +90,10 @@ Polymer({
 				}
 			}
 		});
+
+		window['debug'] = function () {
+			self.$.frame.openDevTools();
+		};
 	},
 
 	ready: function() {
@@ -212,6 +222,24 @@ Polymer({
 			]);
 			menu.popup(remote.getCurrentWindow());
 		});
+		self.Content = new Channel({
+			recv : function (callback) {
+				frame.addEventListener('ipc-message', function (e) {
+					if (e.channel === 'content') {
+						callback(e.args[0]);
+					}
+				});
+			},
+
+			send : function (args) {
+				frame.send('content', args);
+			},
+
+			notification : function (args) {
+				console.log(args);
+			}
+		});
+		window['Content'] = self.Content;
 		self.frame = frame;
 
 		window.onkeydown = function (e) {
@@ -323,6 +351,27 @@ Polymer({
 				if (input.prevValue !== input.value) {
 					input.prevValue = input.value;
 					self.searchIndex();
+				}
+			}, 0);
+		};
+
+		self.$.contentFind.inputElement.onkeydown = function (e) {
+			var key = (e.altKey?"Alt-":"")+(e.ctrlKey?"Control-":"")+(e.metaKey?"Meta-":"")+(e.shiftKey?"Shift-":"")+e.key;   
+			var input = self.$.contentFind.inputElement;
+			if (key === 'Enter') {
+				self.contentFindNext();
+			} else
+			if (key === 'Shift-Enter') {
+				self.contentFindPrev();
+			} else
+			if (key === 'Escape') {
+				self.set('contentFindActive', false);
+			}
+
+			setTimeout(function () {
+				if (input.prevValue !== input.value) {
+					input.prevValue = input.value;
+					self.contentFindNext(null, true);
 				}
 			}, 0);
 		};
@@ -610,6 +659,19 @@ Polymer({
 						type: 'separator'
 					},
 					{
+						label: 'Find',
+						accelerator: 'CmdOrCtrl+F',
+						click: function (item, focusedWindow) {
+							self.set('contentFindActive', !self.contentFindActive);
+							self.async(function () {
+								self.$.contentFind.inputElement.focus();
+							}, 10);
+						}
+					},
+					{
+						type: 'separator'
+					},
+					{
 						label: 'Cut',
 						accelerator: 'CmdOrCtrl+X',
 						role: 'cut'
@@ -838,5 +900,60 @@ Polymer({
 	iconStyleFor : function (item) {
 		console.log('iconStyleFor', item);
 		return 'font-size: 12px; text-overflow: ellipsis; width: 100%; height: 100%; background: ' + (item.definition.color || '#333');
+	},
+
+	contentEval : function (func, args) {
+		var self = this;
+		var code = '(' + func.toString() + ').apply(null, ' + JSON.stringify(args) + ');';
+		return self.Content.request('eval', { string: code });
+	},
+
+	contentFindActiveChanged : function (value) {
+		var self = this;
+		self.toggleClass('active', value, self.$.contentFindBox);
+		self.async(function () {
+			self.$.contentFind.inputElement.focus();
+		}, 10);
+	},
+
+	contentFindPrev : function () {
+		var self = this;
+		self.contentEval(function (aString, aBackwards) {
+			var aCaseSensitive = false;
+			var aWrapAround = true;
+			var aWholeWord = false;
+			var aSearchInFrames = true;
+			var aShowDialog = false;
+			return window.find(aString, aCaseSensitive, aBackwards, aWrapAround, aWholeWord, aSearchInFrames, aShowDialog);
+		}, [ self.$.contentFind.value, true ]).
+			then(function (found) {
+				console.log('contentFindPrev', found);
+			});
+
+	},
+
+	contentFindNext : function (cont) {
+		if (cont instanceof CustomEvent) {
+			cont = false;
+		}
+
+		var self = this;
+		var found = self.contentEval(function (aString, aBackwards, cont) {
+			if (cont) {
+				try {
+					window.getSelection().collapseToStart();
+				} catch (e) {}
+			}
+
+			var aCaseSensitive = false;
+			var aWrapAround = true;
+			var aWholeWord = false;
+			var aSearchInFrames = true;
+			var aShowDialog = false;
+			return window.find(aString, aCaseSensitive, aBackwards, aWrapAround, aWholeWord, aSearchInFrames, aShowDialog);
+		}, [ self.$.contentFind.value, false, cont ]).
+			then(function (found) {
+				console.log('contentFindNext', found);
+			});
 	}
 });
