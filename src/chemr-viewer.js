@@ -371,7 +371,7 @@ Polymer({
 			setTimeout(function () {
 				if (input.prevValue !== input.value) {
 					input.prevValue = input.value;
-					self.contentFindNext(true);
+					self.contentFindNext(null, true);
 				}
 			}, 0);
 		};
@@ -933,6 +933,10 @@ Polymer({
 	},
 
 	contentFindNext : function (cont) {
+		if (cont instanceof CustomEvent) {
+			cont = false;
+		}
+
 		var self = this;
 		var found = self.contentEval(function (aString, aBackwards, cont) {
 			if (cont) {
