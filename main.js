@@ -21,12 +21,6 @@ var Main = {
 		mkdirp.sync(config.cachePath);
 		mkdirp.sync(config.indexerPath);
 
-		app.on('window-all-closed', function() {
-			if (process.platform != 'darwin') {
-				app.quit();
-			}
-		});
-
 		app.on('ready', self.ready.bind(self));
 		app.on('will-quit', self.willQuit.bind(self));
 	},
@@ -39,6 +33,7 @@ var Main = {
 		if (config.DEBUG) self.main.openDevTools();
 		self.main.on('closed', function () {
 			self.main = null;
+			app.quit();
 		});
 
 		ipc.on('viewer', self.handleViewerIPC.bind(self));
