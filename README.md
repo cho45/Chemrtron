@@ -42,6 +42,10 @@ Indexer
  1. ~/.chemer/indexers/*.js
  2. ./indexers/*.js
 
+### For sandboxed
+
+	ln -s ~/Library/Containers/net.lowreal.Chemr/Data/.chemr ~/.chemr
+
 
 ## Indexer definition
 

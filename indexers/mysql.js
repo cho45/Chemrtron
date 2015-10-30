@@ -11,10 +11,6 @@ indexer = {
 				ctx.pushIndex(it.textContent, it.href);
 			}
 		});
-	},
-
-	CSS: function () {
-		return "#header, #nav_container, .page_sidebar { display: none } #page.sidebar { padding: 16px; margin: 0 !important }";
 	}
 };
 
