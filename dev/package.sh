@@ -54,14 +54,22 @@ if [ x$SKIP_OSX != x1 ]; then
 		codesign  -fs "$APP_KEY" --entitlements dev/parent.plist "$APP_PATH"
 		productbuild --component "$APP_PATH" /Applications --sign "$INSTALLER_KEY" "$RESULT_PATH"
 	else
-		codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/Libraries/libnode.dylib"
-		codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/Electron Framework"
-		codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/"
-		codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/$APP Helper.app/"
-		codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/$APP Helper EH.app/"
-		codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/$APP Helper NP.app/"
-		codesign  -fs - --entitlements dev/parent.plist "$APP_PATH"
-		productbuild --component "$APP_PATH" /Applications "$RESULT_PATH"
+		if [ x$SANDBOX == x0 ]; then
+			electron-builder \
+				build/Chemr-mas-x64/Chemr.app \
+				--platform=osx \
+				--out=build/releases \
+				--config=installer.json
+		else
+			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/Libraries/libnode.dylib"
+			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/Electron Framework"
+			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/"
+			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/$APP Helper.app/"
+			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/$APP Helper EH.app/"
+			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/$APP Helper NP.app/"
+			codesign  -fs - --entitlements dev/parent.plist "$APP_PATH"
+			productbuild --component "$APP_PATH" /Applications "$RESULT_PATH"
+		fi
 	fi
 fi
 
