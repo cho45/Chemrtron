@@ -4,7 +4,7 @@ html,
 body {
 	font-family: 'Roboto', sans-serif;
 	font-size: 16px;
-	line-height: 1.33;
+	line-height: 1.66;
 	margin: 0;
 	padding: 0;
 	color: #555;
@@ -40,9 +40,55 @@ h3 {
 	font-size: 24px;
 }
 
+h4 {
+	font-size: 16px;
+	font-weight: 500;
+	margin: 0;
+}
+
+pre {
+	overflow: auto;
+}
+
+pre > code {
+	display: block;
+}
+
+kbd, code {
+	font-family: 'Roboto Mono', monospace;
+	background: #f6f6f6;
+	padding: 2px 5px;
+	font-size: 80%;
+}
+
 code {
 	font-family: "Roboto Mono", monospace;
 	font-size: 80%;
+}
+
+code .identifier {
+	color: #990000;
+	font-weight: 700;
+}
+
+code .keyword {
+	color: #008080;
+}
+
+code .type {
+	color: #458;
+}
+
+code .string {
+	color: #990073;
+}
+
+dt {
+	margin: 1em 0 0 0;
+}
+
+dd p {
+	margin: 0 0 1em 0;
 }
 
 a:link {

@@ -86,7 +86,44 @@
 
 			<section id="download">
 				<h2>Download</h2>
-				<a href="https://github.com/cho45/Chemrtron/releases">Download from github releases.</a>
+
+				<div class="list">
+					<section>
+						<h3>Build from source</h3>
+						<p>Or create your own build with following:</p>
+
+						<section>
+							<h4>Install Development Tools</h4>
+							<p>You must install <a href="https://nodejs.org/">node.js</a> and <a href="https://help.github.com/articles/set-up-git/">git</a>.</p>
+						</section>
+
+						<section>
+							<h4>Install Electron and Build Tools</h4>
+							<p>
+								<kbd>npm -g install electron-prebuilt electrol-packager electron-builder</kbd>
+							</p>
+						</section>
+						
+						<section>
+							<h4>Clone Repository</h4>
+								<p>
+							<kbd>git clone https://github.com/cho45/Chemrtron.git</kbd>
+							</p>
+						</section>
+
+						<section>
+							<h4>Package</h4>
+							<p>
+								<kbd>sh dev/package.sh</kbd>
+							</p>
+							<p>Packaged application is located under <kbd>build/releases</kbd></p>
+						</section>
+					</section>
+					<section>
+						<h3>Packaged release</h3>
+						<a href="https://github.com/cho45/Chemrtron/releases">Download from github releases.</a>
+					</section>
+				</div>
 			</section>
 
 
@@ -208,7 +245,122 @@
 					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/sqlite.js">SQLite</a>
 					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/syoboi.js">しょぼいカレンダー</a>
 				</div>
-				<p>Or <a href="https://github.com/cho45/Chemrtron#indexer">you can write new indexer easily</a>.</p>
+				<p>Or <a href="#create-indexer">you can write new indexer easily</a>.</p>
+			</section>
+
+			<section id="create-indexer">
+				<h2>Create New Indexer</h2>
+				<p>The indexer definition files is written in JavaScript and load from following paths:</p>
+				<ol>
+					<li><kbd>$HOME/.chemr/indexers/*.js</kbd></li>
+					<li><kbd>$APP_ROOT/indexers/*.js</kbd></li>
+				</ol>
+				<p>You can put your own indexer to <kbd>$HOME/.chemer/indexers/</kbd>.</p>
+
+				<aside>
+					<h3>Note: OS X Sandbox</h3>
+					<p>In OS X sandbox (packaged releases are in sandbox. electron command is not in sandbox), .chemr directory is located under <kbd>$HOME/Library/Containers/net.lowreal.Chemr/Data</kbd>.</p>
+					<p>Run following commands for convenience:</p>
+					<kbd>ln -s ~/Library/Containers/net.lowreal.Chemr/Data/.chemr ~/.chemr</kbd>
+				</aside>
+
+				<section>
+					<h3>Indexer definition file</h3>
+					<p>This is a sample indexer definition for PHP:</p>
+					<pre><code class="javascript">
+indexer = {
+	id: 'php',
+	name: 'PHP',
+
+	index : function (ctx) {
+		return ctx.fetchDocument('http://www.php.net/manual/en/indexes.functions.php', { srcdoc: true }).then(function (document) {
+			console.log(document);
+
+			var links = document.querySelectorAll('a.index');
+			for (var i = 0, it; (it = links[i]); i++) {
+				ctx.pushIndex(it.textContent, it.href);
+			}
+		});
+	}
+};
+</code></pre>
+					<dl>
+						<dt><code>id : string</code></dt>
+						<dd>
+							Unique identifier for this indexer.
+						</dd>
+						<dt><code>name : string</code></dt>
+						<dd>
+							Display name. This is also used for indexer search.
+						</dd>
+						<dt><code>index : function(ctx: IndexerContext):Promise&lt;string | null&gt;</code></dt>
+						<dd>
+							A function for creating index. Index data is following format:
+							<pre>
+[Search string]\t[URI]
+[Search string]\t[URI]
+...
+</pre>
+							<p>Or you can use <kbd>pushIndex()</kbd> on IndexerContext instead of returning string.</p>
+						</dd>
+						<dt><code>beforeSearch : function(query : string): string</code></dt>
+						<dd>
+							A function for query translator.
+						</dd>
+						<dt><code>item : function(item: Item):Item</code></dt>
+						<dd>
+							Callback of item called when item will be shown.
+						</dd>
+					</dl>
+				</section>
+
+				<section>
+					<h3>IndexerContext</h3>
+					<p>IndexerContext is passed as <code>index()</code> argument.</p>
+					<dl>
+						<dt><code>pushIndex(name: string, url: string)</code></dt>
+						<dd>
+							Add specified index to current context index.
+							You do not return any value from a promise returned from <code>index()</code>. Chemr will generate index string from current context index.
+						</dd>
+
+						<dt><code>fetchDocument(url: string: opts: Object):Promise&lt;HTMLDocument&gt;</code></dt>
+						<dd>
+							<p>Fetche a URL and create HTMLDocument.</p>
+
+							<p>Specified URL is loaded to sandboxed iframe (scripting is disabled).</p>
+
+							<p>You may encounter with error when the target URL issues <code>X-Frame-Options</code> header.
+							This is restriction of iframe. You can ignore that error with specifing <code>srcdoc: true</code> option to <code>opts</code>.</p>
+
+							<p>With <code>srcdoc: true</code> option, <code>fetchDocument()</code> fetches a URL by <code>fetchText()</code> and set its result to iframe's <code>srcdoc</code> attribute and
+							append <code>&lt;base&gt;</code> element with target URL to <code>document.head</code>.
+							This means <code>document.URL</code> is not more usable (this may be <code>about:srcdoc</code>). But you can load URLs which uses <code>X-Frame-Options</code>.</p>
+						</dd>
+
+						<dt><code>fetchJSON(url: string):Promise&lt;any&gt;</code></dt>
+						<dd>
+							Fetch a URL by <code>fetchText()</code> and parse with <code>JSON.parse</code>.
+						</dd>
+
+						<dt><code>fetchText(url: string):Promise&lt;string&gt;</code></dt>
+						<dd>
+							Fetche a URL and just resolves with its <code>responseText</code>.
+						</dd>
+
+						<dt><code>fetchAsXHR(opts: Object):Promise&lt;XMLHttpRequest&gt;</code></dt>
+						<dd>
+							This is raw method for <code>fetch*</code>.
+						</dd>
+
+						<dt><code>crawl(list: Array<string | object>, callback: function (url, doc: HTMLDocument):void):Promise&lt;any&gt;</code></dt>
+						<dd>
+							<p><code>crawl</code> can crawl specified <code>list</code> which is array of URLs and call <code>callback</code> with its document.</p>
+
+							<p><code>callback</code> function is called with special <code>this</code> object which has <code>pushPage(url)</code> method. <code>pushPage(url)</code> adds to <code>url</code> to current crawl queue.</p>
+						</dd>
+					</dl>
+				</section>
 			</section>
 
 			<section id="contrib">
@@ -249,6 +401,7 @@
 		</footer>
 
 
+		<script src="script.js"></script>
 		<a href="https://github.com/cho45/Chemrtron"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
 	</body>
 </html>
