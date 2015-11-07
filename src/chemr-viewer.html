@@ -296,6 +296,26 @@
 			left: auto;
 			right: 12px;
 		}
+
+		#about .credits h1 {
+			font-size: 100%;
+		}
+
+		#about .credits paper-menu {
+			--paper-menu-focused-item-after: {
+				display: none;
+			};
+		}
+
+		#about .credits paper-menu paper-item {
+			font-size: 12px;
+			min-height: 32px;
+			padding: 0;
+		}
+
+		#about .credits paper-menu paper-item.iron-selected {
+			background: #fff !important;
+		}
 	</style>
 
 	<template>
@@ -442,9 +462,25 @@
 					<p>License: <a href="http://cho45.github.io/mit-license" on-tap="openLinkInBrowser">MIT</a></p>
 				</div>
 			</div>
-			<div class="">
+			<div class="credits">
 				<p>Credits</p>
-				<pre style="height: 300px; overflow: auto; font-size: 12px; white-space: pre-wrap;">{{credits}}</pre>
+				<div class="layout horizontal" style="height: 300px">
+					<div class="flex-1 relative">
+						<paper-menu class="fit" style="overflow: auto" selected="{{creditsPage}}">
+							<template is="dom-repeat" items="{{credits}}">
+								<paper-item>{{item.name}}</paper-item>
+							</template>
+						</paper-menu>
+					</div>
+
+					<div class="flex-2 relative">
+						<iron-pages class="fit" style="overflow: auto" selected="{{creditsPage}}">
+							<template is="dom-repeat" items="{{credits}}">
+								<pre style="margin: 0 16px; overflow: auto; font-size: 12px; white-space: pre-wrap;">{{item.content}}</pre>
+							</template>
+						</iron-pages>
+					</div>
+				</div>
 			</div>
 			<div class="buttons">
 				<paper-button dialog-dismiss>Close</paper-button>

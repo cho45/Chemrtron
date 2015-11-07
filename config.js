@@ -11,6 +11,7 @@ module.exports = {
 	version: version,
 	cachePath: path.join(home, 'cache'),
 	indexerPath: path.join(home, 'indexers'),
+	indexerBuiltinPath: path.join(home, 'indexers', 'builtin'),
 	docsetsPath: path.join(home, 'docsets'),
 	root: __dirname
 };

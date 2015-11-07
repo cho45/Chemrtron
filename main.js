@@ -20,6 +20,7 @@ var Main = {
 
 		mkdirp.sync(config.cachePath);
 		mkdirp.sync(config.indexerPath);
+		mkdirp.sync(config.indexerBuiltinPath);
 
 		app.on('ready', self.ready.bind(self));
 		app.on('will-quit', self.willQuit.bind(self));

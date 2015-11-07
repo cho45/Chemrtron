@@ -52,8 +52,8 @@ Polymer({
 		},
 
 		credits: {
-			type: String,
-			value: ''
+			type: Array,
+			value: []
 		},
 
 		contentFindActive: {
@@ -882,18 +882,39 @@ Polymer({
 	},
 
 	generateCredits : function () {
-		var ret = fs.readFileSync(path.join(__dirname, 'CREDITS'), 'utf8');
-		ret += '\n\n';
+		var CREDITS = fs.readFileSync(path.join(__dirname, 'CREDITS'), 'utf8');
+
+		var sections = [];
+
+		var lines = CREDITS.split(/\n/);
+		var current;
+		for (var i = 0, len = lines.length; i < len; i++) {
+			var matched;
+			if ((matched = lines[i].match(/^## (.+)/))) {
+				if (current) {
+					sections.push(current);
+				}
+				current = {
+					name : matched[1],
+					content: ''
+				};
+			} else {
+				current.content += lines[i] + "\n";
+			}
+		}
+
 		return Chemr.Index.indexers.then(function (indexers) {
 			for (var i = 0, len = indexers.length; i < len; i++) {
 				var index = indexers[i];
 				var copyright = index.definition.copyright || '';
 				if (copyright) {
-					ret += '## Indexer ' + index.name + ' (' + index.id + ')\n';
-					ret += copyright + '\n\n';
+					sections.push({
+						name: 'Indexer ' + index.name + ' (' + index.id + ')\n',
+						content: copyright
+					});
 				}
 			}
-			return ret;
+			return sections;
 		});
 	},
 

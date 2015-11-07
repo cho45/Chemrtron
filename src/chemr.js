@@ -419,21 +419,28 @@ Chemr.Index.loadIndexers = function () {
 	};
 
 	console.log('Loading all indexers');
+	var loaded = {};
+	var append = function (array) {
+		for (var i = 0, it; (it = array[i]); i++) {
+			if (loaded[it.name]) continue;
+			this.push(it);
+			loaded[it.name] = true;
+		}
+		return this;
+	};
+
 	Chemr.Index.indexers = Promise.resolve([]).
 		then(function (ret) {
-			return loadFiles(path.join(config.indexerPath, '*.js')).then(function (a) {
-				return ret.concat(a);
-			});
+			return loadFiles(path.join(config.indexerPath, '*.js')).then(append.bind(ret));
 		}).
 		then(function (ret) {
-			return loadFiles(path.join(config.docsetsPath, '*.docset')).then(function (a) {
-				return ret.concat(a);
-			});
+			return loadFiles(path.join(config.docsetsPath, '*.docset')).then(append.bind(ret));
 		}).
 		then(function (ret) {
-			return loadFiles(__dirname + '/indexers/*.js').then(function (a) {
-				return ret.concat(a);
-			});
+			return loadFiles(path.join(config.indexerBuiltinPath, '*.js')).then(append.bind(ret));
+		}).
+		then(function (ret) {
+			return loadFiles(__dirname + '/indexers/*.js').then(append.bind(ret));
 		});
 };
 
@@ -446,6 +453,89 @@ Chemr.Index.byId = function (id) {
 			}
 		}
 	});
+};
+
+Chemr.Index.updateBuiltinIndexers = function () {
+	var metafile = path.join(config.indexerBuiltinPath, 'meta.json');
+	var meta = new Promise(function (resolve, reject) {
+		fs.readFile(metafile, 'utf-8', function (err, data) {
+			if (err) return reject(err);
+			resolve(JSON.parse(data));
+		});
+	}).
+	catch(function (e) {
+		console.log('meta file is not readable', e);
+		return {
+			timestamp: 0,
+			fileList: []
+		};
+	});
+
+	var remote = GET('https://api.github.com/repos/cho45/Chemrtron/contents/indexers').then(function (string) {
+		return JSON.parse(string);
+	});
+
+	Promise.all([ meta, remote ]).then(function (_) {
+		var local = _[0].fileList, remote = _[1];
+		console.log('promise.all', _);
+
+		var localByName = local.reduce(function (r, i) {
+			r[i.name] = i;
+			return r;
+		}, {});
+
+		return remote.reduce(function (promise, it) {
+			var shouldUpdate = !localByName[it.name] || localByName[it.name].sha !== it.sha;
+			console.log('remote', it.name, 'shouldUpdate:', shouldUpdate);
+			if (!shouldUpdate) return promise;
+			return promise.then(function () {
+				console.log('GET ', it.download_url);
+				return GET(it.download_url).then(function (string) {
+					var filename = path.join(config.indexerBuiltinPath, it.name);
+					console.log('WRITE ', filename);
+					return writeFile(filename, string);
+				}).
+				catch(function (e) {
+					console.log('Error on updating', it.name, ' SKIP');
+				});
+			});
+		}, Promise.resolve()).
+			then(function () {
+				return writeFile(metafile, JSON.stringify({
+					timestamp : new Date().getTime(),
+					fileList : remote
+				}));
+			});
+	}).
+	then(function () {
+		alert('Done');
+	}).
+	catch(function (e) {
+		alert('Error on updateBuiltinIndexers' + e);
+	});
+
+	function GET (uri) {
+		return new Promise(function (resolve, reject) {
+			var xhr = new XMLHttpRequest();
+			xhr.open("GET", uri);
+			xhr.onload = function () {
+				resolve(xhr.responseText);
+			};
+			xhr.onerror = function (e) {
+				reject(e);
+			};
+			xhr.send();
+		});
+	}
+
+	function writeFile (path, content) {
+		return new Promise(function (resolve, reject) {
+			fs.writeFile(path, content, 'utf-8', function (err) {
+				if (err) return reject(err);
+				resolve();
+			});
+		});
+	}
 };
 
 Chemr.Index.loadIndexers();

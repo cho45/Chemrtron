@@ -4,20 +4,23 @@ var glob = require('glob');
 var path = require('path');
 var fs = require('fs');
 
-var Indexer = {
-	indexers : [],
-	_indexersById: {}
-};
+var sections = [];
 
-glob('/usr/share/man/man?/*', {}, function (err, files) {
-	if (err) {
-		console.log(err);
-		return;
+var lines = fs.readFileSync('./CREDITS', 'utf-8').split(/\n/);
+var current;
+for (var i = 0, len = lines.length; i < len; i++) {
+	var matched;
+	if ((matched = lines[i].match(/^## (.+)/))) {
+		if (current) {
+			sections.push(current);
+		}
+		current = {
+			name : matched[1],
+			content: []
+		};
+	} else {
+		current.content.push(lines[i]);
 	}
+}
 
-	for (var i = 0, it; (it = files[i]); i++) {
-		console.log(it);
-	}
-
-});
-
+console.log(sections);
