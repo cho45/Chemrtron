@@ -24,6 +24,11 @@ var Main = {
 
 		app.on('ready', self.ready.bind(self));
 		app.on('will-quit', self.willQuit.bind(self));
+		app.on('before-quit', self.beforeQuit.bind(self));
+		app.on('activate-with-no-open-windows', self.activeWithNoOpenWindows.bind(self));
+		app.on('window-all-closed', self.windowAllClosed.bind(self));
+
+		self.force_quit = false;
 	},
 
 	ready : function () {
@@ -32,9 +37,11 @@ var Main = {
 		self.main = new BrowserWindow({width: 1440, height: 900});
 		self.main.loadUrl('file://' + __dirname + '/viewer.html');
 		if (config.DEBUG) self.main.openDevTools();
-		self.main.on('closed', function () {
-			self.main = null;
-			app.quit();
+		self.main.on('close', function (ev) {
+			if(!self.force_quit) {
+				ev.preventDefault();
+				self.main.hide();
+			}
 		});
 
 		ipc.on('viewer', self.handleViewerIPC.bind(self));
@@ -44,7 +51,24 @@ var Main = {
 
 	willQuit : function () {
 		var self = this;
+		self.main = null;
 		globalShortcut.unregisterAll();
+	},
+
+	beforeQuit : function () {
+		var self = this;
+		self.force_quit = true;
+	},
+
+	windowAllClosed : function () {
+		var self = this;
+		if(process.platform != 'darwin')
+			app.quit();
+	},
+
+	activeWithNoOpenWindows : function () {
+		var self = this;
+		self.main.show();
 	},
 
 	openIndexerProcess : function () {
