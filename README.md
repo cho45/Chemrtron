@@ -59,7 +59,7 @@ BUILD Chemr YOURSELF
 
 Install requirements:
 
-	npm install -g electrol-packager
+	npm install -g electron-packager
 	npm install -g electron-builder
 
 Build:
