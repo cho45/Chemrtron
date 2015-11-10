@@ -883,8 +883,14 @@ Polymer({
 
 	generateCredits : function () {
 		var CREDITS = fs.readFileSync(path.join(__dirname, 'CREDITS'), 'utf8');
+		var CONTRIBUTORS = fs.readFileSync(path.join(__dirname, 'CONTRIBUTORS'), 'utf8');
 
-		var sections = [];
+		var sections = [
+			{
+				name: 'Chemr Contributors',
+				content: CONTRIBUTORS
+			}
+		];
 
 		var lines = CREDITS.split(/\n/);
 		var current;
