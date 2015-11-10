@@ -87,10 +87,6 @@
 			};
 		}
 
-		#container #indexList .inset-shim {
-			height: 10px;
-		}
-
 		#container #indexList paper-icon-item {
 			height: 72px;
 			background: transparent;
@@ -327,10 +323,7 @@
 			<div id="indexList" class="relative">
 				<div class="fit layout vertical">
 					<div class="flex relative">
-						<paper-menu class="fit" style="overflow: hidden; direction: rtl; background: transparent">
-							<template is="dom-if" if="{{isOSX}}">
-								<div class="inset-shim"/>
-							</template>
+						<paper-menu class="fit" style$="{{_styleForIndexMenu()}}">
 							<template is="dom-repeat" items="{{selectedIndexers}}">
 								<paper-icon-item data-indexer-id$="{{item.id}}" on-tap="selectIndex" style="direction: ltr">
 									<div class="index-icon" item-icon>

@@ -59,11 +59,6 @@ Polymer({
 		contentFindActive: {
 			type: Boolean,
 			value: false
-		},
-
-		isOSX: {
-			type: Boolean,
-			value: process.platform === 'darwin'
 		}
 	},
 
@@ -981,5 +976,13 @@ Polymer({
 			then(function (found) {
 				console.log('contentFindNext', found);
 			});
+	},
+
+	_styleForIndexMenu : function () {
+		var ret = 'overflow: hidden; direction: rtl; background: transparent';
+		if (process.platform === 'darwin') {
+			ret += '; margin-top: ' + (10 * window.devicePixelRatio) + 'px';
+		}
+		return ret;
 	}
 });
