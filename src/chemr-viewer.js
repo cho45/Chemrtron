@@ -59,6 +59,11 @@ Polymer({
 		contentFindActive: {
 			type: Boolean,
 			value: false
+		},
+
+		isOSX: {
+			type: Boolean,
+			value: process.platform === 'darwin'
 		}
 	},
 
