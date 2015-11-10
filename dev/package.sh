@@ -10,10 +10,8 @@ echo "Create version: v$version"
 
 echo "UPDATE CONTRIBUTOR LIST"
 curl https://api.github.com/repos/cho45/Chemrtron/contributors | \
-	node -e "console.log(JSON.parse(require('fs').readFileSync('/dev/stdin', 'utf8')).map(x => x.login).filter(x => x !== 'cho45').join(', '));" \
+	node -e "console.log(JSON.parse(require('fs').readFileSync('/dev/stdin', 'utf8')).map(x => '@' + x.login).filter(x => x !== '@cho45').join(', '));" \
 	> CONTRIBUTORS
-
-exit
 
 rm -r build
 mkdir -p build/releases
