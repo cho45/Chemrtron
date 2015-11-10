@@ -976,5 +976,26 @@ Polymer({
 			then(function (found) {
 				console.log('contentFindNext', found);
 			});
+	},
+
+	updateIndexers : function () {
+		var self = this;
+		self.set('updateLog', []);
+		self.$.updateProgress.indeterminate = true;
+		Chemr.Index.updateBuiltinIndexers(function (type, message) {
+				self.push('updateLog', { type: type, message: message });
+			}).
+			then(function () {
+				Chemr.Index.loadIndexers();
+				// reinitialize
+				self.loadedSettings();
+			}).
+			catch(function (e) {
+				self.push('updateLog', { type: 'error', message: 'Error on update indexers: ' + e });
+				alert('Error on updateBuiltinIndexers' + e);
+			}).
+			then(function () {
+				self.$.updateProgress.indeterminate = false;
+			});
 	}
 });

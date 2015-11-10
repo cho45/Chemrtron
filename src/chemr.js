@@ -455,7 +455,7 @@ Chemr.Index.byId = function (id) {
 	});
 };
 
-Chemr.Index.updateBuiltinIndexers = function () {
+Chemr.Index.updateBuiltinIndexers = function (progress) {
 	var metafile = path.join(config.indexerBuiltinPath, 'meta.json');
 	var meta = new Promise(function (resolve, reject) {
 		fs.readFile(metafile, 'utf-8', function (err, data) {
@@ -475,9 +475,11 @@ Chemr.Index.updateBuiltinIndexers = function () {
 		return JSON.parse(string);
 	});
 
-	Promise.all([ meta, remote ]).then(function (_) {
+	return Promise.all([ meta, remote ]).then(function (_) {
 		var local = _[0].fileList, remote = _[1];
 		console.log('promise.all', _);
+		progress('log', 'Local  file list length: ' + local.length);
+		progress('log', 'Remote file list length: ' + remote.length);
 
 		var localByName = local.reduce(function (r, i) {
 			r[i.name] = i;
@@ -486,16 +488,20 @@ Chemr.Index.updateBuiltinIndexers = function () {
 
 		return remote.reduce(function (promise, it) {
 			var shouldUpdate = !localByName[it.name] || localByName[it.name].sha !== it.sha;
+			progress('file', 'Checking update ' + it.name + (shouldUpdate ? ' -> will be updated' : ' -> already updated'));
 			console.log('remote', it.name, 'shouldUpdate:', shouldUpdate);
 			if (!shouldUpdate) return promise;
 			return promise.then(function () {
+				progress('file', 'Updating ' + it.name);
 				console.log('GET ', it.download_url);
 				return GET(it.download_url).then(function (string) {
 					var filename = path.join(config.indexerBuiltinPath, it.name);
 					console.log('WRITE ', filename);
+					progress('file', 'Updated ' + it.name);
 					return writeFile(filename, string);
 				}).
 				catch(function (e) {
+					progress('error', 'Error on updating ' + it.name + ' : ' + e);
 					console.log('Error on updating', it.name, ' SKIP');
 				});
 			});
@@ -508,10 +514,7 @@ Chemr.Index.updateBuiltinIndexers = function () {
 			});
 	}).
 	then(function () {
-		alert('Done');
-	}).
-	catch(function (e) {
-		alert('Error on updateBuiltinIndexers' + e);
+		progress('log', 'all done');
 	});
 
 	function GET (uri) {

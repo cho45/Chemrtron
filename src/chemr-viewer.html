@@ -235,12 +235,17 @@
 
 		#settings iron-pages {
 			position: relative;
-			height: 300px;
+			height: 450px;
 		}
 
 		#settings .page {
 			@apply(--layout-fit);
 			padding: 16px;
+		}
+
+		#settings #button-update {
+			background: var(--paper-pink-500);
+			color: #fff;
 		}
 
 		#indexSearch {
@@ -411,6 +416,7 @@
 			<paper-tabs selected="{{settingsTabSelected}}">
 				<paper-tab>General</paper-tab>
 				<paper-tab>Indexers</paper-tab>
+				<paper-tab>Update</paper-tab>
 			</paper-tabs>
 			<iron-pages selected="{{settingsTabSelected}}">
 				<div class="page layout horizontal">
@@ -435,6 +441,20 @@
 							<div class="flex">{{item.name}}</div>
 						</paper-icon-item>
 					</template>
+				</div>
+
+				<div class="page layout vertical">
+					<div style="padding: 0 0 16px">
+						<paper-button id="button-update" raised on-tap="updateIndexers">Update Indexers from GitHub</paper-button>
+					</div>
+					<paper-progress id="updateProgress" style="width: 100%"></paper-progress>
+					<div class="flex relative" id="updateLog">
+						<div class="fit" style="overflow: auto; padding: 6px">
+							<template is="dom-repeat" items="{{updateLog}}">
+								<div class$="{{item.type}}">{{item.message}}</div>
+							</template>
+						</div>
+					</div>
 				</div>
 			</iron-pages>
 			<div class="buttons">
