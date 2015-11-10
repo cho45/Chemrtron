@@ -21,7 +21,7 @@ if [ x$SKIP_OSX != x1 ]; then
 		--out build \
 		--platform=mas \
 		--arch=x64 \
-		--version=0.34.2 \
+		--version=0.34.3 \
 		--ignore=build \
 		--app-version=$version
 
@@ -82,7 +82,7 @@ if [ x$SKIP_WIN != x1 ]; then
 		--icon=assets/win/icon.ico \
 		--platform=win32 \
 		--arch=ia32 \
-		--version=0.34.2 \
+		--version=0.34.3 \
 		--version-string.ProductName="Chemr" \
 		--version-string.ProductVersion="$version" \
 		--ignore=build \
