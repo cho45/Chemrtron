@@ -118,7 +118,9 @@ Polymer({
 		var scrollTarget = self.$.indexList.querySelector('paper-menu');
 		Sortable.create(scrollTarget.querySelector('.selectable-content'), {
 			animation: 150,
+			handle: '.index-icon',
 			scroll: scrollTarget,
+			forceFallback: true,
 
 			onUpdate: function (e) {
 				self.splice('settings.enabled', e.newIndex, 0, self.splice('settings.enabled', e.oldIndex, 1)[0]);
@@ -530,7 +532,13 @@ Polymer({
 			});
 		}
 
-		self.set('currentProgresses.' + current + '.text', "Reindex... " + progress.id + " : " + progress.state + " [" + progress.current + "/" + progress.total + "] (" + Math.round(progress.current / progress.total * 100) + "%)");
+		var message = "Reindex... " + progress.id + " : " + progress.state;
+		if (self.settings.developerMode) { 
+			message += " [" + progress.current + "/" + progress.total + "]";
+		}
+		message += " (" + Math.round(progress.current / progress.total * 100) + "%)";
+
+		self.set('currentProgresses.' + current + '.text', message);
 		self.set('currentProgresses.' + current + '.percent', Math.round(progress.current / progress.total * 100));
 		if (progress.state === 'done') {
 			self.async(function () {

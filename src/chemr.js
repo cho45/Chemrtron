@@ -2,7 +2,6 @@ var remote = require('remote');
 var glob = remote.require('glob');
 var path = remote.require('path');
 var fs = remote.require('fs');
-var os = remote.require('os');
 var config = remote.require('./config');
 
 var Chemr = {};
@@ -280,7 +279,7 @@ Chemr.Index.IndexerContext.prototype = {
 				}
 			}
 			req.onreadystatechange = function () {
-				if (req.readyState == 4) {
+				if (req.readyState === 4) {
 					self.progress("fetch.done", ++self.current, self.total);
 					resolve(req);
 				}
@@ -358,6 +357,7 @@ Chemr.Index.loadIndexers = function () {
 					if (it.match(/\.docset$/)) {
 						promises.push(fromDocset(it));
 					} else {
+						// ignore
 					}
 				});
 
@@ -374,6 +374,7 @@ Chemr.Index.loadIndexers = function () {
 						return;
 					}
 					var index = new Chemr.Index(eval(content + "\n//# sourceURL=" + it));
+					index.location = it;
 					console.log('Initilized', index.id);
 					resolve(index);
 				});
@@ -404,7 +405,7 @@ Chemr.Index.loadIndexers = function () {
 						return;
 					}
 
-					resolve(new Chemr.Index({
+					var index = new Chemr.Index({
 						id: matchId[1],
 						name: matchName[1],
 						docset: docset,
@@ -412,7 +413,11 @@ Chemr.Index.loadIndexers = function () {
 							item[1] = docset + '/Contents/Resources/Documents/' + item[1];
 							return item;
 						}
-					}));
+					});
+
+					index.location = docset;
+
+					resolve(index);
 				});
 			});
 		}
