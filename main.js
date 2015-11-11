@@ -2,7 +2,6 @@
 var app =  require('app');
 var ipc = require('ipc');
 var fs = require('fs');
-var os = require('os');
 var path = require('path');
 var BrowserWindow = require('browser-window');
 var Channel = require('./src/channel');
@@ -43,7 +42,6 @@ var Main = {
 	},
 
 	willQuit : function () {
-		var self = this;
 		globalShortcut.unregisterAll();
 	},
 
@@ -118,7 +116,7 @@ var Main = {
 		settings: function (settings) {
 			var self = this;
 			console.log(settings);
-			if (config.DEBUG != settings.developerMode) {
+			if (config.DEBUG !== settings.developerMode) {
 				if (settings.developerMode) {
 					self.main.openDevTools();
 					self.indexer.window.openDevTools();
@@ -191,7 +189,7 @@ var Main = {
 				});
 			} else {
 				var docset = params.docset;
-				var docroot = path.join(docset, 'Contents/Resources/Documents');
+				// var docroot = path.join(docset, 'Contents/Resources/Documents');
 				var dbfile = path.join(docset, 'Contents/Resources/docSet.dsidx');
 
 				var buf = require('fs').readFileSync(dbfile);
