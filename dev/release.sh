@@ -7,5 +7,5 @@ echo "Release version: v$version"
 #	v$version
 
 
-ghr v$version build/releases
+ghr --draft v$version build/releases
 

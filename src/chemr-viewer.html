@@ -337,7 +337,7 @@
 			<div id="indexList" class="relative">
 				<div class="fit layout vertical">
 					<div class="flex relative">
-						<paper-menu class="fit" style="overflow: hidden; direction: rtl; background: transparent">
+						<paper-menu class="fit" style$="{{_styleForIndexMenu()}}">
 							<template is="dom-repeat" items="{{selectedIndexers}}">
 								<paper-icon-item data-indexer-id$="{{item.id}}" on-tap="selectIndex" style="direction: ltr">
 									<div class="index-icon" item-icon>
