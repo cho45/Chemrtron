@@ -2,7 +2,6 @@ var remote = require('remote');
 var glob = remote.require('glob');
 var path = remote.require('path');
 var fs = remote.require('fs');
-var os = remote.require('os');
 var config = remote.require('./config');
 
 var Chemr = {};
@@ -280,7 +279,7 @@ Chemr.Index.IndexerContext.prototype = {
 				}
 			}
 			req.onreadystatechange = function () {
-				if (req.readyState == 4) {
+				if (req.readyState === 4) {
 					self.progress("fetch.done", ++self.current, self.total);
 					resolve(req);
 				}
@@ -358,6 +357,7 @@ Chemr.Index.loadIndexers = function () {
 					if (it.match(/\.docset$/)) {
 						promises.push(fromDocset(it));
 					} else {
+						// ignore
 					}
 				});
 
@@ -374,6 +374,7 @@ Chemr.Index.loadIndexers = function () {
 						return;
 					}
 					var index = new Chemr.Index(eval(content + "\n//# sourceURL=" + it));
+					index.location = it;
 					console.log('Initilized', index.id);
 					resolve(index);
 				});
@@ -404,7 +405,7 @@ Chemr.Index.loadIndexers = function () {
 						return;
 					}
 
-					resolve(new Chemr.Index({
+					var index = new Chemr.Index({
 						id: matchId[1],
 						name: matchName[1],
 						docset: docset,
@@ -412,7 +413,11 @@ Chemr.Index.loadIndexers = function () {
 							item[1] = docset + '/Contents/Resources/Documents/' + item[1];
 							return item;
 						}
-					}));
+					});
+
+					index.location = docset;
+
+					resolve(index);
 				});
 			});
 		}
@@ -455,7 +460,7 @@ Chemr.Index.byId = function (id) {
 	});
 };
 
-Chemr.Index.updateBuiltinIndexers = function () {
+Chemr.Index.updateBuiltinIndexers = function (progress) {
 	var metafile = path.join(config.indexerBuiltinPath, 'meta.json');
 	var meta = new Promise(function (resolve, reject) {
 		fs.readFile(metafile, 'utf-8', function (err, data) {
@@ -475,9 +480,11 @@ Chemr.Index.updateBuiltinIndexers = function () {
 		return JSON.parse(string);
 	});
 
-	Promise.all([ meta, remote ]).then(function (_) {
+	return Promise.all([ meta, remote ]).then(function (_) {
 		var local = _[0].fileList, remote = _[1];
 		console.log('promise.all', _);
+		progress('log', 'Local  file list length: ' + local.length);
+		progress('log', 'Remote file list length: ' + remote.length);
 
 		var localByName = local.reduce(function (r, i) {
 			r[i.name] = i;
@@ -486,16 +493,20 @@ Chemr.Index.updateBuiltinIndexers = function () {
 
 		return remote.reduce(function (promise, it) {
 			var shouldUpdate = !localByName[it.name] || localByName[it.name].sha !== it.sha;
+			progress('file', 'Checking update ' + it.name + (shouldUpdate ? ' -> will be updated' : ' -> already updated'));
 			console.log('remote', it.name, 'shouldUpdate:', shouldUpdate);
 			if (!shouldUpdate) return promise;
 			return promise.then(function () {
+				progress('file', 'Updating ' + it.name);
 				console.log('GET ', it.download_url);
 				return GET(it.download_url).then(function (string) {
 					var filename = path.join(config.indexerBuiltinPath, it.name);
 					console.log('WRITE ', filename);
+					progress('file', 'Updated ' + it.name);
 					return writeFile(filename, string);
 				}).
 				catch(function (e) {
+					progress('error', 'Error on updating ' + it.name + ' : ' + e);
 					console.log('Error on updating', it.name, ' SKIP');
 				});
 			});
@@ -508,10 +519,7 @@ Chemr.Index.updateBuiltinIndexers = function () {
 			});
 	}).
 	then(function () {
-		alert('Done');
-	}).
-	catch(function (e) {
-		alert('Error on updateBuiltinIndexers' + e);
+		progress('log', 'all done');
 	});
 
 	function GET (uri) {

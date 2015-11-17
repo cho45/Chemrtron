@@ -5,7 +5,6 @@ var app = remote.require('app');
 var fs = remote.require('fs');
 var config = remote.require('./config');
 var Menu = remote.require('menu');
-var MenuItem = remote.require('menu-item');
 
 Polymer({
 	is: "chemr-viewer",
@@ -117,9 +116,11 @@ Polymer({
 		};
 
 		var scrollTarget = self.$.indexList.querySelector('paper-menu');
-		var sortable = Sortable.create(scrollTarget.querySelector('.selectable-content'), {
+		Sortable.create(scrollTarget.querySelector('.selectable-content'), {
 			animation: 150,
+			handle: '.index-icon',
 			scroll: scrollTarget,
+			forceFallback: true,
 
 			onUpdate: function (e) {
 				self.splice('settings.enabled', e.newIndex, 0, self.splice('settings.enabled', e.oldIndex, 1)[0]);
@@ -403,7 +404,7 @@ Polymer({
 				self.$.input.placeholder = index.name;
 				return index.openIndex({ reindex: false }) ;
 			}).
-			catch(function (error) { alert(error.stack) });
+			catch(function (error) { alert(error.stack); });
 		self.set('index', index);
 		self.set('settings.lastSelected', id);
 		self.$.input.value = "";
@@ -429,7 +430,7 @@ Polymer({
 		console.log('reindex', id);
 
 		var index = Chemr.Index.byId(id).
-			then(function (index) { return index.openIndex({ reindex: true }) }).
+			then(function (index) { return index.openIndex({ reindex: true }); }).
 			catch(function (error) {
 				console.log('Error while reindex', error);
 				alert(error.stack);
@@ -521,8 +522,6 @@ Polymer({
 	handleIndexerProgress : function (progress) {
 		var self = this;
 
-		var byId = 'byId-' + progress.id;
-
 		var current = findCurrent();
 		if (current === null) {
 			current = self.currentProgresses.length;
@@ -533,7 +532,13 @@ Polymer({
 			});
 		}
 
-		self.set('currentProgresses.' + current + '.text', "Reindex... " + progress.id + " : " + progress.state + " [" + progress.current + "/" + progress.total + "] (" + Math.round(progress.current / progress.total * 100) + "%)");
+		var message = "Reindex... " + progress.id + " : " + progress.state;
+		if (self.settings.developerMode) { 
+			message += " [" + progress.current + "/" + progress.total + "]";
+		}
+		message += " (" + Math.round(progress.current / progress.total * 100) + "%)";
+
+		self.set('currentProgresses.' + current + '.text', message);
 		self.set('currentProgresses.' + current + '.percent', Math.round(progress.current / progress.total * 100));
 		if (progress.state === 'done') {
 			self.async(function () {
@@ -705,14 +710,14 @@ Polymer({
 					},
 					{
 						label: 'Toggle Full Screen',
-						accelerator: (process.platform == 'darwin') ? 'Ctrl+Command+F' : 'F11',
+						accelerator: (process.platform === 'darwin') ? 'Ctrl+Command+F' : 'F11',
 						click: function (item, focusedWindow) {
 							if (focusedWindow) focusedWindow.setFullScreen(!focusedWindow.isFullScreen());
 						}
 					},
 					{
 						label: 'Toggle Developer Tools',
-						accelerator: (process.platform == 'darwin') ? 'Alt+Command+I' : 'Ctrl+Shift+I',
+						accelerator: (process.platform === 'darwin') ? 'Alt+Command+I' : 'Ctrl+Shift+I',
 						click: function (item, focusedWindow) {
 							self.set('settings.developerMode', !self.settings.developerMode);
 						}
@@ -741,24 +746,24 @@ Polymer({
 				submenu: [
 					{
 						label: 'Report issue\u2026',
-						click: function() { require('shell').openExternal('https://github.com/cho45/Chemrtron/issues') }
+						click: function() { require('shell').openExternal('https://github.com/cho45/Chemrtron/issues'); }
 					},
 					{
 						label: 'Chemr Help',
-						click: function() { require('shell').openExternal('http://cho45.github.io/Chemrtron/#usage') }
+						click: function() { require('shell').openExternal('http://cho45.github.io/Chemrtron/#usage'); }
 					},
 					{
 						type: 'separator'
 					},
 					{
 						label: 'GitHub Repository\u2026',
-						click: function() { require('shell').openExternal('https://github.com/cho45/Chemrtron') }
+						click: function() { require('shell').openExternal('https://github.com/cho45/Chemrtron'); }
 					}
 				]
 			}
 		];
 
-		if (process.platform == 'darwin') {
+		if (process.platform === 'darwin') {
 			template.unshift({
 				label: name,
 				submenu: [
@@ -883,8 +888,14 @@ Polymer({
 
 	generateCredits : function () {
 		var CREDITS = fs.readFileSync(path.join(__dirname, 'CREDITS'), 'utf8');
+		var CONTRIBUTORS = fs.readFileSync(path.join(__dirname, 'CONTRIBUTORS'), 'utf8');
 
-		var sections = [];
+		var sections = [
+			{
+				name: 'Chemr Contributors',
+				content: CONTRIBUTORS
+			}
+		];
 
 		var lines = CREDITS.split(/\n/);
 		var current;
@@ -959,11 +970,13 @@ Polymer({
 		}
 
 		var self = this;
-		var found = self.contentEval(function (aString, aBackwards, cont) {
+		self.contentEval(function (aString, aBackwards, cont) {
 			if (cont) {
 				try {
 					window.getSelection().collapseToStart();
-				} catch (e) {}
+				} catch (e) {
+					// ignore
+				}
 			}
 
 			var aCaseSensitive = false;
@@ -984,5 +997,26 @@ Polymer({
 			ret += '; margin-top: ' + (10 * window.devicePixelRatio) + 'px';
 		}
 		return ret;
+	},
+
+	updateIndexers : function () {
+		var self = this;
+		self.set('updateLog', []);
+		self.$.updateProgress.indeterminate = true;
+		Chemr.Index.updateBuiltinIndexers(function (type, message) {
+			self.push('updateLog', { type: type, message: message });
+		}).
+		then(function () {
+			Chemr.Index.loadIndexers();
+			// reinitialize
+			self.loadedSettings();
+		}).
+		catch(function (e) {
+			self.push('updateLog', { type: 'error', message: 'Error on update indexers: ' + e });
+			alert('Error on updateBuiltinIndexers' + e);
+		}).
+		then(function () {
+			self.$.updateProgress.indeterminate = false;
+		});
 	}
 });

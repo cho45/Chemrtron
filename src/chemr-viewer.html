@@ -235,12 +235,22 @@
 
 		#settings iron-pages {
 			position: relative;
-			height: 300px;
+			height: 450px;
 		}
 
 		#settings .page {
 			@apply(--layout-fit);
 			padding: 16px;
+		}
+
+		#settings .index-location {
+			font-size: 80%;
+			color: var(--paper-grey-500);
+		}
+
+		#settings #button-update {
+			background: var(--paper-pink-500);
+			color: #fff;
 		}
 
 		#indexSearch {
@@ -316,6 +326,10 @@
 		#about .credits paper-menu paper-item.iron-selected {
 			background: #fff !important;
 		}
+
+		*[hide] {
+			display: none;
+		}
 	</style>
 
 	<template>
@@ -341,7 +355,7 @@
 									<paper-menu-button>
 										<paper-icon-button icon="settings" class="dropdown-trigger"></paper-icon-button>
 										<paper-menu class="dropdown-content" selectable="none">
-											<paper-item on-tap="reindex">Reindex</paper-item>
+											<paper-item on-click="reindex">Reindex</paper-item>
 										</paper-menu>
 									</paper-menu-button>
 								</paper-icon-item>
@@ -411,6 +425,7 @@
 			<paper-tabs selected="{{settingsTabSelected}}">
 				<paper-tab>General</paper-tab>
 				<paper-tab>Indexers</paper-tab>
+				<paper-tab>Update</paper-tab>
 			</paper-tabs>
 			<iron-pages selected="{{settingsTabSelected}}">
 				<div class="page layout horizontal">
@@ -425,16 +440,42 @@
 					</div>
 				</div>
 
-				<div class="page" style="overflow-y: auto">
-					<p>Custom indexers are loaded from 
-						<kbd>{{config.indexerPath}}</kbd>
-					</p>
-					<template is="dom-repeat" items="{{indexers}}">
-						<paper-icon-item>
-							<paper-checkbox item-icon checked="{{item.enabled}}"></paper-checkbox>
-							<div class="flex">{{item.name}}</div>
-						</paper-icon-item>
-					</template>
+				<div class="page layout vertical">
+					<div style="padding: 0 16px 16px">
+						<div>
+							Custom indexers are loaded from <kbd>{{config.indexerPath}}</kbd>
+						</div>
+						<div style="text-align: right">
+							<paper-checkbox checked="{{settings.showIndexerSourceLocation}}">Show source location</paper-checkbox>
+						</div>
+					</div>
+					<div class="flex relative">
+						<div class="fit" style="overflow-y: auto">
+							<template is="dom-repeat" items="{{indexers}}">
+								<paper-icon-item>
+									<paper-checkbox item-icon checked="{{item.enabled}}"></paper-checkbox>
+									<div class="flex">
+										<span>{{item.name}}</span>
+										<span class="index-location only-development-mode" hide$="{{!settings.showIndexerSourceLocation}}">{{item.location}}</span>
+									</div>
+								</paper-icon-item>
+							</template>
+						</div>
+					</div>
+				</div>
+
+				<div class="page layout vertical">
+					<div style="padding: 0 0 16px">
+						<paper-button id="button-update" raised on-tap="updateIndexers">Update Indexers from GitHub</paper-button>
+					</div>
+					<paper-progress id="updateProgress" style="width: 100%"></paper-progress>
+					<div class="flex relative" id="updateLog">
+						<div class="fit" style="overflow: auto; padding: 6px">
+							<template is="dom-repeat" items="{{updateLog}}">
+								<div class$="{{item.type}}">{{item.message}}</div>
+							</template>
+						</div>
+					</div>
 				</div>
 			</iron-pages>
 			<div class="buttons">

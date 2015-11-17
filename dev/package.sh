@@ -8,6 +8,11 @@ cd $ROOT
 version=$(cat VERSION);
 echo "Create version: v$version"
 
+echo "UPDATE CONTRIBUTOR LIST"
+curl https://api.github.com/repos/cho45/Chemrtron/contributors | \
+	node -e "console.log(JSON.parse(require('fs').readFileSync('/dev/stdin', 'utf8')).map(x => '@' + x.login).filter(x => x !== '@cho45').join(', '));" \
+	> CONTRIBUTORS
+
 rm -r build
 mkdir -p build/releases
 
@@ -21,7 +26,7 @@ if [ x$SKIP_OSX != x1 ]; then
 		--out build \
 		--platform=mas \
 		--arch=x64 \
-		--version=0.34.0 \
+		--version=0.34.3 \
 		--ignore=build \
 		--app-version=$version
 
@@ -54,14 +59,22 @@ if [ x$SKIP_OSX != x1 ]; then
 		codesign  -fs "$APP_KEY" --entitlements dev/parent.plist "$APP_PATH"
 		productbuild --component "$APP_PATH" /Applications --sign "$INSTALLER_KEY" "$RESULT_PATH"
 	else
-		codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/Libraries/libnode.dylib"
-		codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/Electron Framework"
-		codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/"
-		codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/$APP Helper.app/"
-		codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/$APP Helper EH.app/"
-		codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/$APP Helper NP.app/"
-		codesign  -fs - --entitlements dev/parent.plist "$APP_PATH"
-		productbuild --component "$APP_PATH" /Applications "$RESULT_PATH"
+		if [ x$SANDBOX == x0 ]; then
+			electron-builder \
+				build/Chemr-mas-x64/Chemr.app \
+				--platform=osx \
+				--out=build/releases \
+				--config=installer.json
+		else
+			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/Libraries/libnode.dylib"
+			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/Electron Framework"
+			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/"
+			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/$APP Helper.app/"
+			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/$APP Helper EH.app/"
+			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/$APP Helper NP.app/"
+			codesign  -fs - --entitlements dev/parent.plist "$APP_PATH"
+			productbuild --component "$APP_PATH" /Applications "$RESULT_PATH"
+		fi
 	fi
 fi
 
@@ -74,7 +87,7 @@ if [ x$SKIP_WIN != x1 ]; then
 		--icon=assets/win/icon.ico \
 		--platform=win32 \
 		--arch=ia32 \
-		--version=0.34.0 \
+		--version=0.34.3 \
 		--version-string.ProductName="Chemr" \
 		--version-string.ProductVersion="$version" \
 		--ignore=build \
