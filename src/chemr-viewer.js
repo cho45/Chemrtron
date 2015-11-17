@@ -994,7 +994,7 @@ Polymer({
 	_styleForIndexMenu : function () {
 		var ret = 'overflow: hidden; direction: rtl; background: transparent';
 		if (process.platform === 'darwin') {
-			ret += '; margin-top: ' + (10 * window.devicePixelRatio) + 'px';
+			ret += '; margin-top: 28px';
 		}
 		return ret;
 	},
