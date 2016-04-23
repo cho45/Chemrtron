@@ -5,6 +5,8 @@ set -x
 ROOT=$(cd $(dirname $0)/..; pwd)
 cd $ROOT
 
+ELECTRON_VERSION=$(ruby -rjson -e 'puts JSON.parse(File.read("package.json"))["dependencies"]["electron-prebuilt"]')
+
 version=$(cat VERSION);
 echo "Create version: v$version"
 
@@ -15,6 +17,7 @@ curl https://api.github.com/repos/cho45/Chemrtron/contributors | \
 
 rm -r build
 mkdir -p build/releases
+cp assets/win/icon.ico build/
 
 ### OS X
 
@@ -26,7 +29,7 @@ if [ x$SKIP_OSX != x1 ]; then
 		--out build \
 		--platform=mas \
 		--arch=x64 \
-		--version=0.34.3 \
+		--version=$ELECTRON_VERSION \
 		--ignore=build \
 		--app-version=$version
 
@@ -60,11 +63,9 @@ if [ x$SKIP_OSX != x1 ]; then
 		productbuild --component "$APP_PATH" /Applications --sign "$INSTALLER_KEY" "$RESULT_PATH"
 	else
 		if [ x$SANDBOX == x0 ]; then
-			electron-builder \
+			./node_modules/.bin/build \
 				build/Chemr-mas-x64/Chemr.app \
-				--platform=osx \
-				--out=build/releases \
-				--config=installer.json
+				--platform=osx
 		else
 			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/Libraries/libnode.dylib"
 			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/Electron Framework"
@@ -87,7 +88,7 @@ if [ x$SKIP_WIN != x1 ]; then
 		--icon=assets/win/icon.ico \
 		--platform=win32 \
 		--arch=ia32 \
-		--version=0.34.3 \
+		--version=$ELECTRON_VERSION \
 		--version-string.ProductName="Chemr" \
 		--version-string.ProductVersion="$version" \
 		--ignore=build \
@@ -96,9 +97,7 @@ if [ x$SKIP_WIN != x1 ]; then
 	cp dev/Chemr.exe.manifest build/Chemr-win32-ia32/
 	cp dev/installer.nsi.tpl node_modules/electron-builder/templates/installer.nsi.tpl
 
-	./node_modules/.bin/electron-builder \
+	./node_modules/.bin/build \
 		build/Chemr-win32-ia32 \
-		--platform=win \
-		--out=build/releases \
-		--config=installer.json
+		--platform=win
 fi
