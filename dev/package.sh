@@ -53,19 +53,22 @@ if [ x$SKIP_OSX != x1 ]; then
 	FRAMEWORKS_PATH="$APP_PATH/Contents/Frameworks"
 
 	if [ x$SIGN == x1 ]; then
-		codesign --deep -fs "$APP_KEY" --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/Libraries/libnode.dylib"
-		codesign --deep -fs "$APP_KEY" --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/Electron Framework"
-		codesign --deep -fs "$APP_KEY" --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/"
-		codesign --deep -fs "$APP_KEY" --entitlements dev/child.plist "$FRAMEWORKS_PATH/$APP Helper.app/"
-		codesign --deep -fs "$APP_KEY" --entitlements dev/child.plist "$FRAMEWORKS_PATH/$APP Helper EH.app/"
-		codesign --deep -fs "$APP_KEY" --entitlements dev/child.plist "$FRAMEWORKS_PATH/$APP Helper NP.app/"
-		codesign  -fs "$APP_KEY" --entitlements dev/parent.plist "$APP_PATH"
+		./node_modules/.bin/electron-osx-sign "$APP_PATH" --entitlements=dev/parent.plist --entitlements-inherit=dev/child.plist --identity="$APP_KEY"
+
+#		codesign --deep -fs "$APP_KEY" --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/Libraries/libnode.dylib"
+#		codesign --deep -fs "$APP_KEY" --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/Electron Framework"
+#		codesign --deep -fs "$APP_KEY" --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/"
+#		codesign --deep -fs "$APP_KEY" --entitlements dev/child.plist "$FRAMEWORKS_PATH/$APP Helper.app/"
+#		codesign --deep -fs "$APP_KEY" --entitlements dev/child.plist "$FRAMEWORKS_PATH/$APP Helper EH.app/"
+#		codesign --deep -fs "$APP_KEY" --entitlements dev/child.plist "$FRAMEWORKS_PATH/$APP Helper NP.app/"
+#		codesign  -fs "$APP_KEY" --entitlements dev/parent.plist "$APP_PATH"
 		productbuild --component "$APP_PATH" /Applications --sign "$INSTALLER_KEY" "$RESULT_PATH"
 	else
 		if [ x$SANDBOX == x0 ]; then
-			./node_modules/.bin/build \
-				--dist \
-				--platform=osx
+			echo "not SANDBOXed"
+#			./node_modules/.bin/build \
+#				--dist \
+#				--platform=osx
 		else
 			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/Libraries/libnode.dylib"
 			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/Electron Framework"

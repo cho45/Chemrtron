@@ -10,38 +10,47 @@
   "author": "cho45 <cho45@lowreal.net> (http://www.lowreal.net/)",
   "license": "MIT",
   "dependencies": {
+    "electron-osx-sign": "^0.3.0",
+    "electron-prebuilt": "0.37.7",
     "glob": "^5.0.15",
     "mkdirp": "^0.5.1",
-    "sql.js": "^0.2.21",
-    "electron-prebuilt": "0.37.7"
+    "sql.js": "^0.2.21"
   },
   "devDependencies": {
-    "electron-builder": "^3.9.0",
     "electron-builder": "^7.0.1"
   },
   "build": {
-    "app-bundle-id" : "",
+    "app-bundle-id": "",
     "app-category-type": "public.app-category.developer-tools",
     "asar": false,
     "iconUrl": "https://raw.githubusercontent.com/cho45/Chemrtron/master/assets/chemr-assets/icon_1024x1024.png",
-    "osx" : {
+    "osx": {
       "title": "Chemr",
       "background": "assets/osx/installer.png",
       "icon": "assets/osx/icon.icns",
       "icon-size": 80,
       "contents": [
-        { "x": 438, "y": 344, "type": "link", "path": "/Applications" },
-        { "x": 192, "y": 344, "type": "file" }
+        {
+          "x": 438,
+          "y": 344,
+          "type": "link",
+          "path": "/Applications"
+        },
+        {
+          "x": 192,
+          "y": 344,
+          "type": "file"
+        }
       ]
     },
-    "win" : {
-      "title" : "Chemr",
-      "icon" : "assets/win/icon.ico"
+    "win": {
+      "title": "Chemr",
+      "icon": "assets/win/icon.ico"
     }
   },
   "directories": {
-      "buildResources": "build",
-      "output": "build/releases",
-      "app": "."
+    "buildResources": "build",
+    "output": "build/releases",
+    "app": "."
   }
 }
