@@ -64,7 +64,7 @@ if [ x$SKIP_OSX != x1 ]; then
 	else
 		if [ x$SANDBOX == x0 ]; then
 			./node_modules/.bin/build \
-				build/Chemr-mas-x64/Chemr.app \
+				--dist \
 				--platform=osx
 		else
 			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/Libraries/libnode.dylib"
@@ -83,21 +83,21 @@ fi
 ### Windows
 
 if [ x$SKIP_WIN != x1 ]; then
-	electron-packager . Chemr \
-		--out build \
-		--icon=assets/win/icon.ico \
-		--platform=win32 \
-		--arch=ia32 \
-		--version=$ELECTRON_VERSION \
-		--version-string.ProductName="Chemr" \
-		--version-string.ProductVersion="$version" \
-		--ignore=build \
-		--app-version=$version
+#	electron-packager . Chemr \
+#		--out build \
+#		--icon=assets/win/icon.ico \
+#		--platform=win32 \
+#		--arch=ia32 \
+#		--version=$ELECTRON_VERSION \
+#		--version-string.ProductName="Chemr" \
+#		--version-string.ProductVersion="$version" \
+#		--ignore=build \
+#		--app-version=$version
 
-	cp dev/Chemr.exe.manifest build/Chemr-win32-ia32/
-	cp dev/installer.nsi.tpl node_modules/electron-builder/templates/installer.nsi.tpl
+#	cp dev/Chemr.exe.manifest build/Chemr-win32-ia32/
+#	cp dev/installer.nsi.tpl node_modules/electron-builder/templates/installer.nsi.tpl
 
 	./node_modules/.bin/build \
-		build/Chemr-win32-ia32 \
+		--dist \
 		--platform=win
 fi
