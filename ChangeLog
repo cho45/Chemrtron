@@ -1,3 +1,8 @@
+2016-04-23  SATOH Hiroh <cho45@lowreal.net>
+
+	* Add feature: hidden title bar (by @rhysd)
+	* Add indexer: pandas (by @m-ueno)
+
 2015-11-11  SATOH Hiroh <cho45@lowreal.net>
 
 	* Add online indexer update.
