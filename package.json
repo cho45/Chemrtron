@@ -15,6 +15,7 @@
     "sql.js": "^0.2.21"
   },
   "devDependencies": {
-    "electron-builder": "^2.0.2"
+    "electron-builder": "^3.9.0",
+    "electron-builder": "^7.0.1"
   }
 }

@@ -32,8 +32,8 @@ if [ x$SKIP_OSX != x1 ]; then
 
 	cd build/Chemr-mas-x64
 
-	ruby -i -anal -e 'puts gsub(/com.github.electron/, "net.lowreal.Chemr").gsub(/Electron/, "Chemr")' Chemr.app/Contents/Frameworks/Chemr\ Helper\ EH.app/Contents/Info.plist
-	ruby -i -anal -e 'puts gsub(/com.github.electron/, "net.lowreal.Chemr").gsub(/Electron/, "Chemr")' Chemr.app/Contents/Frameworks/Chemr\ Helper\ NP.app/Contents/Info.plist
+#	ruby -i -anal -e 'puts gsub(/com.github.electron/, "net.lowreal.Chemr").gsub(/Electron/, "Chemr")' Chemr.app/Contents/Frameworks/Chemr\ Helper\ EH.app/Contents/Info.plist
+#	ruby -i -anal -e 'puts gsub(/com.github.electron/, "net.lowreal.Chemr").gsub(/Electron/, "Chemr")' Chemr.app/Contents/Frameworks/Chemr\ Helper\ NP.app/Contents/Info.plist
 
 	cd $ROOT
 
