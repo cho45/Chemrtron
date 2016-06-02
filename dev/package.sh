@@ -64,7 +64,7 @@ if [ x$SKIP_OSX != x1 ]; then
 #		if [ x$SANDBOX == x0 ]; then
 #			echo "not SANDBOXed"
 #		else
-			# ./node_modules/.bin/electron-osx-sign --no-pre-auto-entitlements --platform=mas --version=1.2.0 "$APP_PATH" --entitlements=dev/parent.plist --entitlements-inherit=dev/child.plist --identity="-"
+			./node_modules/.bin/electron-osx-sign --no-pre-auto-entitlements --platform=mas --version=1.2.0 "$APP_PATH" --entitlements=dev/parent.plist --entitlements-inherit=dev/child.plist --identity="-"
 			productbuild --component "$APP_PATH" /Applications "$RESULT_PATH"
 #		fi
 	fi
