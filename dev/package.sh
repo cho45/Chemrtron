@@ -5,7 +5,7 @@ set -x
 ROOT=$(cd $(dirname $0)/..; pwd)
 cd $ROOT
 
-ELECTRON_VERSION=$(ruby -rjson -e 'puts JSON.parse(File.read("package.json"))["dependencies"]["electron-prebuilt"]')
+ELECTRON_VERSION=$(ruby -rjson -e 'puts JSON.parse(File.read("package.json"))["dependencies"]["electron"]')
 
 version=$(cat VERSION);
 echo "Create version: v$version"
@@ -22,6 +22,7 @@ cp assets/win/icon.ico build/
 ### OS X
 
 if [ x$SKIP_OSX != x1 ]; then
+	export DEBUG=electron-osx-sign 
 	./node_modules/.bin/electron-packager  . Chemr \
 		--icon=assets/osx/icon.icns \
 		--app-bundle-id=net.lowreal.Chemr \
@@ -31,7 +32,10 @@ if [ x$SKIP_OSX != x1 ]; then
 		--arch=x64 \
 		--version=$ELECTRON_VERSION \
 		--ignore=build \
-		--app-version=$version
+		--ignore="dev|sketch" \
+		--ignore="node_modules/(electron-.*)" \
+		--app-version=$version \
+		--extend-info=dev/Info.plist
 
 	cd build/Chemr-mas-x64
 
@@ -48,38 +52,21 @@ if [ x$SKIP_OSX != x1 ]; then
 	RESULT_PATH="build/releases/Chemr.pkg"
 	# The name of certificates you requested.
 	APP_KEY="3rd Party Mac Developer Application: Hirofumi Watanabe (877L5ULMT9)"
+	APP_KEY="3rd Party Mac Developer Application: Hirofumi Watanabe (877L5ULMT9)"
 	INSTALLER_KEY="3rd Party Mac Developer Installer: Hirofumi Watanabe (877L5ULMT9)"
 
 	FRAMEWORKS_PATH="$APP_PATH/Contents/Frameworks"
 
 	if [ x$SIGN == x1 ]; then
-		./node_modules/.bin/electron-osx-sign --version=1.2.0 "$APP_PATH" --entitlements=dev/parent.plist --entitlements-inherit=dev/child.plist --identity="$APP_KEY"
-
-#		codesign --deep -fs "$APP_KEY" --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/Libraries/libnode.dylib"
-#		codesign --deep -fs "$APP_KEY" --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/Electron Framework"
-#		codesign --deep -fs "$APP_KEY" --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/"
-#		codesign --deep -fs "$APP_KEY" --entitlements dev/child.plist "$FRAMEWORKS_PATH/$APP Helper.app/"
-#		codesign --deep -fs "$APP_KEY" --entitlements dev/child.plist "$FRAMEWORKS_PATH/$APP Helper EH.app/"
-#		codesign --deep -fs "$APP_KEY" --entitlements dev/child.plist "$FRAMEWORKS_PATH/$APP Helper NP.app/"
-#		codesign  -fs "$APP_KEY" --entitlements dev/parent.plist "$APP_PATH"
+		./node_modules/.bin/electron-osx-sign --no-pre-auto-entitlements --version=1.2.0 "$APP_PATH" --entitlements=dev/parent.plist --entitlements-inherit=dev/child.plist --identity="$APP_KEY"
 		productbuild --component "$APP_PATH" /Applications --sign "$INSTALLER_KEY" "$RESULT_PATH"
 	else
-		if [ x$SANDBOX == x0 ]; then
-			echo "not SANDBOXed"
-#			./node_modules/.bin/build \
-#				--dist \
-#				--platform=osx
-		else
-			./node_modules/.bin/electron-osx-sign --version=1.2.0 "$APP_PATH" --entitlements=dev/parent.plist --entitlements-inherit=dev/child.plist --identity="-"
-#			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/Libraries/libnode.dylib"
-#			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/Electron Framework"
-#			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/"
-#			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/$APP Helper.app/"
-#			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/$APP Helper EH.app/"
-#			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/$APP Helper NP.app/"
-#			codesign  -fs - --entitlements dev/parent.plist "$APP_PATH"
+#		if [ x$SANDBOX == x0 ]; then
+#			echo "not SANDBOXed"
+#		else
+			# ./node_modules/.bin/electron-osx-sign --no-pre-auto-entitlements --platform=mas --version=1.2.0 "$APP_PATH" --entitlements=dev/parent.plist --entitlements-inherit=dev/child.plist --identity="-"
 			productbuild --component "$APP_PATH" /Applications "$RESULT_PATH"
-		fi
+#		fi
 	fi
 fi
 

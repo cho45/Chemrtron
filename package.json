@@ -10,15 +10,14 @@
   "author": "cho45 <cho45@lowreal.net> (http://www.lowreal.net/)",
   "license": "MIT",
   "dependencies": {
-    "electron-osx-sign": "^0.3.0",
-    "electron-prebuilt": "1.0.2",
     "glob": "^5.0.15",
     "mkdirp": "^0.5.1",
     "sql.js": "^0.2.21"
   },
   "devDependencies": {
-    "electron-packager": "^7.0.3",
-    "electron-builder": "^7.0.1"
+    "electron-osx-sign": "^0.4.0-beta4",
+    "electron-prebuilt": "1.2.1",
+    "electron-packager": "^7.0.3"
   },
   "build": {
     "app-bundle-id": "",
