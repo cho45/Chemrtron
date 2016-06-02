@@ -384,7 +384,7 @@
 					<div id="webviewToolbar" class="layout horizontal wrap" style="">
 						<paper-icon-button icon="icons:arrow-back" on-tap="back"></paper-icon-button>
 						<paper-icon-button icon="icons:arrow-forward" on-tap="forward"></paper-icon-button>
-						<div class="flex" style="height: 40px; line-height: 40px; overflow: hidden; text-overflow: ellipsis;">{{currentLocation}}</div>
+						<div class="flex" style="height: 40px; line-height: 40px; overflow: hidden; text-overflow: ellipsis; -webkit-app-region: drag">{{currentLocation}}</div>
 						<paper-progress id="progress" style="width: 100%"></paper-progress>
 						<div style="width: 100%; position: relative">
 							<div id="contentFindBox" class="layout horizontal" style="">
