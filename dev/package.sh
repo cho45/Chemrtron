@@ -22,7 +22,7 @@ cp assets/win/icon.ico build/
 ### OS X
 
 if [ x$SKIP_OSX != x1 ]; then
-	electron-packager . Chemr \
+	./node_modules/.bin/electron-packager  . Chemr \
 		--icon=assets/osx/icon.icns \
 		--app-bundle-id=net.lowreal.Chemr \
 		--helper-bundle-id=net.lowreal.ChemrHelper \
@@ -53,7 +53,7 @@ if [ x$SKIP_OSX != x1 ]; then
 	FRAMEWORKS_PATH="$APP_PATH/Contents/Frameworks"
 
 	if [ x$SIGN == x1 ]; then
-		./node_modules/.bin/electron-osx-sign "$APP_PATH" --entitlements=dev/parent.plist --entitlements-inherit=dev/child.plist --identity="$APP_KEY"
+		./node_modules/.bin/electron-osx-sign --version=1.2.0 "$APP_PATH" --entitlements=dev/parent.plist --entitlements-inherit=dev/child.plist --identity="$APP_KEY"
 
 #		codesign --deep -fs "$APP_KEY" --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/Libraries/libnode.dylib"
 #		codesign --deep -fs "$APP_KEY" --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/Electron Framework"
@@ -70,13 +70,14 @@ if [ x$SKIP_OSX != x1 ]; then
 #				--dist \
 #				--platform=osx
 		else
-			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/Libraries/libnode.dylib"
-			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/Electron Framework"
-			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/"
-			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/$APP Helper.app/"
-			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/$APP Helper EH.app/"
-			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/$APP Helper NP.app/"
-			codesign  -fs - --entitlements dev/parent.plist "$APP_PATH"
+			./node_modules/.bin/electron-osx-sign --version=1.2.0 "$APP_PATH" --entitlements=dev/parent.plist --entitlements-inherit=dev/child.plist --identity="-"
+#			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/Libraries/libnode.dylib"
+#			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/Electron Framework"
+#			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/Electron Framework.framework/"
+#			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/$APP Helper.app/"
+#			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/$APP Helper EH.app/"
+#			codesign --deep -fs - --entitlements dev/child.plist "$FRAMEWORKS_PATH/$APP Helper NP.app/"
+#			codesign  -fs - --entitlements dev/parent.plist "$APP_PATH"
 			productbuild --component "$APP_PATH" /Applications "$RESULT_PATH"
 		fi
 	fi

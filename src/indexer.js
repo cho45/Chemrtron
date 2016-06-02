@@ -2,18 +2,17 @@
 //   * create index
 //   * emit event around index creation
 
-var config = require('remote').require('./config');
 console.log('config', config);
-var ipc = require('ipc');
+const ipc = electron.ipcRenderer;
 var Indexer = {
 	init : function () {
 		var self = this;
 		ipc.on('indexer', self.handleIPC.bind(self));
 	},
 
-	handleIPC : function (args) {
+	handleIPC : function (e, args) {
 		var self = this;
-		console.log('[indexer]', args);
+		console.log('[indexer]', e, args);
 
 		var func = self.IPCMethods[args.method];
 

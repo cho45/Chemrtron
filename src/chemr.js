@@ -1,10 +1,11 @@
-var remote = require('remote');
-var glob = remote.require('glob');
-var path = remote.require('path');
-var fs = remote.require('fs');
-var config = remote.require('./config');
+const electron = require('electron');
+const remote = electron.remote;
+const glob = remote.require('glob');
+const path = remote.require('path');
+const fs = remote.require('fs');
+const config = remote.require('./config');
 
-var Chemr = {};
+const Chemr = {};
 
 Chemr.Index = function () { this.init.apply(this, arguments) };
 Chemr.Index.prototype = {

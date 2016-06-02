@@ -1,10 +1,8 @@
-var remote = require('remote');
-var ipc = require('ipc');
-var Channel = require('./src/channel');
-var app = remote.require('app');
-var fs = remote.require('fs');
-var config = remote.require('./config');
-var Menu = remote.require('menu');
+
+const ipc = electron.ipcRenderer;
+const app = remote.require('electron').app;
+const Menu =  remote.require('electron').Menu;
+const Channel = require('./src/channel');
 
 Polymer({
 	is: "chemr-viewer",
@@ -72,8 +70,8 @@ Polymer({
 		var self = this;
 		Chemr.IPC = new Channel({
 			recv : function (callback) {
-				ipc.on('viewer', function (args) {
-					// console.log('[viewer]', args);
+				ipc.on('viewer', function (e, args) {
+					console.log('[viewer]', args);
 					callback(args);
 				});
 			},
@@ -153,7 +151,7 @@ Polymer({
 			}
 		});
 		frame.addEventListener('dom-ready', function (e) {
-			self.set('currentLocation', frame.getUrl());
+			self.set('currentLocation', frame.getURL());
 			console.log('frame.dom-ready');
 		});
 		frame.addEventListener('did-finish-load', function (e) {
@@ -175,7 +173,7 @@ Polymer({
 		frame.addEventListener('did-get-redirect-request', function (e) {
 			console.log('did-get-redirect-request', e);
 			if (e.isMainFrame) {
-				self.set('currentLocation', e.newUrl);
+				self.set('currentLocation', e.newURL);
 			}
 		});
 		frame.addEventListener('page-title-set', function (e) {

@@ -1,14 +1,15 @@
+const electron = require('electron');
+const ipc = electron.ipcRenderer;
 var serializeError = require('./utils').serializeError;
-var ipc = require('ipc');
 var Content = {
 	init : function () {
 		var self = this;
 		ipc.on('content', self.handleIPC.bind(self));
 	},
 
-	handleIPC : function (args) {
+	handleIPC : function (e, args) {
 		var self = this;
-		console.log('[content]', args);
+		console.log('[content]', e, args);
 
 		var func = self.IPCMethods[args.method];
 

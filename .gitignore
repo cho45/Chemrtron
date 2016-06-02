@@ -1,5 +1,4 @@
 build/
 .DS_Store
-node_modules/electron-builder
-node_modules/.bin/electron-builder
+node_modules/
 sketch/

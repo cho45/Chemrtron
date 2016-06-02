@@ -1,17 +1,18 @@
 
-var app =  require('app');
-var ipc = require('ipc');
-var fs = require('fs');
-var path = require('path');
-var BrowserWindow = require('browser-window');
-var Channel = require('./src/channel');
-var config = require('./config');
-var serializeError = require('./src/utils').serializeError;
-var mkdirp = require('mkdirp');
-var globalShortcut = require('global-shortcut');
-var SQL = require('sql.js');
+const electron = require('electron');
+const {app} = electron;
+const ipc = electron.ipcMain;
+const {BrowserWindow} = electron;
+const {globalShortcut} = electron;
+const fs = require('fs');
+const path = require('path');
+const Channel = require('./src/channel');
+const config = require('./config');
+const serializeError = require('./src/utils').serializeError;
+const mkdirp = require('mkdirp');
+const SQL = require('sql.js');
 
-require('crash-reporter').start();
+// electron.crashReporter.start();
 
 var Main = {
 	init : function () {
@@ -28,8 +29,8 @@ var Main = {
 	ready : function () {
 		var self = this;
 
-		self.main = new BrowserWindow({width: 1440, height: 900, 'title-bar-style': 'hidden-inset'});
-		self.main.loadUrl('file://' + __dirname + '/viewer.html');
+		self.main = new BrowserWindow({width: 1440, height: 900, titleBarStyle: 'hidden-inset'});
+		self.main.loadURL('file://' + __dirname + '/viewer.html');
 		if (config.DEBUG) self.main.openDevTools();
 		self.main.on('closed', function () {
 			self.main = null;
@@ -56,7 +57,7 @@ var Main = {
 				var self = this;
 				return new Promise(function (resolve, reject) {
 					self.window = new BrowserWindow({width: 800, height: 600, x: 0, y: 0, show: config.DEBUG });
-					self.window.loadUrl('file://' + __dirname + '/indexer.html');
+					self.window.loadURL('file://' + __dirname + '/indexer.html');
 					if (config.DEBUG) self.window.openDevTools();
 					self.window.webContents.on('did-finish-load', resolve);
 				});
