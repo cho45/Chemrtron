@@ -15,9 +15,7 @@
     "sql.js": "^0.2.21"
   },
   "devDependencies": {
-    "electron-osx-sign": "^0.4.0-beta4",
-    "electron-prebuilt": "1.2.1",
-    "electron-packager": "^7.0.3"
+    "electron": "^7.0.0"
   },
   "build": {
     "app-bundle-id": "",
