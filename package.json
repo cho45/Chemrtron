@@ -15,7 +15,8 @@
     "sql.js": "^0.2.21"
   },
   "devDependencies": {
-    "electron": "^7.0.0"
+    "electron": "^7.0.0",
+    "electron-packager": "^14.0.6"
   },
   "build": {
     "app-bundle-id": "",
