@@ -6,30 +6,28 @@ indexer = {
 	index : function (ctx) {
 		var self = this;
 
+		function addIndex(page) {
+			ctx.pushIndex(page.title, page.slug);
+			for (let subpage of page.subpages) {
+				addIndex(subpage);
+			}
+		}
+
 		function _search(url) {
 			console.log('MDN search', url);
 			return self.fetchJSON(url).
 			then(function (results) {
-				console.log('MDN search', results.page, results.pages);
+				console.log(results);
 
-				for (var i = 0, it; (it = results.documents[i]); i++) {
-					ctx.pushIndex(it.title, it.slug);
-				}
-
-				if (results.next) {
-					return _search(results.next);
-				} else {
-					// all done
-					return;
-				}
+				addIndex(results);
 			});
 		}
 
-		return _search('https://developer.mozilla.org/en-US/search.json?q=&topic=api&topic=css&topic=canvas&topic=html&topic=js&topic=webgl&per_page=100');
+		return _search('https://developer.mozilla.org/en-US/docs/Web$children');
 	},
 
 	item : function (item) {
-		item[1] = "https://developer.mozilla.org/en-US/" + item[1];
+		item[1] = "https://developer.mozilla.org/en-US/docs/" + item[1];
 		return item;
 	},
 
