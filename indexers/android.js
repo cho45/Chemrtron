@@ -1,4 +1,4 @@
-indexer = {
+export default {
 	id: 'android',
 	name: 'Android',
 	icon: 'http://developer.android.com/images/brand/Android_Robot_100.png',

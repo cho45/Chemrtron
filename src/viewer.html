@@ -4,6 +4,7 @@
 		<title>Chemr</title>
 		<meta charset="utf-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+		<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' esm:; object-src 'none'">
 
 		<style type="text/css">
 			html, body {
@@ -114,29 +115,32 @@
 		</style>
 	</head>
 	<body>
-		<div id="index-container">
-			<div class="index-item">
-				CPAN
+		<div id="app">
+			foobar
+			<div id="index-container">
+				<div class="index-item">
+					CPAN
+				</div>
+				<div class="index-item">
+					nodejs
+				</div>
 			</div>
-			<div class="index-item">
-				nodejs
+
+			<div id="chemr-container" class="container">
+				<div class="search">
+					<input type="text" id="input" name="input" class="input" placeholder="Input" autocomplete="off"/>
+					<select id="select" class="select" size="10"></select>
+				</div>
+			</div>
+
+			<div id="frame-container">
+				<webview src="about:blank" id="frame"></webview>
 			</div>
 		</div>
 
-		<div id="chemr-container" class="container">
-			<div class="search">
-				<input type="text" id="input" name="input" class="input" placeholder="Input" autocomplete="off"/>
-				<select id="select" class="select" size="10"></select>
-			</div>
-		</div>
-
-		<div id="frame-container">
-			<webview src="about:blank" id="frame"></webview>
-		</div>
-
-		<script src="lib/keyboard.js"></script>
+		<script src="../lib/keyboard.js"></script>
+		<script src="../node_modules/vue/dist/vue.js"></script>
 		<script src="utils.js"></script>
-		<script src="chemr.js"></script>
-		<script src="viewer.js"></script>
+		<script src="esm://src/viewer.js" type="module"></script>
 	</body>
 </html>

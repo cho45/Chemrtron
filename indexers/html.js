@@ -1,4 +1,4 @@
-indexer = {
+export default {
 	id: 'html',
 	name: 'HTML Standard',
 	logo: 'http://www.w3.org/html/logo/downloads/HTML5_Logo_512.png',

@@ -4,6 +4,7 @@ const {app} = electron;
 const ipc = electron.ipcMain;
 const {BrowserWindow} = electron;
 const {globalShortcut} = electron;
+const {protocol} = electron;
 const fs = require('fs');
 const path = require('path');
 const Channel = require('./src/channel');
@@ -12,34 +13,50 @@ const serializeError = require('./src/utils').serializeError;
 const mkdirp = require('mkdirp');
 const SQL = require('sql.js');
 
+protocol.registerSchemesAsPrivileged([{ scheme: "esm" }]);
+
 // electron.crashReporter.start();
-
-var Main = {
+const Main = {
 	init : function () {
-		var self = this;
-
 		mkdirp.sync(config.cachePath);
 		mkdirp.sync(config.indexerPath);
 		mkdirp.sync(config.indexerBuiltinPath);
 
-		app.on('ready', self.ready.bind(self));
-		app.on('will-quit', self.willQuit.bind(self));
+		app.on('ready', this.ready.bind(this));
+		app.on('will-quit', this.willQuit.bind(this));
 	},
 
 	ready : function () {
-		var self = this;
 
-		self.main = new BrowserWindow({width: 1440, height: 900, titleBarStyle: 'hidden-inset'});
-		self.main.loadURL('file://' + __dirname + '/viewer.html');
-		if (config.DEBUG) self.main.openDevTools();
-		self.main.on('closed', function () {
-			self.main = null;
+		protocol.registerBufferProtocol("esm", async (req, cb) => {
+			const relpath = req.url.replace("esm://", "")
+			const filepath = path.resolve(__dirname, relpath)
+			console.log('esm scheme load file from', filepath);
+			const data = await fs.promises.readFile(filepath)
+			cb({ mimeType: "text/javascript", data })
+		})
+
+		this.main = new BrowserWindow({
+			width: 1440,
+			height: 900, 
+			titleBarStyle: 'hidden-inset',
+			webPreferences: {
+				webviewTag: true,
+				nodeIntegration: true,
+				contextIsolation: false,
+				// preload: __dirname + '/preload.js',
+			}
+		});
+		this.main.loadURL('file://' + __dirname + '/src/viewer.html');
+		if (config.DEBUG) this.main.openDevTools();
+		this.main.on('closed', () => {
+			this.main = null;
 			app.quit();
 		});
 
-		ipc.on('viewer', self.handleViewerIPC.bind(self));
+		ipc.on('viewer', this.handleViewerIPC.bind(this));
 
-		self.openIndexerProcess();
+		this.openIndexerProcess();
 	},
 
 	willQuit : function () {
@@ -47,19 +64,32 @@ var Main = {
 	},
 
 	openIndexerProcess : function () {
-		var self = this;
-		if (self.indexer) {
-			self.indexer.window.close();
+		if (this.indexer) {
+			this.indexer.window.close();
 		}
 
-		self.indexer = new Channel({
+		const {main} = this;
+
+		this.indexer = new Channel({
 			ready : function () {
-				var self = this;
-				return new Promise(function (resolve, reject) {
-					self.window = new BrowserWindow({width: 800, height: 600, x: 0, y: 0, show: config.DEBUG });
-					self.window.loadURL('file://' + __dirname + '/indexer.html');
-					if (config.DEBUG) self.window.openDevTools();
-					self.window.webContents.on('did-finish-load', resolve);
+				return new Promise((resolve, reject) => {
+					this.window = new BrowserWindow({
+						width: 800,
+						height: 600,
+						x: 0,
+						y: 0,
+						show: config.DEBUG,
+						webPreferences: {
+							webviewTag: false,
+							nodeIntegration: true,
+							nodeIntegrationInSubFrames: false,
+							contextIsolation: true,
+							// preload: __dirname + '/preload.js',
+						}
+					});
+					this.window.loadURL('file://' + __dirname + '/src/indexer.html');
+					if (config.DEBUG) this.window.openDevTools();
+					this.window.webContents.on('did-finish-load', resolve);
 				});
 			},
 			recv : function (callback) {
@@ -73,21 +103,20 @@ var Main = {
 			},
 
 			notification : function (args) {
-				self.main.webContents.send('viewer', args);
+				main.webContents.send('viewer', args);
 			}
 		});
 	},
 
-	handleViewerIPC : function (e, args) {
-		var self = this;
+	handleViewerIPC : async function (e, args) {
 		console.log('[main][chan=viewer] ipc.on', args);
 
-		var func = self.IPCMethods[args.method];
+		var func = this.IPCMethods[args.method];
 
 		var promise;
 		if (func) {
 			try {
-				promise = func.call(self, args.params);
+				promise = func.call(this, args.params);
 			} catch (e) {
 				promise = Promise.reject(e);
 			}
@@ -95,18 +124,19 @@ var Main = {
 			promise = Promise.reject("no such method");
 		}
 
-		promise.then(function (result) {
+		try {
+			await promise;
 			e.sender.send('viewer', {
 				id: args.id,
 				result: result
 			});
-		}, function (error) {
+		} catch (error) {
 			// console.log('Error', serializeError(error));
 			e.sender.send('viewer', {
 				id: args.id,
 				error: serializeError(error)
 			});
-		});
+		}
 	},
 
 	IPCMethods : {
@@ -115,17 +145,16 @@ var Main = {
 		},
 
 		settings: function (settings) {
-			var self = this;
 			console.log(settings);
 			if (config.DEBUG !== settings.developerMode) {
 				if (settings.developerMode) {
-					self.main.openDevTools();
-					self.indexer.window.openDevTools();
-					self.indexer.window.show();
+					this.main.openDevTools();
+					this.indexer.window.openDevTools();
+					this.indexer.window.show();
 				} else {
-					self.main.closeDevTools();
-					self.indexer.window.closeDevTools();
-					self.indexer.window.hide();
+					this.main.closeDevTools();
+					this.indexer.window.closeDevTools();
+					this.indexer.window.hide();
 				}
 				config.DEBUG = settings.developerMode;
 			}
@@ -142,7 +171,7 @@ var Main = {
 				try {
 					var ret = globalShortcut.register(key, function() {
 						console.log('globalShortcut');
-						self.main.focus();
+						this.main.focus();
 					});
 					if (!ret) {
 						console.log('registration failed');
@@ -155,39 +184,31 @@ var Main = {
 			return Promise.resolve();
 		},
 
-		getIndex : function (params) {
-			var self = this;
-
+		getIndex : async function (params) {
 			if (!params.docset) {
-				var filename = path.join(config.cachePath, params.id + '.dat');
+				const filename = path.join(config.cachePath, params.id + '.dat');
 
-				return new Promise(function (resolve, reject) {
-					if (!params.reindex) {
-						fs.readFile(filename, 'utf8', function (err, data) {
-							if (err) return reject(err);
-							resolve(data);
-						});
-					} else {
-						return reject('force index');
-					}
-				}).
-				catch(function (error) {
-					console.log('REINDEX', error);
-					return self.indexer.request('createIndex', { id : params.id }).
-						then(function (data) {
-							console.log('INDEXED', data.length);
-							return new Promise(function (resolve, reject) {
-								console.log('WRITE INDEX TO', filename);
-								var meta = "\x01" + JSON.stringify({
-									created: new Date().getTime()
-								}) + "\n";
-								fs.writeFile(filename, meta + data, 'utf8', function (err) {
-									if (err) return reject(err);
-									resolve(data);
-								});
-							});
-						});
-				});
+				let reindex = params.reindex;
+
+				let index;
+				try {
+					index = await fs.promises.readFile(filename, 'utf8');
+				} catch (error) {
+					console.log(`ERROR reading index ${filename}`);
+					reindex = true;
+				}
+
+				if (reindex) {
+					const data = await this.indexer.request('createIndex', { id : params.id });
+					console.log('INDEXED', data.length);
+					const meta = "\x01" + JSON.stringify({
+						created: new Date().getTime()
+					}) + "\n";
+					index = meta + data;
+					fs.promises.writeFile(filename, index, 'utf8');
+				}
+
+				return index;
 			} else {
 				var docset = params.docset;
 				// var docroot = path.join(docset, 'Contents/Resources/Documents');

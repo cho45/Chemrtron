@@ -1,4 +1,4 @@
-indexer = {
+export default {
 	id: 'ecma-262-3rd-ja',
 	name: 'ECMAScript 3rd JA',
 

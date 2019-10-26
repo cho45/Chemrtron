@@ -1,10 +1,10 @@
-indexer = {
+export default {
 	id: 'ruby',
 	name: 'Ruby',
 	color: '#CC342D',
 
 	index : function (ctx) {
-		return ctx.fetchDocument('http://docs.ruby-lang.org/en/2.2.0/table_of_contents.html').then(function (document) {
+		return ctx.fetchDocument('https://docs.ruby-lang.org/en/2.6.0/table_of_contents.html').then(function (document) {
 			console.log(document);
 
 			var modules = document.querySelectorAll('li.class a, li.module a');

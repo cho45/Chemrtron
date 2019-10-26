@@ -1,4 +1,4 @@
-indexer = {
+export default {
 	id: 'mdn',
 	name: 'MDN',
 	color: '#00539f',

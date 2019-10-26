@@ -5,7 +5,7 @@ const path = remote.require('path');
 const fs = remote.require('fs');
 const config = remote.require('./config');
 
-const Chemr = {};
+export const Chemr = {};
 
 Chemr.Index = function () { this.init.apply(this, arguments) };
 Chemr.Index.prototype = {
@@ -366,20 +366,31 @@ Chemr.Index.loadIndexers = function () {
 			});
 		});
 
-		function fromIndexerDefinition (it) {
-			return new Promise(function (resolve, reject) {
-				fs.readFile(it, "utf-8", function (err, content) {
-					if (err) {
-						console.log(err);
-						resolve(null);
-						return;
-					}
-					var index = new Chemr.Index(eval(content + "\n//# sourceURL=" + it));
-					index.location = it;
-					console.log('Initilized', index.id);
-					resolve(index);
-				});
-			});
+		async function fromIndexerDefinition (it) {
+//			return new Promise(function (resolve, reject) {
+//				fs.readFile(it, "utf-8", function (err, content) {
+//					if (err) {
+//						console.log(err);
+//						resolve(null);
+//						return;
+//					}
+//					var index = new Chemr.Index(eval(content + "\n//# sourceURL=" + it));
+//					index.location = it;
+//					console.log('Initilized', index.id);
+//					resolve(index);
+//				});
+//			});
+			console.log('fromIndexerDefinition', it);
+			const definition = await import(`esm://${it}`);
+			if (!definition.default) {
+				throw new Error('failed to load indexer definition');
+			}
+			console.log(definition);
+
+			const index = new Chemr.Index(definition.default);
+			index.location = it;
+			console.log('Initilized', index.id);
+			return index;
 		}
 
 		function fromDocset (docset) {
@@ -446,7 +457,7 @@ Chemr.Index.loadIndexers = function () {
 			return loadFiles(path.join(config.indexerBuiltinPath, '*.js')).then(append.bind(ret));
 		}).
 		then(function (ret) {
-			return loadFiles(__dirname + '/indexers/*.js').then(append.bind(ret));
+			return loadFiles(path.join(__dirname, '../indexers/*.js')).then(append.bind(ret));
 		});
 };
 

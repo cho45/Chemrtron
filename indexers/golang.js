@@ -1,4 +1,4 @@
-indexer = {
+export default {
 	id: 'golang',
 	name: 'Go',
 	icon: 'https://golang.org/doc/gopher/pkg.png',

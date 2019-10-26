@@ -1,4 +1,4 @@
-indexer = {
+export default {
 	id: 'nodejs',
 	name: 'Node.js',
 	icon: 'https://nodejs.org/static/images/logos/js-black.svg',

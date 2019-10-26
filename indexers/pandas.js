@@ -1,4 +1,4 @@
-indexer = {
+export default {
 	id: 'pandas',
 	name: 'pandas',
 	color: '#6BA81E',

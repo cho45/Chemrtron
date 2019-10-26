@@ -1,5 +1,4 @@
-
-indexer = {
+export default {
 	id: 'python3',
 	name: 'Python 3',
 

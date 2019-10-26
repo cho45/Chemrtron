@@ -1,5 +1,4 @@
-
-indexer = {
+export default {
 	id: 'vimdoc-ja',
 	name: 'Vim ja',
 

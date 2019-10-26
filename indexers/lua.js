@@ -1,5 +1,4 @@
-
-indexer = {
+export default {
 	id: 'lua',
 	name: 'Lua',
 

@@ -1,4 +1,4 @@
-indexer = {
+export default {
 	id: 'javase',
 	name: 'Java SE',
 	color: '#5382A1',

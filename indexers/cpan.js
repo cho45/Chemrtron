@@ -1,4 +1,4 @@
-indexer = {
+export default {
 	id: 'cpan',
 	name: 'CPAN',
 

@@ -1,9 +1,9 @@
-indexer = {
+export default {
 	id: 'mac',
 	name: 'Mac Developer Library',
 
 	index : function (ctx) {
-		return ctx.fetchJSON('https://developer.apple.com/library/mac/navigation/library.json').
+		return ctx.fetchJSON('https://developer.apple.com/library/archive/navigation/library.json').
 		then(function (data) {
 			var NAME = data.columns.name;
 			var URL = data.columns.url;

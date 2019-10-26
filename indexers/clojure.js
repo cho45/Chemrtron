@@ -1,4 +1,4 @@
-indexer = {
+export default {
 	id: 'clojure',
 	name: 'Clojure',
 	icon: 'http://clojure.org/file/view/clojure-icon.gif',

@@ -1,4 +1,4 @@
-indexer = {
+export default {
 	id: 'elasticsearch',
 	name: 'Elasticsearch',
 	color: '#31beb1',

@@ -12,7 +12,8 @@
   "dependencies": {
     "glob": "^5.0.15",
     "mkdirp": "^0.5.1",
-    "sql.js": "^0.2.21"
+    "sql.js": "^0.2.21",
+    "vue": "^2.6.10"
   },
   "devDependencies": {
     "electron": "^7.0.0",

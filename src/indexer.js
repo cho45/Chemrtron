@@ -4,22 +4,20 @@
 
 console.log('config', config);
 const ipc = electron.ipcRenderer;
-var Indexer = {
+const Indexer = {
 	init : function () {
-		var self = this;
-		ipc.on('indexer', self.handleIPC.bind(self));
+		ipc.on('indexer', this.handleIPC.bind(this));
 	},
 
 	handleIPC : function (e, args) {
-		var self = this;
 		console.log('[indexer]', e, args);
 
-		var func = self.IPCMethods[args.method];
+		const func = this.IPCMethods[args.method];
 
-		var promise;
+		let promise;
 		if (func) {
 			try {
-				promise = func.call(self, args.params);
+				promise = func.call(this, args.params);
 			} catch (e) {
 				promise = Promise.reject(e);
 			}
@@ -27,48 +25,49 @@ var Indexer = {
 			promise = Promise.reject("no such method");
 		}
 
-		promise.then(function (result) {
-			ipc.send('indexer', {
-				id: args.id,
-				result: result
-			});
-		}, function (error) {
-			console.log('Error', serializeError(error));
-			ipc.send('indexer', {
-				id: args.id,
-				error: serializeError(error)
-			});
-		});
+		promise.then(
+			(result) => {
+				ipc.send('indexer', {
+					id: args.id,
+					result: result
+				});
+			},
+			(error) => {
+				console.log('Error', serializeError(error));
+				ipc.send('indexer', {
+					id: args.id,
+					error: serializeError(error)
+				});
+			}
+		);
 	},
 
 	IPCMethods : {
-		echo : function (params) {
-			return Promise.resolve(params);
+		echo : async function (params) {
+			return params;
 		},
 
-		createIndex : function (params) {
-			var id = params.id;
+		createIndex : async function (params) {
+			const id = params.id;
 
 			// reload indexers
 			Chemr.Index.loadIndexers();
 
 			console.log('CREATE INDEX', id);
-			return Chemr.Index.byId(params.id).
-				then(function (index) {
-					console.log('CREATE INDEX runIndexer', index);
-					return index.runIndexer(function (state, current, total) {
-						ipc.send('indexer', {
-							id : null,
-							result: {
-								type: "progress",
-								id : id,
-								state: state,
-								current: current,
-								total: total
-							}
-						});
-					});
+			const index = await Chemr.Index.byId(params.id);
+			console.log('CREATE INDEX runIndexer', index);
+			return await index.runIndexer((state, current, total) => {
+				ipc.send('indexer', {
+					id : null,
+					result: {
+						type: "progress",
+						id : id,
+						state: state,
+						current: current,
+						total: total
+					}
 				});
+			});
 		}
 	}
 };

@@ -1,4 +1,4 @@
-indexer = {
+export default {
 	id: 'cal.syoboi.jp',
 	name: 'しょぼいカレンダー',
 

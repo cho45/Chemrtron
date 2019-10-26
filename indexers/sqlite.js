@@ -1,4 +1,4 @@
-indexer = {
+export default {
 	id: 'sqlite',
 	name: 'SQLite',
 	color: '#044a64',

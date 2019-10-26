@@ -1,4 +1,4 @@
-indexer = {
+export default {
 	id: 'perl6',
 	name: 'Perl6',
 	icon: 'http://doc.perl6.org/images/camelia-small.png',
