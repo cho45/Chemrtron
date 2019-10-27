@@ -125,7 +125,7 @@ const Main = {
 		}
 
 		try {
-			await promise;
+			const result = await promise;
 			e.sender.send('viewer', {
 				id: args.id,
 				result: result

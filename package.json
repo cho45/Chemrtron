@@ -11,9 +11,11 @@
   "license": "MIT",
   "dependencies": {
     "glob": "^5.0.15",
+    "material-design-icons-iconfont": "^5.0.1",
     "mkdirp": "^0.5.1",
     "sql.js": "^0.2.21",
-    "vue": "^2.6.10"
+    "vue": "^2.6.10",
+    "vue-material": "^1.0.0-beta-11"
   },
   "devDependencies": {
     "electron": "^7.0.0",
