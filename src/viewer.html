@@ -126,18 +126,18 @@
 	<body>
 		<div id="app">
 			<div id="index-container">
-				<div class="index-item">
-					CPAN
-				</div>
-				<div class="index-item">
-					nodejs
+				<div class="index-item" v-for="index in indexers" v-if="index.enabled">
+					{{index.id}}
 				</div>
 			</div>
 
 			<div id="chemr-container" class="container">
 				<div class="search">
 					<input type="text" ref="input" id="input" name="input" class="input" placeholder="Input" autocomplete="off"/>
-					<select ref="select" class="select" size="10"></select>
+					<select ref="select" class="select" size="10" @change="loadContent">
+						<option :value="result[1]" v-for="result in results" v-html="result[2]">
+						</option>
+					</select>
 				</div>
 			</div>
 

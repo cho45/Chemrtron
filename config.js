@@ -7,7 +7,7 @@ var home = path.join(os.homedir(), '.chemr');
 var version = fs.readFileSync(path.join(__dirname, 'VERSION'), 'utf8');
 
 module.exports = {
-	DEBUG: false,
+	DEBUG: true,
 	version: version,
 	cachePath: path.join(home, 'cache'),
 	indexerPath: path.join(home, 'indexers'),

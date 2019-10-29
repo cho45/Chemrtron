@@ -341,7 +341,7 @@ Chemr.Index.IndexerContext.prototype = {
 Chemr.IPC = null;
 
 Chemr.Index.loadIndexers = function () {
-	var loadFiles = function (target) {
+	const loadFiles = function (target) {
 		return new Promise(function (resolve, reject) {
 			console.log('glob from', target);
 			glob(target, {}, function (err, files) {
@@ -367,19 +367,6 @@ Chemr.Index.loadIndexers = function () {
 		});
 
 		async function fromIndexerDefinition (it) {
-//			return new Promise(function (resolve, reject) {
-//				fs.readFile(it, "utf-8", function (err, content) {
-//					if (err) {
-//						console.log(err);
-//						resolve(null);
-//						return;
-//					}
-//					var index = new Chemr.Index(eval(content + "\n//# sourceURL=" + it));
-//					index.location = it;
-//					console.log('Initilized', index.id);
-//					resolve(index);
-//				});
-//			});
 			console.log('fromIndexerDefinition', it);
 			const definition = await import(`esm://${it}`);
 			if (!definition.default) {
@@ -459,6 +446,7 @@ Chemr.Index.loadIndexers = function () {
 		then(function (ret) {
 			return loadFiles(path.join(__dirname, '../indexers/*.js')).then(append.bind(ret));
 		});
+	console.log('loadIndexers end', Chemr.Index.indexers);
 };
 
 
