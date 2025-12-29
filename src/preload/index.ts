@@ -21,6 +21,11 @@ const api = {
   // キーボードアクションのリスナー登録
   onKeyboardAction: (callback: (action: KeyboardAction) => void) => {
     ipcRenderer.on(IPC_CHANNELS.KEYBOARD_ACTION, (_event, action) => callback(action));
+  },
+
+  // URL変更のリスナー登録
+  onUrlChanged: (callback: (url: string) => void) => {
+    ipcRenderer.on(IPC_CHANNELS.URL_CHANGED, (_event, url) => callback(url));
   }
 };
 

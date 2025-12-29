@@ -9,6 +9,7 @@ let mainWindow: BrowserWindow | null = null;
 let documentView: WebContentsView | null = null;
 
 const SIDEBAR_WIDTH = 400; // 左側の検索結果リストの幅
+const URL_BAR_HEIGHT = 40; // URL表示バーの高さ
 
 /**
  * キーボードアクションをレンダラープロセスに送信
@@ -154,6 +155,19 @@ function createDocumentView(): WebContentsView {
     }
   });
 
+  // URL変更時にRendererに通知
+  view.webContents.on('did-navigate', (_event, url) => {
+    if (mainWindow) {
+      mainWindow.webContents.send(IPC_CHANNELS.URL_CHANGED, url);
+    }
+  });
+
+  view.webContents.on('did-navigate-in-page', (_event, url) => {
+    if (mainWindow) {
+      mainWindow.webContents.send(IPC_CHANNELS.URL_CHANGED, url);
+    }
+  });
+
   // WebContentsView でのキーボードショートカットをインターセプト
   view.webContents.on('before-input-event', (event, input) => {
     const isMac = process.platform === 'darwin';
@@ -190,9 +204,9 @@ function updateDocumentViewBounds(): void {
   const bounds = mainWindow.getContentBounds();
   documentView.setBounds({
     x: SIDEBAR_WIDTH,
-    y: 0,
+    y: URL_BAR_HEIGHT,
     width: bounds.width - SIDEBAR_WIDTH,
-    height: bounds.height
+    height: bounds.height - URL_BAR_HEIGHT
   });
 }
 

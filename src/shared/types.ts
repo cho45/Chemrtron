@@ -130,7 +130,8 @@ export const IPC_CHANNELS = {
   LOAD_DOCUMENT: 'load-document',
   UPDATE_SETTINGS: 'update-settings',
   PROGRESS: 'progress',
-  KEYBOARD_ACTION: 'keyboard-action'
+  KEYBOARD_ACTION: 'keyboard-action',
+  URL_CHANGED: 'url-changed'
 } as const;
 
 /**

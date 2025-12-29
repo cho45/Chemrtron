@@ -17,6 +17,11 @@
       />
     </div>
 
+    <!-- URL表示バー（documentView用） -->
+    <div class="url-bar">
+      <div class="url-text">{{ currentUrl || 'No document loaded' }}</div>
+    </div>
+
     <div v-if="store.isLoading" class="loading">Loading index...</div>
 
     <div class="results-container">
@@ -47,6 +52,7 @@ const store = useIndexerStore();
 const query = ref('');
 const searchInput = ref<HTMLInputElement>();
 const selectedIndex = ref(-1);
+const currentUrl = ref<string>('');
 
 onMounted(async () => {
   // sampleインデックスを読み込み
@@ -83,6 +89,11 @@ onMounted(async () => {
         }
         break;
     }
+  });
+
+  // URL変更を受け取る
+  window.api.onUrlChanged((url) => {
+    currentUrl.value = url;
   });
 });
 
@@ -284,5 +295,28 @@ function handleInputKeydown(e: KeyboardEvent) {
   padding: 16px;
   text-align: center;
   color: #858585;
+}
+
+.url-bar {
+  position: fixed;
+  top: 0;
+  left: 400px;
+  right: 0;
+  height: 40px;
+  background: #2d2d30;
+  border-bottom: 1px solid #3e3e42;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  z-index: 1000;
+}
+
+.url-text {
+  font-size: 13px;
+  color: #cccccc;
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>
