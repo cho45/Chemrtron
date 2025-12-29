@@ -8,6 +8,18 @@ const api = {
   getIndex: (id: string, reindex = false) =>
     ipcRenderer.invoke(IPC_CHANNELS.GET_INDEX, { id, reindex }),
 
+  // 全インデクサーリストを取得
+  getAllIndexers: () =>
+    ipcRenderer.invoke(IPC_CHANNELS.GET_ALL_INDEXERS),
+
+  // 設定を取得
+  getSettings: () =>
+    ipcRenderer.invoke(IPC_CHANNELS.GET_SETTINGS),
+
+  // 設定を更新
+  updateSettings: (settings: any) =>
+    ipcRenderer.invoke(IPC_CHANNELS.UPDATE_SETTINGS, settings),
+
   // ドキュメントをロード
   loadDocument: (url: string) => {
     ipcRenderer.send(IPC_CHANNELS.LOAD_DOCUMENT, url);

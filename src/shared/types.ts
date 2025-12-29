@@ -96,6 +96,7 @@ export interface Settings {
   enabled: string[];
   developerMode: boolean;
   globalShortcut?: string;
+  lastSelected?: string; // 前回選択したインデクサーID
 }
 
 /**
@@ -127,8 +128,10 @@ export interface SerializableIndexerMetadata {
  */
 export const IPC_CHANNELS = {
   GET_INDEX: 'get-index',
+  GET_ALL_INDEXERS: 'get-all-indexers',
   LOAD_DOCUMENT: 'load-document',
   UPDATE_SETTINGS: 'update-settings',
+  GET_SETTINGS: 'get-settings',
   PROGRESS: 'progress',
   KEYBOARD_ACTION: 'keyboard-action',
   URL_CHANGED: 'url-changed'

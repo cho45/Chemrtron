@@ -3,15 +3,48 @@
  */
 
 import { ipcMain } from 'electron';
-import { IPC_CHANNELS, type SerializableIndexerMetadata, type IndexerDefinition } from '../shared/types';
+import { IPC_CHANNELS, type SerializableIndexerMetadata, type IndexerDefinition, type Settings } from '../shared/types';
 import * as CacheManager from './cache-manager';
-import { getIndexerById } from './indexer-loader';
+import { getIndexerById, loadAllIndexers } from './indexer-loader';
 import { createIndexerContext } from './indexer-context';
+import * as SettingsManager from './settings-manager';
 
 /**
  * IPC handlersを登録
  */
 export function setupIpcHandlers(): void {
+  // 全インデクサーリストを取得
+  ipcMain.handle(IPC_CHANNELS.GET_ALL_INDEXERS, async () => {
+    try {
+      const indexers = await loadAllIndexers();
+      return indexers.map(serializeIndexerMetadata);
+    } catch (error) {
+      console.error('[IPC] Error getting all indexers:', error);
+      throw error;
+    }
+  });
+
+  // 設定を取得
+  ipcMain.handle(IPC_CHANNELS.GET_SETTINGS, async () => {
+    try {
+      return SettingsManager.loadSettings();
+    } catch (error) {
+      console.error('[IPC] Error getting settings:', error);
+      throw error;
+    }
+  });
+
+  // 設定を更新
+  ipcMain.handle(IPC_CHANNELS.UPDATE_SETTINGS, async (_event, settings: Settings) => {
+    try {
+      SettingsManager.saveSettings(settings);
+      console.log('[IPC] Settings updated:', settings);
+      return true;
+    } catch (error) {
+      console.error('[IPC] Error updating settings:', error);
+      throw error;
+    }
+  });
   // インデックスデータを取得
   ipcMain.handle(IPC_CHANNELS.GET_INDEX, async (_event, args: { id: string; reindex?: boolean }) => {
     const { id, reindex } = args;

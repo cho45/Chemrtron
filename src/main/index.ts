@@ -8,7 +8,7 @@ import { IPC_CHANNELS, type KeyboardAction } from '../shared/types';
 let mainWindow: BrowserWindow | null = null;
 let documentView: WebContentsView | null = null;
 
-const SIDEBAR_WIDTH = 400; // 左側の検索結果リストの幅
+const SIDEBAR_WIDTH = 460; // 60px (アイコン列) + 400px (検索結果リスト)
 const URL_BAR_HEIGHT = 40; // URL表示バーの高さ
 
 /**

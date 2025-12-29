@@ -1,44 +1,62 @@
 <template>
   <div class="chemrtron">
-    <header class="header">
-      <h1>Chemrtron - {{ store.metadata?.name || store.currentIndexId }}</h1>
-    </header>
+    <!-- 左端: インデクサーアイコン列 -->
+    <div class="indexer-icons">
+      <div
+        v-for="indexer in store.enabledIndexers"
+        :key="indexer.id"
+        :class="{ 'indexer-icon-item': true, 'active': indexer.id === store.currentIndexId }"
+        @click="selectIndexer(indexer.id)"
+        :title="indexer.name"
+      >
+        <div class="indexer-icon" :style="{ background: indexer.color || '#666' }">
+          {{ indexer.name.substring(0, 2).toUpperCase() }}
+        </div>
+      </div>
+    </div>
 
-    <div class="search-container">
-      <input
-        ref="searchInput"
-        v-model="query"
-        type="text"
-        class="search-input"
-        placeholder="Search..."
-        @input="handleSearch"
-        @keydown="handleInputKeydown"
-        autofocus
-      />
+    <!-- 中央: 検索バー + 結果列 -->
+    <div class="search-panel">
+      <header class="header">
+        <h1>{{ store.currentIndexer?.name || 'Chemrtron' }}</h1>
+      </header>
+
+      <div class="search-container">
+        <input
+          ref="searchInput"
+          v-model="query"
+          type="text"
+          class="search-input"
+          placeholder="Search..."
+          @input="handleSearch"
+          @keydown="handleInputKeydown"
+          autofocus
+        />
+      </div>
+
+      <div v-if="store.isLoading" class="loading">Loading index...</div>
+
+      <div class="results-container">
+        <div v-if="store.searchResults.length > 0" class="results">
+          <div
+            v-for="(result, index) in store.searchResults"
+            :key="index"
+            :class="{ 'result-item': true, 'selected': index === selectedIndex }"
+            @click="selectResult(index)"
+          >
+            <div class="result-title" v-html="result[2] || result[0]"></div>
+            <div class="result-url">{{ result[1] }}</div>
+          </div>
+        </div>
+        <div v-else-if="query && !store.isLoading" class="no-results">
+          No results found for "{{ query }}"
+        </div>
+      </div>
     </div>
 
     <!-- URL表示バー（documentView用） -->
     <div class="url-bar">
       <div class="url-text">{{ currentUrl || 'No document loaded' }}</div>
-    </div>
-
-    <div v-if="store.isLoading" class="loading">Loading index...</div>
-
-    <div class="results-container">
-      <div v-if="store.searchResults.length > 0" class="results">
-        <div
-          v-for="(result, index) in store.searchResults"
-          :key="index"
-          :class="{ 'result-item': true, 'selected': index === selectedIndex }"
-          @click="selectResult(index)"
-        >
-          <div class="result-title" v-html="result[2] || result[0]"></div>
-          <div class="result-url">{{ result[1] }}</div>
-        </div>
-      </div>
-      <div v-else-if="query && !store.isLoading" class="no-results">
-        No results found for "{{ query }}"
-      </div>
     </div>
   </div>
 </template>
@@ -55,8 +73,17 @@ const selectedIndex = ref(-1);
 const currentUrl = ref<string>('');
 
 onMounted(async () => {
-  // sampleインデックスを読み込み
-  await store.loadIndex('sample');
+  // 初期化（全インデクサーと設定を読み込み）
+  await store.initialize();
+
+  // 前回選択したインデックスを復元（なければ最初のインデクサーを読み込み）
+  if (store.enabledIndexers.length > 0) {
+    const lastSelectedId = store.settings.lastSelected;
+    const indexToLoad = lastSelectedId && store.enabledIndexers.find(i => i.id === lastSelectedId)
+      ? lastSelectedId
+      : store.enabledIndexers[0].id;
+    await store.loadIndex(indexToLoad);
+  }
 
   // Main process からのキーボードアクションを受け取る
   window.api.onKeyboardAction((action) => {
@@ -147,6 +174,17 @@ function scrollToSelected() {
   });
 }
 
+async function selectIndexer(id: string) {
+  await store.loadIndex(id);
+  // 選択したインデクサーを設定に保存
+  await store.updateSettings({ lastSelected: id });
+  query.value = '';
+  handleSearch();
+  nextTick(() => {
+    searchInput.value?.focus();
+  });
+}
+
 function handleInputKeydown(e: KeyboardEvent) {
   const key = (e.altKey ? 'Alt-' : '') +
               (e.ctrlKey ? 'Control-' : '') +
@@ -196,12 +234,71 @@ function handleInputKeydown(e: KeyboardEvent) {
   position: fixed;
   top: 0;
   left: 0;
-  width: 400px;
+  width: 460px; /* 60px (icons) + 400px (search panel) */
   height: 100vh;
+  display: grid;
+  grid-template-columns: 60px 400px;
+  grid-template-rows: 1fr;
+  background: #1e1e1e;
+  color: #d4d4d4;
+}
+
+/* 左端: インデクサーアイコン列 */
+.indexer-icons {
+  display: flex;
+  flex-direction: column;
+  background: #252526;
+  border-right: 1px solid #3e3e42;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.indexer-icon-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.2s;
+}
+
+.indexer-icon-item:hover {
+  background: #2a2d2e;
+}
+
+.indexer-icon-item.active {
+  background: #094771;
+}
+
+.indexer-icon-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #007acc;
+}
+
+.indexer-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  flex-shrink: 0;
+}
+
+/* 中央: 検索パネル */
+.search-panel {
   display: flex;
   flex-direction: column;
   background: #1e1e1e;
-  color: #d4d4d4;
   border-right: 1px solid #3e3e42;
 }
 
@@ -300,7 +397,7 @@ function handleInputKeydown(e: KeyboardEvent) {
 .url-bar {
   position: fixed;
   top: 0;
-  left: 400px;
+  left: 460px; /* 60px (icons) + 400px (search panel) */
   right: 0;
   height: 40px;
   background: #2d2d30;

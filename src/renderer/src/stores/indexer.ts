@@ -3,11 +3,17 @@
  */
 
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
-import type { IndexerDefinition, SearchResultItem, CacheMetadata, SerializableIndexerMetadata } from '../../../shared/types';
+import { ref, computed } from 'vue';
+import type { IndexerDefinition, SearchResultItem, CacheMetadata, SerializableIndexerMetadata, Settings } from '../../../shared/types';
 
 export const useIndexerStore = defineStore('indexer', () => {
   // State
+  const allIndexers = ref<SerializableIndexerMetadata[]>([]);
+  const settings = ref<Settings>({
+    enabled: ['sample'],
+    developerMode: false,
+    globalShortcut: 'Alt+Space'
+  });
   const currentIndexId = ref<string>('sample');
   const indexData = ref<string>('');
   const metadata = ref<CacheMetadata | null>(null);
@@ -16,7 +22,26 @@ export const useIndexerStore = defineStore('indexer', () => {
   const isLoading = ref<boolean>(false);
   const currentIndexer = ref<Pick<IndexerDefinition, 'id' | 'name' | 'color' | 'icon' | 'urlTemplate' | 'css'> | null>(null);
 
+  // Computed
+  const enabledIndexers = computed(() => {
+    return settings.value.enabled
+      .map(id => allIndexers.value.find(indexer => indexer.id === id))
+      .filter((indexer): indexer is SerializableIndexerMetadata => indexer !== undefined);
+  });
+
   // Actions
+  async function initialize() {
+    // 全インデクサーを読み込み
+    const indexers = await window.api.getAllIndexers();
+    allIndexers.value = indexers;
+
+    // 設定を読み込み
+    const loadedSettings = await window.api.getSettings();
+    settings.value = loadedSettings;
+
+    console.log('[Store] Initialized:', indexers.length, 'indexers,', settings.value.enabled.length, 'enabled');
+  }
+
   async function loadIndex(id: string, reindex = false) {
     isLoading.value = true;
     try {
@@ -39,6 +64,12 @@ export const useIndexerStore = defineStore('indexer', () => {
     }
   }
 
+  async function updateSettings(newSettings: Partial<Settings>) {
+    settings.value = { ...settings.value, ...newSettings };
+    await window.api.updateSettings(settings.value);
+    console.log('[Store] Settings updated:', settings.value);
+  }
+
   function setSearchQuery(query: string) {
     searchQuery.value = query;
   }
@@ -49,6 +80,9 @@ export const useIndexerStore = defineStore('indexer', () => {
 
   return {
     // State
+    allIndexers,
+    settings,
+    enabledIndexers,
     currentIndexId,
     indexData,
     metadata,
@@ -58,7 +92,9 @@ export const useIndexerStore = defineStore('indexer', () => {
     currentIndexer,
 
     // Actions
+    initialize,
     loadIndex,
+    updateSettings,
     setSearchQuery,
     setSearchResults
   };
