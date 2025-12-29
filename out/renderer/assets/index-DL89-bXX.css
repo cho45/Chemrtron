@@ -236,30 +236,35 @@ code {
   }
 }
 
-.chemrtron[data-v-5c3799b4] {
+.chemrtron[data-v-49b0fb79] {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 400px;
   height: 100vh;
   display: flex;
   flex-direction: column;
   background: #1e1e1e;
   color: #d4d4d4;
+  border-right: 1px solid #3e3e42;
 }
-.header[data-v-5c3799b4] {
+.header[data-v-49b0fb79] {
   padding: 12px 16px;
   background: #252526;
   border-bottom: 1px solid #3e3e42;
 }
-.header h1[data-v-5c3799b4] {
+.header h1[data-v-49b0fb79] {
   margin: 0;
   font-size: 16px;
   font-weight: 600;
   color: #cccccc;
 }
-.search-container[data-v-5c3799b4] {
+.search-container[data-v-49b0fb79] {
   padding: 12px 16px;
   background: #252526;
   border-bottom: 1px solid #3e3e42;
 }
-.search-input[data-v-5c3799b4] {
+.search-input[data-v-49b0fb79] {
   width: 100%;
   padding: 8px 12px;
   font-size: 14px;
@@ -269,22 +274,22 @@ code {
   color: #cccccc;
   outline: none;
 }
-.search-input[data-v-5c3799b4]:focus {
+.search-input[data-v-49b0fb79]:focus {
   border-color: #007acc;
 }
-.loading[data-v-5c3799b4] {
+.loading[data-v-49b0fb79] {
   padding: 16px;
   text-align: center;
   color: #858585;
 }
-.results-container[data-v-5c3799b4] {
+.results-container[data-v-49b0fb79] {
   flex: 1;
   overflow-y: auto;
 }
-.results[data-v-5c3799b4] {
+.results[data-v-49b0fb79] {
   padding: 8px;
 }
-.result-item[data-v-5c3799b4] {
+.result-item[data-v-49b0fb79] {
   padding: 12px;
   margin-bottom: 4px;
   background: #252526;
@@ -292,26 +297,26 @@ code {
   cursor: pointer;
   transition: background 0.2s;
 }
-.result-item[data-v-5c3799b4]:hover {
+.result-item[data-v-49b0fb79]:hover {
   background: #2a2d2e;
 }
-.result-title[data-v-5c3799b4] {
+.result-title[data-v-49b0fb79] {
   font-size: 14px;
   margin-bottom: 4px;
   color: #cccccc;
 }
-.result-title[data-v-5c3799b4] b {
+.result-title[data-v-49b0fb79] b {
   color: #4ec9b0;
   font-weight: 600;
 }
-.result-url[data-v-5c3799b4] {
+.result-url[data-v-49b0fb79] {
   font-size: 12px;
   color: #858585;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.no-results[data-v-5c3799b4] {
+.no-results[data-v-49b0fb79] {
   padding: 16px;
   text-align: center;
   color: #858585;

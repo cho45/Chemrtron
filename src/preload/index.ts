@@ -8,6 +8,11 @@ const api = {
   getIndex: (id: string, reindex = false) =>
     ipcRenderer.invoke(IPC_CHANNELS.GET_INDEX, { id, reindex }),
 
+  // ドキュメントをロード
+  loadDocument: (url: string) => {
+    ipcRenderer.send(IPC_CHANNELS.LOAD_DOCUMENT, url);
+  },
+
   // 進捗通知のリスナー登録（将来の実装用）
   onProgress: (callback: (message: string) => void) => {
     ipcRenderer.on(IPC_CHANNELS.PROGRESS, (_event, message) => callback(message));

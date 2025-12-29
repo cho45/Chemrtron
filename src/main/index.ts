@@ -1,14 +1,48 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron';
+import { app, shell, BrowserWindow, WebContentsView, ipcMain } from 'electron';
 import { join } from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import icon from '../../resources/icon.png?asset';
 import { setupIpcHandlers } from './ipc-handlers';
+import { IPC_CHANNELS } from '../shared/types';
+
+let mainWindow: BrowserWindow | null = null;
+let documentView: WebContentsView | null = null;
+
+const SIDEBAR_WIDTH = 400; // 左側の検索結果リストの幅
+
+function createDocumentView(): WebContentsView {
+  const view = new WebContentsView({
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true
+    }
+  });
+
+  view.webContents.setWindowOpenHandler((details) => {
+    shell.openExternal(details.url);
+    return { action: 'deny' };
+  });
+
+  return view;
+}
+
+function updateDocumentViewBounds(): void {
+  if (!mainWindow || !documentView) return;
+
+  const bounds = mainWindow.getContentBounds();
+  documentView.setBounds({
+    x: SIDEBAR_WIDTH,
+    y: 0,
+    width: bounds.width - SIDEBAR_WIDTH,
+    height: bounds.height
+  });
+}
 
 function createWindow(): void {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+  mainWindow = new BrowserWindow({
+    width: 1440,
+    height: 900,
     show: false,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
@@ -16,23 +50,33 @@ function createWindow(): void {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
     }
-  })
+  });
 
   mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
-  })
+    mainWindow?.show();
+  });
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
-    return { action: 'deny' }
-  })
+    shell.openExternal(details.url);
+    return { action: 'deny' };
+  });
+
+  // ウィンドウのリサイズ時にWebContentsViewのサイズを調整
+  mainWindow.on('resize', () => {
+    updateDocumentViewBounds();
+  });
+
+  // WebContentsViewを作成して追加
+  documentView = createDocumentView();
+  mainWindow.contentView.addChildView(documentView);
+  updateDocumentViewBounds();
 
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
+    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL']);
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    mainWindow.loadFile(join(__dirname, '../renderer/index.html'));
   }
 }
 
@@ -45,6 +89,13 @@ app.whenReady().then(() => {
 
   // Setup IPC handlers
   setupIpcHandlers();
+
+  // LOAD_DOCUMENT IPCハンドラー
+  ipcMain.on(IPC_CHANNELS.LOAD_DOCUMENT, (_event, url: string) => {
+    if (documentView) {
+      documentView.webContents.loadURL(url);
+    }
+  });
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.

@@ -6781,7 +6781,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       store.setSearchQuery(query.value);
     }
     function openDocument(url) {
-      window.electron.ipcRenderer.send("open-url", url);
+      window.api.loadDocument(url);
       console.log("Open document:", url);
     }
     return (_ctx, _cache) => {
@@ -6830,7 +6830,7 @@ const _export_sfc = (sfc, props) => {
   }
   return target;
 };
-const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-5c3799b4"]]);
+const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-49b0fb79"]]);
 const app = createApp(App);
 const pinia = createPinia();
 app.use(pinia);

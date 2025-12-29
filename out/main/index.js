@@ -5,7 +5,8 @@ const utils = require("@electron-toolkit/utils");
 const fs = require("fs");
 const icon = path.join(__dirname, "../../resources/icon.png");
 const IPC_CHANNELS = {
-  GET_INDEX: "get-index"
+  GET_INDEX: "get-index",
+  LOAD_DOCUMENT: "load-document"
 };
 const CACHE_DIR = path.join(electron.app.getPath("home"), ".chemr", "cache");
 function ensureCacheDir() {
@@ -79,10 +80,36 @@ fetch()	https://developer.mozilla.org/en-US/docs/Web/API/fetch
   }
   return "\n";
 }
+let mainWindow = null;
+let documentView = null;
+const SIDEBAR_WIDTH = 400;
+function createDocumentView() {
+  const view = new electron.WebContentsView({
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true
+    }
+  });
+  view.webContents.setWindowOpenHandler((details) => {
+    electron.shell.openExternal(details.url);
+    return { action: "deny" };
+  });
+  return view;
+}
+function updateDocumentViewBounds() {
+  if (!mainWindow || !documentView) return;
+  const bounds = mainWindow.getContentBounds();
+  documentView.setBounds({
+    x: SIDEBAR_WIDTH,
+    y: 0,
+    width: bounds.width - SIDEBAR_WIDTH,
+    height: bounds.height
+  });
+}
 function createWindow() {
-  const mainWindow = new electron.BrowserWindow({
-    width: 900,
-    height: 670,
+  mainWindow = new electron.BrowserWindow({
+    width: 1440,
+    height: 900,
     show: false,
     autoHideMenuBar: true,
     ...process.platform === "linux" ? { icon } : {},
@@ -92,12 +119,18 @@ function createWindow() {
     }
   });
   mainWindow.on("ready-to-show", () => {
-    mainWindow.show();
+    mainWindow?.show();
   });
   mainWindow.webContents.setWindowOpenHandler((details) => {
     electron.shell.openExternal(details.url);
     return { action: "deny" };
   });
+  mainWindow.on("resize", () => {
+    updateDocumentViewBounds();
+  });
+  documentView = createDocumentView();
+  mainWindow.contentView.addChildView(documentView);
+  updateDocumentViewBounds();
   if (utils.is.dev && process.env["ELECTRON_RENDERER_URL"]) {
     mainWindow.loadURL(process.env["ELECTRON_RENDERER_URL"]);
   } else {
@@ -107,6 +140,11 @@ function createWindow() {
 electron.app.whenReady().then(() => {
   utils.electronApp.setAppUserModelId("com.electron");
   setupIpcHandlers();
+  electron.ipcMain.on(IPC_CHANNELS.LOAD_DOCUMENT, (_event, url) => {
+    if (documentView) {
+      documentView.webContents.loadURL(url);
+    }
+  });
   electron.app.on("browser-window-created", (_, window) => {
     utils.optimizer.watchWindowShortcuts(window);
   });

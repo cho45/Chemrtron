@@ -62,19 +62,24 @@ function handleSearch() {
 }
 
 function openDocument(url: string) {
-  // 外部ブラウザで開く（MVP段階）
-  window.electron.ipcRenderer.send('open-url', url);
+  // WebContentsViewでドキュメントを表示
+  window.api.loadDocument(url);
   console.log('Open document:', url);
 }
 </script>
 
 <style scoped>
 .chemrtron {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 400px;
   height: 100vh;
   display: flex;
   flex-direction: column;
   background: #1e1e1e;
   color: #d4d4d4;
+  border-right: 1px solid #3e3e42;
 }
 
 .header {
