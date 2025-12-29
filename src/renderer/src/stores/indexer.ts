@@ -39,7 +39,7 @@ export const useIndexerStore = defineStore('indexer', () => {
     const loadedSettings = await window.api.getSettings();
     settings.value = loadedSettings;
 
-    console.log('[Store] Initialized:', indexers.length, 'indexers,', settings.value.enabled.length, 'enabled');
+    console.log('[Store] Initialized:', indexers.length, 'indexers,', settings.value.enabled.length, 'enabled', loadedSettings);
   }
 
   async function loadIndex(id: string, reindex = false) {
@@ -66,7 +66,7 @@ export const useIndexerStore = defineStore('indexer', () => {
 
   async function updateSettings(newSettings: Partial<Settings>) {
     settings.value = { ...settings.value, ...newSettings };
-    await window.api.updateSettings(settings.value);
+    await window.api.updateSettings(JSON.parse(JSON.stringify(settings.value)));
     console.log('[Store] Settings updated:', settings.value);
   }
 

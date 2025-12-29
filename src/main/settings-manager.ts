@@ -31,6 +31,7 @@ function ensureSettingsDir(): void {
 export function loadSettings(): Settings {
   ensureSettingsDir();
 
+  console.log('[SettingsManager] loadSettings file path:', SETTINGS_FILE);
   if (!existsSync(SETTINGS_FILE)) {
     // 設定ファイルがない場合はデフォルトを返す
     return { ...DEFAULT_SETTINGS };
