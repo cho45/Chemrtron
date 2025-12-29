@@ -1,7 +1,7 @@
 <template>
   <div class="chemrtron">
     <header class="header">
-      <h1>Chemrtron - {{ store.mdnIndexer.name }}</h1>
+      <h1>Chemrtron - {{ store.metadata?.name || store.currentIndexId }}</h1>
     </header>
 
     <div class="search-container">
@@ -49,8 +49,8 @@ const searchInput = ref<HTMLInputElement>();
 const selectedIndex = ref(-1);
 
 onMounted(async () => {
-  // MDNインデックスを読み込み
-  await store.loadIndex('mdn');
+  // sampleインデックスを読み込み
+  await store.loadIndex('sample');
 
   // Main process からのキーボードアクションを受け取る
   window.api.onKeyboardAction((action) => {
@@ -97,8 +97,10 @@ function handleSearch() {
     return;
   }
 
-  // 検索実行
-  const results = fuzzySearch(query.value, store.indexData, store.mdnIndexer);
+  // currentIndexerからurlTemplateを取得して検索実行
+  const results = fuzzySearch(query.value, store.indexData, {
+    urlTemplate: store.currentIndexer?.urlTemplate
+  });
   store.setSearchResults(results);
   store.setSearchQuery(query.value);
 }

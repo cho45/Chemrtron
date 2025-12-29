@@ -158,8 +158,6 @@ function createDocumentView(): WebContentsView {
   view.webContents.on('before-input-event', (event, input) => {
     const isMac = process.platform === 'darwin';
     const cmdOrCtrl = isMac ? input.meta : input.control;
-    const cmd = input.meta;
-    const ctrl = input.control;
 
     // Cmd/Ctrl + L: 検索フィールドにフォーカス
     if (cmdOrCtrl && input.key.toLowerCase() === 'l') {

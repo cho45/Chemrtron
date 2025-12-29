@@ -3,8 +3,10 @@
  */
 
 import { ipcMain } from 'electron';
-import { IPC_CHANNELS } from '../shared/types';
+import { IPC_CHANNELS, type SerializableIndexerMetadata, type IndexerDefinition } from '../shared/types';
 import * as CacheManager from './cache-manager';
+import { getIndexerById } from './indexer-loader';
+import { createIndexerContext } from './indexer-context';
 
 /**
  * IPC handlersを登録
@@ -15,7 +17,14 @@ export function setupIpcHandlers(): void {
     const { id, reindex } = args;
 
     try {
-      // reindex=true の場合はキャッシュを削除して再作成（MVP段階では未実装）
+      // インデクサーをロードしてメタデータを作成
+      const indexer = await getIndexerById(id);
+      if (!indexer) {
+        throw new Error(`Indexer not found: ${id}`);
+      }
+      const indexerMetadata = serializeIndexerMetadata(indexer);
+
+      // reindex=true の場合はキャッシュを削除して再作成
       if (reindex) {
         CacheManager.deleteCache(id);
       }
@@ -23,13 +32,13 @@ export function setupIpcHandlers(): void {
       // キャッシュが存在する場合は読み込み
       if (CacheManager.hasCache(id)) {
         const { data, metadata } = CacheManager.getIndex(id);
-        console.log(`[IPC] Loaded index for ${id}`, metadata);
-        return { data, metadata };
+        console.log(`[IPC] Loaded index from cache for ${id}`, metadata);
+        return { data, metadata, indexerMetadata };
       } else {
-        // キャッシュがない場合（MVP段階ではサンプルデータを返す）
-        console.log(`[IPC] No cache for ${id}, returning sample data`);
-        const sampleData = createSampleData(id);
-        return { data: sampleData, metadata: null };
+        // キャッシュがない場合はインデクサーを実行してインデックスを作成
+        console.log(`[IPC] No cache for ${id}, creating index...`);
+        const indexData = await createIndex(id, indexer);
+        return { data: indexData, metadata: null, indexerMetadata };
       }
     } catch (error) {
       console.error(`[IPC] Error getting index for ${id}:`, error);
@@ -41,18 +50,45 @@ export function setupIpcHandlers(): void {
 }
 
 /**
- * サンプルデータを作成（MVP用）
+ * IndexerDefinitionをシリアライズ可能な形式に変換
  */
-function createSampleData(id: string): string {
-  if (id === 'mdn') {
-    return `\nArray\thttps://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array
-Array.prototype.map()\thttps://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map
-Array.prototype.filter()\thttps://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
-Array.prototype.reduce()\thttps://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce
-Promise\thttps://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise
-async function\thttps://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function
-fetch()\thttps://developer.mozilla.org/en-US/docs/Web/API/fetch
-`;
-  }
-  return '\n';
+function serializeIndexerMetadata(indexer: IndexerDefinition): SerializableIndexerMetadata {
+  return {
+    id: indexer.id,
+    name: indexer.name,
+    color: indexer.color,
+    icon: indexer.icon,
+    urlTemplate: indexer.urlTemplate,
+    css: indexer.css
+  };
+}
+
+/**
+ * インデクサーを実行してインデックスを作成
+ */
+async function createIndex(id: string, indexer: IndexerDefinition): Promise<string> {
+  console.log(`[IPC] Creating index for ${id}...`);
+  console.log(`[IPC] Using indexer: ${indexer.name}`);
+
+  // IndexerContext を作成
+  const ctx = createIndexerContext();
+
+  // インデクサーを実行
+  await indexer.index(ctx);
+
+  // インデックスデータを取得
+  const indexData = ctx.getIndexData();
+  console.log(`[IPC] Index created: ${indexData.split('\n').length - 2} entries`);
+
+  // キャッシュに保存
+  CacheManager.saveIndex(id, indexData, {
+    id: indexer.id,
+    name: indexer.name,
+    version: '1.0.0',
+    created: Date.now()
+  });
+
+  console.log(`[IPC] Index saved to cache for ${id}`);
+
+  return indexData;
 }

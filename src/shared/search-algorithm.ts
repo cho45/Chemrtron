@@ -63,11 +63,10 @@ function createSearchIterator(data: string, query: string | RegExp) {
 export function fuzzySearch(
   query: string,
   data: string,
-  definition: Pick<IndexerDefinition, 'beforeSearch' | 'item'>
+  definition: Pick<IndexerDefinition, 'urlTemplate'>
 ): SearchResultItem[] {
   // クエリ変換（デフォルト: スペースを .*? に変換）
-  const convert = definition.beforeSearch || ((a: string) => a.replace(/\s+/g, '.*?'));
-  const convertedQuery = convert(query);
+  const convertedQuery = query.replace(/\s+/g, '.*?');
 
   // 検索実行（最大300件）
   const itr = createSearchIterator(data, convertedQuery);
@@ -121,8 +120,11 @@ export function fuzzySearch(
       item.score = str.length * 100;
     }
 
-    // インデクサーの item() メソッドを適用
-    return definition.item ? definition.item(item) : item;
+    // urlTemplateがあればURLを変換
+    if (definition.urlTemplate) {
+      item[1] = definition.urlTemplate.replace('${url}', item[1]);
+    }
+    return item;
   });
 
   // スコアでソート（昇順：低いほど優先）

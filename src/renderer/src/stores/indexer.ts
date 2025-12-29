@@ -4,32 +4,17 @@
 
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import type { IndexerDefinition, SearchResultItem, CacheMetadata } from '../../../shared/types';
+import type { IndexerDefinition, SearchResultItem, CacheMetadata, SerializableIndexerMetadata } from '../../../shared/types';
 
 export const useIndexerStore = defineStore('indexer', () => {
   // State
-  const currentIndexId = ref<string>('mdn');
+  const currentIndexId = ref<string>('sample');
   const indexData = ref<string>('');
   const metadata = ref<CacheMetadata | null>(null);
   const searchQuery = ref<string>('');
   const searchResults = ref<SearchResultItem[]>([]);
   const isLoading = ref<boolean>(false);
-
-  // MDN Indexer definition (MVP用)
-  const mdnIndexer = ref<IndexerDefinition>({
-    id: 'mdn',
-    name: 'MDN',
-    color: '#00539f',
-    index: async () => {
-      // MVP段階では未実装
-    },
-    item: (item: SearchResultItem) => {
-      // URLを完全なものに変換
-      item[1] = 'https://developer.mozilla.org/en-US/docs/' + item[1];
-      return item;
-    },
-    CSS: () => '.global-notice, #main-header { display: none }'
-  });
+  const currentIndexer = ref<Pick<IndexerDefinition, 'id' | 'name' | 'color' | 'icon' | 'urlTemplate' | 'css'> | null>(null);
 
   // Actions
   async function loadIndex(id: string, reindex = false) {
@@ -39,6 +24,12 @@ export const useIndexerStore = defineStore('indexer', () => {
       indexData.value = result.data;
       metadata.value = result.metadata;
       currentIndexId.value = id;
+
+      // indexerMetadataをそのまま設定
+      if (result.indexerMetadata) {
+        currentIndexer.value = result.indexerMetadata;
+      }
+
       console.log('[Store] Index loaded:', id, result.data.length, 'bytes');
     } catch (error) {
       console.error('[Store] Failed to load index:', error);
@@ -64,7 +55,7 @@ export const useIndexerStore = defineStore('indexer', () => {
     searchQuery,
     searchResults,
     isLoading,
-    mdnIndexer,
+    currentIndexer,
 
     // Actions
     loadIndex,
