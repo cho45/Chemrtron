@@ -63,5 +63,19 @@ export const IPC_CHANNELS = {
   GET_INDEX: 'get-index',
   LOAD_DOCUMENT: 'load-document',
   UPDATE_SETTINGS: 'update-settings',
-  PROGRESS: 'progress'
+  PROGRESS: 'progress',
+  KEYBOARD_ACTION: 'keyboard-action'
 } as const;
+
+/**
+ * Keyboard action types
+ */
+export type KeyboardAction =
+  | 'focus-search'
+  | 'select-next'
+  | 'select-previous'
+  | 'clear-input'
+  | 'autocomplete'
+  | 'select-result'
+  | 'go-back'
+  | 'go-forward';

@@ -6,11 +6,13 @@
 
     <div class="search-container">
       <input
+        ref="searchInput"
         v-model="query"
         type="text"
         class="search-input"
         placeholder="Search..."
         @input="handleSearch"
+        @keydown="handleInputKeydown"
         autofocus
       />
     </div>
@@ -22,8 +24,8 @@
         <div
           v-for="(result, index) in store.searchResults"
           :key="index"
-          class="result-item"
-          @click="openDocument(result[1])"
+          :class="{ 'result-item': true, 'selected': index === selectedIndex }"
+          @click="selectResult(index)"
         >
           <div class="result-title" v-html="result[2] || result[0]"></div>
           <div class="result-url">{{ result[1] }}</div>
@@ -37,16 +39,56 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch, nextTick } from 'vue';
 import { useIndexerStore } from './stores/indexer';
 import { fuzzySearch } from '../../shared/search-algorithm';
 
 const store = useIndexerStore();
 const query = ref('');
+const searchInput = ref<HTMLInputElement>();
+const selectedIndex = ref(-1);
 
 onMounted(async () => {
   // MDNインデックスを読み込み
   await store.loadIndex('mdn');
+
+  // Main process からのキーボードアクションを受け取る
+  window.api.onKeyboardAction((action) => {
+    switch (action) {
+      case 'focus-search':
+        searchInput.value?.focus();
+        break;
+      case 'select-next':
+        selectNext();
+        break;
+      case 'select-previous':
+        selectPrevious();
+        break;
+      case 'clear-input':
+        query.value = '';
+        handleSearch();
+        break;
+      case 'autocomplete':
+        const firstResult = store.searchResults[0];
+        if (firstResult) {
+          query.value = firstResult[0];
+          handleSearch();
+        }
+        break;
+      case 'select-result':
+        if (selectedIndex.value >= 0 && store.searchResults[selectedIndex.value]) {
+          selectResult(selectedIndex.value);
+        } else if (store.searchResults.length > 0) {
+          selectResult(0);
+        }
+        break;
+    }
+  });
+});
+
+// 検索結果が変わったら選択をリセット
+watch(() => store.searchResults, () => {
+  selectedIndex.value = -1;
 });
 
 function handleSearch() {
@@ -61,10 +103,78 @@ function handleSearch() {
   store.setSearchQuery(query.value);
 }
 
-function openDocument(url: string) {
-  // WebContentsViewでドキュメントを表示
-  window.api.loadDocument(url);
-  console.log('Open document:', url);
+function selectResult(index: number) {
+  selectedIndex.value = index;
+  const result = store.searchResults[index];
+  if (result) {
+    window.api.loadDocument(result[1]);
+  }
+}
+
+function selectNext() {
+  if (store.searchResults.length === 0) return;
+  selectedIndex.value = Math.min(selectedIndex.value + 1, store.searchResults.length - 1);
+  selectResult(selectedIndex.value);
+  scrollToSelected();
+}
+
+function selectPrevious() {
+  if (store.searchResults.length === 0) return;
+  selectedIndex.value = Math.max(selectedIndex.value - 1, 0);
+  selectResult(selectedIndex.value);
+  scrollToSelected();
+}
+
+function scrollToSelected() {
+  nextTick(() => {
+    const selected = document.querySelector('.result-item.selected');
+    if (selected) {
+      selected.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  });
+}
+
+function handleInputKeydown(e: KeyboardEvent) {
+  const key = (e.altKey ? 'Alt-' : '') +
+              (e.ctrlKey ? 'Control-' : '') +
+              (e.metaKey ? 'Meta-' : '') +
+              (e.shiftKey ? 'Shift-' : '') +
+              e.key;
+
+  // Ctrl + N / 下矢印: 次の結果を選択
+  if (key === 'Control-n' || key === 'ArrowDown') {
+    e.preventDefault();
+    selectNext();
+  }
+  // Ctrl + P / 上矢印: 前の結果を選択
+  else if (key === 'Control-p' || key === 'ArrowUp') {
+    e.preventDefault();
+    selectPrevious();
+  }
+  // Ctrl + U: 入力をクリア
+  else if (key === 'Control-u') {
+    e.preventDefault();
+    query.value = '';
+    handleSearch();
+  }
+  // Tab: 補完（最初の結果のタイトル）
+  else if (key === 'Tab') {
+    e.preventDefault();
+    const firstResult = store.searchResults[0];
+    if (firstResult) {
+      query.value = firstResult[0]; // タイトルで補完
+      handleSearch();
+    }
+  }
+  // Enter: 選択された結果を開く
+  else if (key === 'Enter') {
+    e.preventDefault();
+    if (selectedIndex.value >= 0 && store.searchResults[selectedIndex.value]) {
+      selectResult(selectedIndex.value);
+    } else if (store.searchResults.length > 0) {
+      selectResult(0);
+    }
+  }
 }
 </script>
 
@@ -142,6 +252,11 @@ function openDocument(url: string) {
 
 .result-item:hover {
   background: #2a2d2e;
+}
+
+.result-item.selected {
+  background: #094771;
+  border-left: 3px solid #007acc;
 }
 
 .result-title {
