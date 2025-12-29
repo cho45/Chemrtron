@@ -50,6 +50,14 @@ export interface IndexerContext {
    * @param callback 各URLに対して実行するコールバック
    */
   crawl(urls: string[], callback: (url: string, doc: Document) => void): Promise<void>;
+
+  /**
+   * 進捗コールバック
+   * @param state 進捗の状態（"init", "fetch.start", "fetch.done", "crawl.start", "crawl.progress", "done" など）
+   * @param current 現在の進捗
+   * @param total 全体の作業量
+   */
+  progress(state: string, current: number, total: number): void;
 }
 
 /**

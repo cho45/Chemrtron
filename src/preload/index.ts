@@ -25,9 +25,9 @@ const api = {
     ipcRenderer.send(IPC_CHANNELS.LOAD_DOCUMENT, url);
   },
 
-  // 進捗通知のリスナー登録（将来の実装用）
-  onProgress: (callback: (message: string) => void) => {
-    ipcRenderer.on(IPC_CHANNELS.PROGRESS, (_event, message) => callback(message));
+  // 進捗通知のリスナー登録
+  onProgress: (callback: (progress: { id: string; state: string; current: number; total: number }) => void) => {
+    ipcRenderer.on(IPC_CHANNELS.PROGRESS, (_event, progress) => callback(progress));
   },
 
   // キーボードアクションのリスナー登録

@@ -46,7 +46,7 @@ export function setupIpcHandlers(): void {
     }
   });
   // インデックスデータを取得
-  ipcMain.handle(IPC_CHANNELS.GET_INDEX, async (_event, args: { id: string; reindex?: boolean }) => {
+  ipcMain.handle(IPC_CHANNELS.GET_INDEX, async (event, args: { id: string; reindex?: boolean }) => {
     const { id, reindex } = args;
 
     try {
@@ -70,7 +70,7 @@ export function setupIpcHandlers(): void {
       } else {
         // キャッシュがない場合はインデクサーを実行してインデックスを作成
         console.log(`[IPC] No cache for ${id}, creating index...`);
-        const indexData = await createIndex(id, indexer);
+        const indexData = await createIndex(id, indexer, event);
         return { data: indexData, metadata: null, indexerMetadata };
       }
     } catch (error) {
@@ -99,12 +99,23 @@ function serializeIndexerMetadata(indexer: IndexerDefinition): SerializableIndex
 /**
  * インデクサーを実行してインデックスを作成
  */
-async function createIndex(id: string, indexer: IndexerDefinition): Promise<string> {
+async function createIndex(id: string, indexer: IndexerDefinition, event?: Electron.IpcMainInvokeEvent): Promise<string> {
   console.log(`[IPC] Creating index for ${id}...`);
   console.log(`[IPC] Using indexer: ${indexer.name}`);
 
+  // 進捗コールバック
+  const progressCallback = (state: string, current: number, total: number) => {
+    console.log(`[IPC] Progress: ${state} ${current}/${total}`);
+    if (event) {
+      event.sender.send(IPC_CHANNELS.PROGRESS, { id, state, current, total });
+    }
+  };
+
   // IndexerContext を作成
-  const ctx = createIndexerContext();
+  const ctx = createIndexerContext(progressCallback);
+
+  // 初期進捗を送信
+  progressCallback('init', 0, 1);
 
   // インデクサーを実行
   await indexer.index(ctx);
@@ -122,6 +133,9 @@ async function createIndex(id: string, indexer: IndexerDefinition): Promise<stri
   });
 
   console.log(`[IPC] Index saved to cache for ${id}`);
+
+  // 完了を送信
+  progressCallback('done', 1, 1);
 
   return indexData;
 }

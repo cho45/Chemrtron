@@ -11,7 +11,7 @@ const SETTINGS_DIR = join(app.getPath('home'), '.chemr');
 const SETTINGS_FILE = join(SETTINGS_DIR, 'settings.json');
 
 const DEFAULT_SETTINGS: Settings = {
-  enabled: ['sample'],
+  enabled: ['sample', 'mdn'],
   developerMode: false,
   globalShortcut: 'Alt+Space'
 };

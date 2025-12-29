@@ -7,10 +7,15 @@
         :key="indexer.id"
         :class="{ 'indexer-icon-item': true, 'active': indexer.id === store.currentIndexId }"
         @click="selectIndexer(indexer.id)"
-        :title="indexer.name"
+        @contextmenu.prevent="reindexIndexer(indexer.id)"
+        :title="indexer.name + ' (右クリックで再インデックス)'"
       >
         <div class="indexer-icon" :style="{ background: indexer.color || '#666' }">
           {{ indexer.name.substring(0, 2).toUpperCase() }}
+        </div>
+        <!-- 進捗表示 -->
+        <div v-if="progressState && progressState.id === indexer.id" class="indexer-progress">
+          <div class="progress-bar" :style="{ width: `${(progressState.current / progressState.total) * 100}%` }"></div>
         </div>
       </div>
     </div>
@@ -71,6 +76,7 @@ const query = ref('');
 const searchInput = ref<HTMLInputElement>();
 const selectedIndex = ref(-1);
 const currentUrl = ref<string>('');
+const progressState = ref<{ id: string; state: string; current: number; total: number } | null>(null);
 
 onMounted(async () => {
   // 初期化（全インデクサーと設定を読み込み）
@@ -121,6 +127,19 @@ onMounted(async () => {
   // URL変更を受け取る
   window.api.onUrlChanged((url) => {
     currentUrl.value = url;
+  });
+
+  // 進捗通知を受け取る
+  window.api.onProgress((progress) => {
+    progressState.value = progress;
+    // 完了したら3秒後にクリア
+    if (progress.state === 'done') {
+      setTimeout(() => {
+        if (progressState.value?.id === progress.id && progressState.value?.state === 'done') {
+          progressState.value = null;
+        }
+      }, 3000);
+    }
   });
 });
 
@@ -183,6 +202,12 @@ async function selectIndexer(id: string) {
   nextTick(() => {
     searchInput.value?.focus();
   });
+}
+
+async function reindexIndexer(id: string) {
+  if (confirm(`${id} インデクサーを再インデックスしますか？`)) {
+    await store.loadIndex(id, true);
+  }
 }
 
 function handleInputKeydown(e: KeyboardEvent) {
@@ -292,6 +317,22 @@ function handleInputKeydown(e: KeyboardEvent) {
   font-weight: 600;
   color: white;
   flex-shrink: 0;
+}
+
+.indexer-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #3e3e42;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: #007acc;
+  transition: width 0.3s ease;
 }
 
 /* 中央: 検索パネル */

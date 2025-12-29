@@ -7,9 +7,14 @@ import type { IndexerContext } from '../shared/types';
 
 /**
  * IndexerContext の実装を作成
+ * @param progressCallback 進捗通知コールバック
  */
-export function createIndexerContext(): IndexerContext & { getIndexData(): string } {
+export function createIndexerContext(
+  progressCallback?: (state: string, current: number, total: number) => void
+): IndexerContext & { getIndexData(): string } {
   const indexEntries: Array<{ title: string; url: string }> = [];
+  let current = 0;
+  let total = 1;
 
   return {
     /**
@@ -17,6 +22,17 @@ export function createIndexerContext(): IndexerContext & { getIndexData(): strin
      */
     pushIndex(title: string, url: string): void {
       indexEntries.push({ title, url });
+    },
+
+    /**
+     * 進捗コールバック
+     */
+    progress(state: string, currentValue: number, totalValue: number): void {
+      current = currentValue;
+      total = totalValue;
+      if (progressCallback) {
+        progressCallback(state, current, total);
+      }
     },
 
     /**
