@@ -3,6 +3,7 @@
  * インデクサーがインデックスを作成する際に使用するコンテキスト
  */
 
+import { parseHTML } from 'linkedom';
 import type { IndexerContext } from '../shared/types';
 
 /**
@@ -37,10 +38,11 @@ export function createIndexerContext(
 
     /**
      * URLからHTMLドキュメントを取得
-     * TODO: 将来的に実装（現在は未対応）
      */
-    async fetchDocument(_url: string): Promise<Document> {
-      throw new Error('fetchDocument is not implemented yet');
+    async fetchDocument(url: string): Promise<Document> {
+      const html = await this.fetchText(url);
+      const { document } = parseHTML(html);
+      return document as unknown as Document;
     },
 
     /**
@@ -67,10 +69,19 @@ export function createIndexerContext(
 
     /**
      * 複数のURLを巡回してコールバックを実行
-     * TODO: 将来的に実装（現在は未対応）
      */
-    async crawl(_urls: string[], _callback: (url: string, doc: Document) => void): Promise<void> {
-      throw new Error('crawl is not implemented yet');
+    async crawl(urls: string[], callback: (url: string, doc: Document) => void): Promise<void> {
+      this.progress('crawl.start', 0, urls.length);
+      for (let i = 0; i < urls.length; i++) {
+        const url = urls[i];
+        try {
+          const doc = await this.fetchDocument(url);
+          callback(url, doc);
+        } catch (e) {
+          console.error(`[IndexerContext] Failed to crawl ${url}:`, e);
+        }
+        this.progress('crawl.progress', i + 1, urls.length);
+      }
     },
 
     /**

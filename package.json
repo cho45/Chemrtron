@@ -24,6 +24,7 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
+    "linkedom": "^0.18.12",
     "pinia": "^3.0.4"
   },
   "devDependencies": {
