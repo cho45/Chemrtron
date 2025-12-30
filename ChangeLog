@@ -1,3 +1,12 @@
+2025-12-30  SATOH Hiroh <cho45@lowreal.net>
+
+	* Complete rewrite from scratch using modern Electron, Vite, Vue 3, and TypeScript.
+	* Migrate build system to electron-builder and update Makefile.
+	* Remove Mac App Store related configurations and legacy build scripts.
+	* Implement type-safe IPC communication and enhanced core logic.
+	* Clean up obsolete implementation (ref-old) and legacy assets.
+	* Update documentation for the new architecture and build process.
+
 2016-04-23  SATOH Hiroh <cho45@lowreal.net>
 
 	* Add feature: hidden title bar (by @rhysd)
