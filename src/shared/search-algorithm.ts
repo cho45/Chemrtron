@@ -43,7 +43,7 @@ function createSearchIterator(data: string, query: string | RegExp) {
         hasNext = false;
       }
 
-      if (start > tab) {
+      if (start >= tab) {
         const line = data.slice(start, end).split('\t');
         return line as SearchResultItem;
       } else {
