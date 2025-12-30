@@ -20,6 +20,10 @@ const api = {
   updateSettings: (settings: any) =>
     ipcRenderer.invoke(IPC_CHANNELS.UPDATE_SETTINGS, settings),
 
+  // クレジット情報を取得
+  getAboutInfo: () =>
+    ipcRenderer.invoke(IPC_CHANNELS.GET_ABOUT_INFO),
+
   // ドキュメントをロード
   loadDocument: (url: string) => {
     ipcRenderer.send(IPC_CHANNELS.LOAD_DOCUMENT, url);

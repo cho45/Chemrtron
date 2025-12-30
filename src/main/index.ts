@@ -95,7 +95,10 @@ function createApplicationMenu(): void {
           {
             label: app.name,
             submenu: [
-              { role: 'about' as const },
+              { 
+                label: `About ${app.name}`,
+                click: () => handleKeyboardAction('open-about')
+              },
               { type: 'separator' as const },
               {
                 label: 'Preferences...',
@@ -192,6 +195,23 @@ function createApplicationMenu(): void {
         ...(isMac
           ? [{ type: 'separator' as const }, { role: 'front' as const }]
           : [])
+      ]
+    },
+    // Help メニュー
+    {
+      label: 'Help',
+      role: 'help',
+      submenu: [
+        {
+          label: 'About Chemrtron',
+          click: () => handleKeyboardAction('open-about')
+        },
+        {
+          label: 'Report issue...',
+          click: () => {
+            shell.openExternal('https://github.com/cho45/Chemrtron/issues');
+          }
+        }
       ]
     }
   ];

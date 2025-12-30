@@ -140,6 +140,7 @@ export const IPC_CHANNELS = {
   LOAD_DOCUMENT: 'load-document',
   UPDATE_SETTINGS: 'update-settings',
   GET_SETTINGS: 'get-settings',
+  GET_ABOUT_INFO: 'get-about-info',
   PROGRESS: 'progress',
   KEYBOARD_ACTION: 'keyboard-action',
   URL_CHANGED: 'url-changed',
@@ -162,4 +163,5 @@ export type KeyboardAction =
   | 'go-forward'
   | 'open-settings'
   | 'open-indexer-search'
-  | 'open-find';
+  | 'open-find'
+  | 'open-about';

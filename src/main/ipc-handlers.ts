@@ -2,7 +2,9 @@
  * IPC Handlers - Renderer ↔ Main プロセス間通信
  */
 
-import { ipcMain } from 'electron';
+import { ipcMain, app } from 'electron';
+import { readFileSync, existsSync } from 'fs';
+import { join } from 'path';
 import { IPC_CHANNELS, type SerializableIndexerMetadata, type IndexerDefinition, type Settings } from '../shared/types';
 import * as CacheManager from './cache-manager';
 import { getIndexerById, loadAllIndexers } from './indexer-loader';
@@ -47,6 +49,35 @@ export function setupIpcHandlers(): void {
       throw error;
     }
   });
+
+  // クレジット情報を取得
+  ipcMain.handle(IPC_CHANNELS.GET_ABOUT_INFO, async () => {
+    try {
+      const rootDir = join(__dirname, '../../');
+      const contributors = existsSync(join(rootDir, 'CONTRIBUTORS'))
+        ? readFileSync(join(rootDir, 'CONTRIBUTORS'), 'utf-8')
+        : '';
+      const credits = existsSync(join(rootDir, 'CREDITS'))
+        ? readFileSync(join(rootDir, 'CREDITS'), 'utf-8')
+        : '';
+
+      const indexers = await loadAllIndexers();
+      const indexerCopyrights = indexers
+        .filter((i) => (i as any).copyright)
+        .map((i) => ({ id: i.id, name: i.name, copyright: (i as any).copyright }));
+
+      return { 
+        version: app.getVersion(),
+        contributors, 
+        credits, 
+        indexerCopyrights 
+      };
+    } catch (error) {
+      console.error('[IPC] Error getting about info:', error);
+      throw error;
+    }
+  });
+
   // インデックスデータを取得
   ipcMain.handle(IPC_CHANNELS.GET_INDEX, async (event, args: { id: string; reindex?: boolean }) => {
     const { id, reindex } = args;

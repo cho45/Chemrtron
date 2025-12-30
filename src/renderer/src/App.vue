@@ -135,7 +135,7 @@
       </div>
       <FindInPage :is-open="isFindOpen" @close="isFindOpen = false" />
       <!-- WebContentsView が重なるプレースホルダー -->
-      <div ref="viewPlaceholder" class="view-placeholder" v-show="!isSettingsOpen && !isIndexerSearchOpen"></div>
+      <div ref="viewPlaceholder" class="view-placeholder" v-show="!isSettingsOpen && !isIndexerSearchOpen && !isAboutOpen"></div>
     </div>
 
     <SettingsModal :is-open="isSettingsOpen" @close="isSettingsOpen = false" />
@@ -144,6 +144,7 @@
       @close="isIndexerSearchOpen = false"
       @select="selectIndexer"
     />
+    <AboutModal :is-open="isAboutOpen" @close="isAboutOpen = false" />
   </div>
 </template>
 
@@ -154,6 +155,7 @@ import { fuzzySearch } from '../../shared/search-algorithm';
 import SettingsModal from './components/SettingsModal.vue';
 import IndexerSearchModal from './components/IndexerSearchModal.vue';
 import FindInPage from './components/FindInPage.vue';
+import AboutModal from './components/AboutModal.vue';
 import { getContrastColor } from './utils/color';
 
 const store = useIndexerStore();
@@ -170,6 +172,7 @@ const isSettingsOpen = ref(false);
 const isIndexerSearchOpen = ref(false);
 const isIndexerMenuOpen = ref(false);
 const isFindOpen = ref(false);
+const isAboutOpen = ref(false);
 const isSidebarExpanded = ref(false);
 const draggingIndex = ref<number | null>(null);
 
@@ -256,6 +259,9 @@ onMounted(async () => {
         break;
       case 'open-find':
         isFindOpen.value = true;
+        break;
+      case 'open-about':
+        isAboutOpen.value = true;
         break;
       case 'focus-search':
         searchInput.value?.focus();
@@ -486,7 +492,7 @@ function handleInputKeydown(e: KeyboardEvent) {
   flex-direction: column;
   background: var(--color-sidebar-bg);
   border-right: 1px solid var(--color-border);
-  z-index: 50;
+  z-index: 5;
   height: 100vh;
   position: absolute;
   top: 0;
