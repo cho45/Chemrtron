@@ -92,7 +92,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted, onUnmounted } from 'vue';
 import { useIndexerStore } from '../stores/indexer';
 import { getContrastColor } from '../utils/color';
 
@@ -158,6 +158,21 @@ function handleShortcutKey(e: KeyboardEvent) {
   store.updateSettings({ globalShortcut: shortcut });
   (e.target as HTMLElement).blur();
 }
+
+function handleGlobalKeyDown(e: KeyboardEvent) {
+  // ショートカット記録中でない場合のみ Escape で閉じる
+  if (e.key === 'Escape' && props.isOpen && !isRecording.value) {
+    close();
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleGlobalKeyDown);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleGlobalKeyDown);
+});
 </script>
 
 <style scoped>

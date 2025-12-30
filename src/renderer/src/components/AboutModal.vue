@@ -50,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted, onUnmounted } from 'vue';
 import appIcon from '../../../../resources/icon.png';
 import type { AboutInfo } from '../../../shared/types';
 
@@ -82,6 +82,20 @@ async function loadInfo() {
 function close() {
   emit('close');
 }
+
+function handleKeyDown(e: KeyboardEvent) {
+  if (e.key === 'Escape' && props.isOpen) {
+    close();
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeyDown);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyDown);
+});
 
 watch(() => props.isOpen, (val) => {
   if (val) {

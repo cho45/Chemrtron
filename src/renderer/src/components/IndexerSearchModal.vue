@@ -45,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, nextTick } from 'vue';
+import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue';
 import { useIndexerStore } from '../stores/indexer';
 import { fuzzySearch } from '../../../shared/search-algorithm';
 import type { SearchResultItem } from '../../../shared/types';
@@ -125,6 +125,20 @@ function handleKeydown(e: KeyboardEvent) {
     close();
   }
 }
+
+function handleGlobalKeyDown(e: KeyboardEvent) {
+  if (e.key === 'Escape' && props.isOpen) {
+    close();
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleGlobalKeyDown);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleGlobalKeyDown);
+});
 
 function scrollToSelected() {
   nextTick(() => {
