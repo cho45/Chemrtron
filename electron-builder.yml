@@ -25,6 +25,7 @@ nsis:
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
 mac:
+  identity: null
   target:
     - dmg
     - zip

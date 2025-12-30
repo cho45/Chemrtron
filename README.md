@@ -100,6 +100,8 @@ The GitHub Action will automatically:
 - Upload the installers and binaries to the release.
 - Generate release notes based on commit history.
 
+**Note for macOS users:** Since the app is not signed with an Apple Developer certificate, you may see a warning when opening it for the first time. To open it, **Right-click (or Control-click) the app icon and select "Open"** from the menu.
+
 Creating New Indexers
 =====================
 
