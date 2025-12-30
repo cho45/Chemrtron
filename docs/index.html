@@ -98,33 +98,25 @@
 						</section>
 
 						<section>
-							<h4>Install Electron and Build Tools</h4>
+							<h4>Clone Repository and Install Dependencies</h4>
 							<p>
-								<kbd>npm -g install electron-prebuilt electron-packager electron-builder</kbd>
-							</p>
-						</section>
-						
-						<section>
-							<h4>Clone Repository</h4>
-								<p>
-							<kbd>git clone https://github.com/cho45/Chemrtron.git</kbd>
+								<kbd>git clone https://github.com/cho45/Chemrtron.git</kbd><br/>
+								<kbd>cd Chemrtron</kbd><br/>
+								<kbd>npm install</kbd>
 							</p>
 						</section>
 
 						<section>
 							<h4>Package</h4>
 							<p>
-								<kbd>sh dev/package.sh</kbd>
+								<kbd>make mac</kbd> (for macOS)<br/>
+								<kbd>make win</kbd> (for Windows)
 							</p>
-							<p>Packaged application is located under <kbd>build/releases</kbd></p>
+							<p>Packaged application is located under <kbd>dist/</kbd></p>
 						</section>
 					</section>
 					<section>
 						<h3>Packaged release</h3>
-						<h4>For Mac</h4>
-						<div style="text-align: center;">
-							<a href="https://itunes.apple.com/jp/app/chemr/id1051159776?mt=12"><img src="img/Download_on_the_App_Store_Badge_US-UK_135x40.svg" alt="Download on the App Store"/></a>
-						</div>
 						<h4>For Windows or Mac</h4>
 						<div style="text-align: center;">
 							<a href="https://github.com/cho45/Chemrtron/releases">
@@ -264,14 +256,7 @@
 					<li><kbd>$HOME/.chemr/indexers/*.js</kbd></li>
 					<li><kbd>$APP_ROOT/indexers/*.js</kbd></li>
 				</ol>
-				<p>You can put your own indexer to <kbd>$HOME/.chemer/indexers/</kbd>.</p>
-
-				<aside>
-					<h3>Note: OS X Sandbox</h3>
-					<p>In OS X sandbox (packaged releases are in sandbox. electron command is not in sandbox), .chemr directory is located under <kbd>$HOME/Library/Containers/net.lowreal.Chemr/Data</kbd>.</p>
-					<p>Run following commands for convenience:</p>
-					<kbd>ln -s ~/Library/Containers/net.lowreal.Chemr/Data/.chemr ~/.chemr</kbd>
-				</aside>
+				<p>You can put your own indexer to <kbd>$HOME/.chemr/indexers/</kbd>.</p>
 
 				<section>
 					<h3>Indexer definition file</h3>
