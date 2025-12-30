@@ -73,7 +73,7 @@
                 />
                 <div
                   class="mini-icon"
-                  :style="{ background: indexer.color || '#666' }"
+                  :style="{ background: indexer.color || '#666', color: getContrastColor(indexer.color) }"
                 >
                   {{ indexer.name.substring(0, 1).toUpperCase() }}
                 </div>
@@ -94,6 +94,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { useIndexerStore } from '../stores/indexer';
+import { getContrastColor } from '../utils/color';
 
 const props = defineProps<{
   isOpen: boolean;
@@ -317,7 +318,6 @@ function handleShortcutKey(e: KeyboardEvent) {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
   font-weight: bold;
 }
 

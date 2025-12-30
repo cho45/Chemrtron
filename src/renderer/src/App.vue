@@ -11,13 +11,14 @@
           @click="selectIndexer(indexer.id)"
           @contextmenu.prevent="reindexIndexer(indexer.id)"
           :title="indexer.name + ' (右クリックで再インデックス)'"
+          :style="{ '--active-color': indexer.color || 'var(--color-accent)' }"
         >
-          <div class="indexer-icon" :style="{ background: indexer.color || '#666' }">
+          <div class="indexer-icon" :style="{ background: indexer.color || '#666', color: getContrastColor(indexer.color) }">
             {{ indexer.name.substring(0, 2).toUpperCase() }}
           </div>
           <!-- 進捗表示 -->
           <div v-if="progressState && progressState.id === indexer.id" class="indexer-progress">
-            <div class="progress-bar" :style="{ width: `${(progressState.current / progressState.total) * 100}%` }"></div>
+            <div class="progress-bar" :style="{ width: `${(progressState.current / progressState.total) * 100}%`, background: indexer.color || 'var(--color-accent)' }"></div>
           </div>
         </div>
       </div>
@@ -35,7 +36,13 @@
     </div>
 
     <!-- 中央: 検索バー + 結果列 -->
-    <div class="search-panel">
+    <div
+      class="search-panel"
+      :style="{
+        '--indexer-color': store.currentIndexer?.color || 'var(--color-accent)',
+        '--indexer-contrast-color': getContrastColor(store.currentIndexer?.color)
+      }"
+    >
       <header class="header drag-region">
         <h1>{{ store.currentIndexer?.name || 'Chemrtron' }}</h1>
       </header>
@@ -65,7 +72,7 @@
         </div>
       </div>
 
-      <div class="results-container" v-else>
+      <div class="results-container" v-else :style="{ '--indexer-color': store.currentIndexer?.color || 'var(--color-accent)' }">
         <div v-if="store.searchResults.length > 0" class="results">
           <div
             v-for="(result, index) in store.searchResults"
@@ -107,6 +114,7 @@ import { useIndexerStore } from './stores/indexer';
 import { fuzzySearch } from '../../shared/search-algorithm';
 import SettingsModal from './components/SettingsModal.vue';
 import IndexerSearchModal from './components/IndexerSearchModal.vue';
+import { getContrastColor } from './utils/color';
 
 const store = useIndexerStore();
 const query = ref('');
@@ -439,7 +447,7 @@ function handleInputKeydown(e: KeyboardEvent) {
   top: 0;
   bottom: 0;
   width: 4px;
-  background: var(--color-accent);
+  background: var(--active-color);
 }
 
 .indexer-icon {
@@ -451,7 +459,6 @@ function handleInputKeydown(e: KeyboardEvent) {
   justify-content: center;
   font-size: 14px;
   font-weight: 700;
-  color: white;
   flex-shrink: 0;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
@@ -477,7 +484,6 @@ function handleInputKeydown(e: KeyboardEvent) {
 
 .progress-bar {
   height: 100%;
-  background: var(--color-accent);
   transition: width 0.3s ease;
 }
 
@@ -488,21 +494,24 @@ function handleInputKeydown(e: KeyboardEvent) {
   background: var(--color-background);
   border-right: 1px solid var(--color-border);
   overflow: hidden;
+  --indexer-color: var(--color-accent); /* Default */
 }
 
 .header {
-  padding: 16px;
-  background: var(--color-background-soft);
+  padding: 12px 16px;
+  background: var(--indexer-color);
   border-bottom: 1px solid var(--color-border);
+  transition: background 0.2s;
 }
 
 .header h1 {
   margin: 0;
   font-size: 14px;
   font-weight: 700;
-  color: var(--color-text-mute);
+  color: var(--indexer-contrast-color);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  transition: color 0.2s;
 }
 
 .search-container {
@@ -524,7 +533,7 @@ function handleInputKeydown(e: KeyboardEvent) {
 }
 
 .search-input:focus {
-  border-color: var(--color-accent);
+  border-color: var(--indexer-color);
   box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.2);
 }
 
@@ -598,8 +607,8 @@ function handleInputKeydown(e: KeyboardEvent) {
 }
 
 .result-item.selected {
-  background: var(--color-accent);
-  color: white;
+  background: var(--indexer-color);
+  color: var(--indexer-contrast-color);
 }
 
 .result-title {
@@ -612,16 +621,16 @@ function handleInputKeydown(e: KeyboardEvent) {
 }
 
 .result-item.selected .result-title {
-  color: white;
+  color: var(--indexer-contrast-color);
 }
 
 .result-title :deep(b) {
-  color: var(--color-accent);
+  color: var(--indexer-color);
   font-weight: 700;
 }
 
 .result-item.selected .result-title :deep(b) {
-  color: white;
+  color: var(--indexer-contrast-color);
   text-decoration: underline;
 }
 
@@ -634,7 +643,8 @@ function handleInputKeydown(e: KeyboardEvent) {
 }
 
 .result-item.selected .result-url {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--indexer-contrast-color);
+  opacity: 0.8;
 }
 
 .no-results {

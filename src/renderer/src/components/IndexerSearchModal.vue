@@ -20,11 +20,15 @@
             :key="result[1]"
             :class="{ 'result-item': true, 'selected': index === selectedIndex }"
             @click="selectIndexer(result[1])"
+            :style="{
+              '--indexer-color': getIndexerColor(result[1]),
+              '--indexer-contrast-color': getContrastColor(getIndexerColor(result[1]))
+            }"
           >
             <div class="indexer-info">
               <div
                 class="mini-icon"
-                :style="{ background: getIndexerColor(result[1]) }"
+                :style="{ background: getIndexerColor(result[1]), color: getContrastColor(getIndexerColor(result[1])) }"
               >
                 {{ getIndexerInitial(result[1]) }}
               </div>
@@ -45,6 +49,7 @@ import { ref, watch, nextTick } from 'vue';
 import { useIndexerStore } from '../stores/indexer';
 import { fuzzySearch } from '../../../shared/search-algorithm';
 import type { SearchResultItem } from '../../../shared/types';
+import { getContrastColor } from '../utils/color';
 
 const props = defineProps({
   isOpen: {
@@ -207,8 +212,8 @@ watch(() => props.isOpen, (val) => {
 }
 
 .result-item.selected {
-  background: var(--color-accent);
-  color: white;
+  background: var(--indexer-color);
+  color: var(--indexer-contrast-color);
 }
 
 .indexer-info {
@@ -226,7 +231,6 @@ watch(() => props.isOpen, (val) => {
   justify-content: center;
   font-size: 12px;
   font-weight: bold;
-  color: white;
   flex-shrink: 0;
 }
 
@@ -235,12 +239,12 @@ watch(() => props.isOpen, (val) => {
 }
 
 .result-title :deep(b) {
-  color: var(--color-accent);
+  color: var(--indexer-color);
   text-decoration: underline;
 }
 
 .result-item.selected .result-title :deep(b) {
-  color: white;
+  color: var(--indexer-contrast-color);
 }
 
 .no-results {
