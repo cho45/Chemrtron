@@ -143,7 +143,9 @@ export const IPC_CHANNELS = {
   PROGRESS: 'progress',
   KEYBOARD_ACTION: 'keyboard-action',
   URL_CHANGED: 'url-changed',
-  UPDATE_VIEW_BOUNDS: 'update-view-bounds'
+  UPDATE_VIEW_BOUNDS: 'update-view-bounds',
+  FIND_IN_PAGE: 'find-in-page',
+  STOP_FIND_IN_PAGE: 'stop-find-in-page'
 } as const;
 
 /**
@@ -159,4 +161,5 @@ export type KeyboardAction =
   | 'go-back'
   | 'go-forward'
   | 'open-settings'
-  | 'open-indexer-search';
+  | 'open-indexer-search'
+  | 'open-find';

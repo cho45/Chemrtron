@@ -133,6 +133,12 @@ function createApplicationMenu(): void {
           click: () => handleKeyboardAction('go-forward')
         },
         { type: 'separator' as const },
+        {
+          label: 'Find in Page...',
+          accelerator: 'CmdOrCtrl+F',
+          click: () => handleKeyboardAction('open-find')
+        },
+        { type: 'separator' as const },
         { role: 'reload' as const },
         { role: 'toggleDevTools' as const },
         { type: 'separator' as const },
@@ -255,6 +261,13 @@ function createDocumentView(): WebContentsView {
       handleKeyboardAction('go-forward');
       return;
     }
+
+    // Cmd/Ctrl + F: ページ内検索
+    if (cmdOrCtrl && input.key.toLowerCase() === 'f') {
+      event.preventDefault();
+      handleKeyboardAction('open-find');
+      return;
+    }
   });
 
   return view;
@@ -322,6 +335,20 @@ app.whenReady().then(() => {
       // サイズがある場合のみ表示する
       const isVisible = bounds.width > 0 && bounds.height > 0;
       documentView.setVisible(isVisible);
+    }
+  });
+
+  // FIND_IN_PAGE IPCハンドラー
+  ipcMain.on(IPC_CHANNELS.FIND_IN_PAGE, (_event, text: string, options?: any) => {
+    if (documentView) {
+      documentView.webContents.findInPage(text, options);
+    }
+  });
+
+  // STOP_FIND_IN_PAGE IPCハンドラー
+  ipcMain.on(IPC_CHANNELS.STOP_FIND_IN_PAGE, (_event, action: 'clearSelection' | 'keepSelection' | 'activateSelection') => {
+    if (documentView) {
+      documentView.webContents.stopFindInPage(action);
     }
   });
 

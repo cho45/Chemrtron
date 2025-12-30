@@ -43,6 +43,16 @@ const api = {
   // ビューのサイズ更新を通知
   updateViewBounds: (bounds: { x: number; y: number; width: number; height: number }) => {
     ipcRenderer.send(IPC_CHANNELS.UPDATE_VIEW_BOUNDS, bounds);
+  },
+
+  // ページ内検索を開始
+  findInPage: (text: string, options?: any) => {
+    ipcRenderer.send(IPC_CHANNELS.FIND_IN_PAGE, text, options);
+  },
+
+  // ページ内検索を停止
+  stopFindInPage: (action: 'clearSelection' | 'keepSelection' | 'activateSelection') => {
+    ipcRenderer.send(IPC_CHANNELS.STOP_FIND_IN_PAGE, action);
   }
 };
 

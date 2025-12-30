@@ -113,6 +113,7 @@
       <div class="url-bar drag-region">
         <div class="url-text">{{ currentUrl || 'No document loaded' }}</div>
       </div>
+      <FindInPage :is-open="isFindOpen" @close="isFindOpen = false" />
       <!-- WebContentsView が重なるプレースホルダー -->
       <div ref="viewPlaceholder" class="view-placeholder" v-show="!isSettingsOpen && !isIndexerSearchOpen"></div>
     </div>
@@ -132,6 +133,7 @@ import { useIndexerStore } from './stores/indexer';
 import { fuzzySearch } from '../../shared/search-algorithm';
 import SettingsModal from './components/SettingsModal.vue';
 import IndexerSearchModal from './components/IndexerSearchModal.vue';
+import FindInPage from './components/FindInPage.vue';
 import { getContrastColor } from './utils/color';
 
 const store = useIndexerStore();
@@ -147,6 +149,7 @@ const isMac = navigator.userAgent.indexOf('Mac') !== -1;
 const isSettingsOpen = ref(false);
 const isIndexerSearchOpen = ref(false);
 const isIndexerMenuOpen = ref(false);
+const isFindOpen = ref(false);
 
 let resizeObserver: ResizeObserver | null = null;
 
@@ -228,6 +231,9 @@ onMounted(async () => {
         break;
       case 'open-indexer-search':
         isIndexerSearchOpen.value = true;
+        break;
+      case 'open-find':
+        isFindOpen.value = true;
         break;
       case 'focus-search':
         searchInput.value?.focus();
