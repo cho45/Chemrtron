@@ -82,7 +82,27 @@ To build the application for your current platform:
 npm run build
 ```
 
-This uses `electron-builder` to generate production-ready packages in the `out` directory.
+This uses `electron-builder` to generate production-ready packages in the `dist` directory.
+
+Release
+=======
+
+Releases are automated via GitHub Actions when a version tag is pushed.
+
+1.  Update the version in `package.json` and the `VERSION` file.
+2.  Commit and push the changes.
+3.  Create and push a git tag:
+
+```bash
+git tag v2.0.1
+git push origin v2.0.1
+```
+
+The GitHub Action will automatically:
+- Build the application for Windows, macOS, and Linux.
+- Create a new GitHub Release.
+- Upload the installers and binaries to the release.
+- Generate release notes based on commit history.
 
 Creating New Indexers
 =====================
