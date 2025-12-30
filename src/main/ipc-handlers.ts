@@ -137,5 +137,8 @@ async function createIndex(id: string, indexer: IndexerDefinition, event?: Elect
   // 完了を送信
   progressCallback('done', 1, 1);
 
+  // UIで完了メッセージが見えるように少し待つ
+  await new Promise((resolve) => setTimeout(resolve, 500));
+
   return indexData;
 }

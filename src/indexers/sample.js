@@ -14,11 +14,11 @@ const sampleIndexer = {
    * @param {import('../shared/types').IndexerContext} ctx
    */
   async index(ctx) {
-    // setTimeout で非同期処理をシミュレート
-    await new Promise(resolve => setTimeout(resolve, 100));
+    ctx.progress('init', 0, 100);
+    // 初期化のシミュレート
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     // サンプルデータをインデックスに追加
-    // インデックスサイズを削減するため、共通prefix（https://example.com/docs/）は保存しない
     const sampleData = [
       { title: 'Getting Started', url: 'getting-started' },
       { title: 'API Reference', url: 'api-reference' },
@@ -29,14 +29,32 @@ const sampleIndexer = {
       { title: 'FAQ', url: 'faq' },
       { title: 'Installation', url: 'installation' },
       { title: 'Migration Guide', url: 'migration' },
-      { title: 'Best Practices', url: 'best-practices' }
+      { title: 'Best Practices', url: 'best-practices' },
+      { title: 'Contributing Guide', url: 'contributing' },
+      { title: 'Security Policy', url: 'security' },
+      { title: 'Release Notes v2.0', url: 'releases/v2.0' },
+      { title: 'Release Notes v1.5', url: 'releases/v1.5' },
+      { title: 'CLI Tool Documentation', url: 'cli-docs' },
+      { title: 'Plugin Development', url: 'plugins' },
+      { title: 'Deployment Strategies', url: 'deployment' },
+      { title: 'Performance Optimization', url: 'performance' },
+      { title: 'Monitoring and Logging', url: 'monitoring' },
+      { title: 'Community Resources', url: 'community' }
     ];
 
-    for (const item of sampleData) {
+    const total = sampleData.length;
+    ctx.progress('crawl.start', 0, total);
+
+    for (let i = 0; i < total; i++) {
+      const item = sampleData[i];
       ctx.pushIndex(item.title, item.url);
-      // 各アイテムの追加を遅延させて非同期処理をシミュレート
-      await new Promise(resolve => setTimeout(resolve, 50));
+      
+      // 各アイテムの処理を遅延させてプログレス表示を確認しやすくする
+      ctx.progress('crawl.progress', i + 1, total);
+      await new Promise(resolve => setTimeout(resolve, 200));
     }
+
+    ctx.progress('done', total, total);
   },
 
   /**
