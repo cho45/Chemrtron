@@ -142,7 +142,8 @@ export const IPC_CHANNELS = {
   GET_SETTINGS: 'get-settings',
   PROGRESS: 'progress',
   KEYBOARD_ACTION: 'keyboard-action',
-  URL_CHANGED: 'url-changed'
+  URL_CHANGED: 'url-changed',
+  UPDATE_VIEW_BOUNDS: 'update-view-bounds'
 } as const;
 
 /**

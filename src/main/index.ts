@@ -8,9 +8,6 @@ import { IPC_CHANNELS, type KeyboardAction } from '../shared/types';
 let mainWindow: BrowserWindow | null = null;
 let documentView: WebContentsView | null = null;
 
-const SIDEBAR_WIDTH = 460; // 60px (アイコン列) + 400px (検索結果リスト)
-const URL_BAR_HEIGHT = 40; // URL表示バーの高さ
-
 /**
  * キーボードアクションをレンダラープロセスに送信
  */
@@ -198,18 +195,6 @@ function createDocumentView(): WebContentsView {
   return view;
 }
 
-function updateDocumentViewBounds(): void {
-  if (!mainWindow || !documentView) return;
-
-  const bounds = mainWindow.getContentBounds();
-  documentView.setBounds({
-    x: SIDEBAR_WIDTH,
-    y: URL_BAR_HEIGHT,
-    width: bounds.width - SIDEBAR_WIDTH,
-    height: bounds.height - URL_BAR_HEIGHT
-  });
-}
-
 function createWindow(): void {
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -233,15 +218,9 @@ function createWindow(): void {
     return { action: 'deny' };
   });
 
-  // ウィンドウのリサイズ時にWebContentsViewのサイズを調整
-  mainWindow.on('resize', () => {
-    updateDocumentViewBounds();
-  });
-
   // WebContentsViewを作成して追加
   documentView = createDocumentView();
   mainWindow.contentView.addChildView(documentView);
-  updateDocumentViewBounds();
 
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
@@ -267,6 +246,13 @@ app.whenReady().then(() => {
     if (documentView) {
       documentView.webContents.loadURL(url);
       // フォーカスは did-finish-load イベントで戻す
+    }
+  });
+
+  // UPDATE_VIEW_BOUNDS IPCハンドラー
+  ipcMain.on(IPC_CHANNELS.UPDATE_VIEW_BOUNDS, (_event, bounds: { x: number; y: number; width: number; height: number }) => {
+    if (documentView) {
+      documentView.setBounds(bounds);
     }
   });
 

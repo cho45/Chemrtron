@@ -38,6 +38,11 @@ const api = {
   // URL変更のリスナー登録
   onUrlChanged: (callback: (url: string) => void) => {
     ipcRenderer.on(IPC_CHANNELS.URL_CHANGED, (_event, url) => callback(url));
+  },
+
+  // ビューのサイズ更新を通知
+  updateViewBounds: (bounds: { x: number; y: number; width: number; height: number }) => {
+    ipcRenderer.send(IPC_CHANNELS.UPDATE_VIEW_BOUNDS, bounds);
   }
 };
 

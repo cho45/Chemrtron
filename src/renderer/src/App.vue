@@ -60,23 +60,30 @@
     </div>
 
     <!-- URL表示バー（documentView用） -->
-    <div class="url-bar">
-      <div class="url-text">{{ currentUrl || 'No document loaded' }}</div>
+    <div class="main-content">
+      <div class="url-bar">
+        <div class="url-text">{{ currentUrl || 'No document loaded' }}</div>
+      </div>
+      <!-- WebContentsView が重なるプレースホルダー -->
+      <div ref="viewPlaceholder" class="view-placeholder"></div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, nextTick } from 'vue';
+import { ref, onMounted, watch, nextTick, onUnmounted } from 'vue';
 import { useIndexerStore } from './stores/indexer';
 import { fuzzySearch } from '../../shared/search-algorithm';
 
 const store = useIndexerStore();
 const query = ref('');
 const searchInput = ref<HTMLInputElement>();
+const viewPlaceholder = ref<HTMLElement>();
 const selectedIndex = ref(-1);
 const currentUrl = ref<string>('');
 const progressState = ref<{ id: string; state: string; current: number; total: number } | null>(null);
+
+let resizeObserver: ResizeObserver | null = null;
 
 onMounted(async () => {
   // 初期化（全インデクサーと設定を読み込み）
@@ -89,6 +96,22 @@ onMounted(async () => {
       ? lastSelectedId
       : store.enabledIndexers[0].id;
     await store.loadIndex(indexToLoad);
+  }
+
+  // View の位置とサイズを監視
+  if (viewPlaceholder.value) {
+    resizeObserver = new ResizeObserver(() => {
+      if (viewPlaceholder.value) {
+        const rect = viewPlaceholder.value.getBoundingClientRect();
+        window.api.updateViewBounds({
+          x: Math.round(rect.x),
+          y: Math.round(rect.y),
+          width: Math.round(rect.width),
+          height: Math.round(rect.height)
+        });
+      }
+    });
+    resizeObserver.observe(viewPlaceholder.value);
   }
 
   // Main process からのキーボードアクションを受け取る
@@ -259,10 +282,10 @@ function handleInputKeydown(e: KeyboardEvent) {
   position: fixed;
   top: 0;
   left: 0;
-  width: 460px; /* 60px (icons) + 400px (search panel) */
+  width: 100vw;
   height: 100vh;
   display: grid;
-  grid-template-columns: 60px 400px;
+  grid-template-columns: 60px 400px 1fr;
   grid-template-rows: 1fr;
   background: #1e1e1e;
   color: #d4d4d4;
@@ -435,18 +458,19 @@ function handleInputKeydown(e: KeyboardEvent) {
   color: #858585;
 }
 
+.main-content {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
 .url-bar {
-  position: fixed;
-  top: 0;
-  left: 460px; /* 60px (icons) + 400px (search panel) */
-  right: 0;
   height: 40px;
   background: #2d2d30;
   border-bottom: 1px solid #3e3e42;
   display: flex;
   align-items: center;
   padding: 0 16px;
-  z-index: 1000;
 }
 
 .url-text {
@@ -456,5 +480,10 @@ function handleInputKeydown(e: KeyboardEvent) {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.view-placeholder {
+  flex: 1;
+  background: #000;
 }
 </style>
