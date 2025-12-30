@@ -1,5 +1,5 @@
 appId: net.lowreal.Chemr
-productName: Chemrtron
+productName: Chemr
 directories:
   buildResources: build
   output: dist
@@ -16,7 +16,7 @@ files:
 asarUnpack:
   - resources/**
 win:
-  executableName: Chemrtron
+  executableName: Chemr
   target:
     - nsis
 nsis:

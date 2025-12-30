@@ -5,7 +5,7 @@
         <div class="app-info">
           <img :src="appIcon" class="app-logo" />
           <div class="app-details">
-            <h2>Chemrtron</h2>
+            <h2>Chemr</h2>
             <p class="version">{{ version }}</p>
           </div>
         </div>

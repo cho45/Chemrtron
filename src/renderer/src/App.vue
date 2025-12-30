@@ -65,7 +65,7 @@
     >
       <header class="header drag-region">
         <div class="header-content">
-          <h1>{{ store.currentIndexer?.name || 'Chemrtron' }}</h1>
+          <h1>{{ store.currentIndexer?.name || 'Chemr' }}</h1>
           <div class="header-actions no-drag">
             <button
               class="icon-button"

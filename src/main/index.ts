@@ -97,7 +97,7 @@ function createApplicationMenu(): void {
             label: app.name,
             submenu: [
               { 
-                label: `About ${app.name}`,
+                label: 'About Chemr',
                 click: () => handleKeyboardAction('open-about')
               },
               { type: 'separator' as const },
@@ -204,7 +204,7 @@ function createApplicationMenu(): void {
       role: 'help',
       submenu: [
         {
-          label: 'About Chemrtron',
+          label: 'About Chemr',
           click: () => handleKeyboardAction('open-about')
         },
         {

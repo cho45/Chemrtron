@@ -5,6 +5,13 @@ A document viewer with fuzzy match incremental search, built on Electron.
 
 Chemrtron is the modern implementation of Chemr, designed for high-speed documentation access with a unified interface.
 
+Project Naming
+--------------
+
+*   **Chemrtron**: The project codename and repository name for this Electron-based implementation.
+*   **Chemr**: The product name. The application executable and system identity use this name.
+*   **~/.chemr**: The configuration and cache directory used by the application.
+
 Features
 ========
 
