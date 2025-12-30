@@ -1,50 +1,59 @@
 <template>
   <div class="chemrtron">
     <!-- 左端: インデクサーアイコン列 -->
-    <div class="indexer-icons" :class="{ 'is-mac': isMac }">
-      <div v-if="isMac" class="sidebar-drag-region"></div>
-      <div class="icons-scroll">
-        <TransitionGroup name="icons-list" tag="div" class="icons-container">
-          <div
-            v-for="(indexer, index) in store.enabledIndexers"
-            :key="indexer.id"
-            :class="{ 
-              'indexer-icon-item': true, 
-              'active': indexer.id === store.currentIndexId,
-              'dragging': index === draggingIndex 
-            }"
-            @click="selectIndexer(indexer.id)"
-            @contextmenu.prevent="reindexIndexer(indexer.id)"
-            :title="indexer.name + ' (右クリックで再インデックス)'"
-            :style="{ '--active-color': indexer.color || 'var(--color-accent)' }"
-            draggable="true"
-            @dragstart="handleDragStart(index)"
-            @dragover.prevent
-            @dragenter="handleDragEnter(index)"
-            @dragend="handleDragEnd"
-          >
-            <div class="indexer-icon" :style="{ background: indexer.color || '#666', color: getContrastColor(indexer.color) }">
-              {{ indexer.name.substring(0, 2).toUpperCase() }}
+    <aside class="sidebar-placeholder">
+      <div 
+        class="indexer-icons" 
+        :class="{ 'is-mac': isMac, 'expanded': isSidebarExpanded }"
+        @mouseenter="isSidebarExpanded = true"
+        @mouseleave="isSidebarExpanded = false"
+      >
+        <div v-if="isMac" class="sidebar-drag-region"></div>
+        <div class="icons-scroll">
+          <TransitionGroup name="icons-list" tag="div" class="icons-container">
+            <div
+              v-for="(indexer, index) in store.enabledIndexers"
+              :key="indexer.id"
+              :class="{ 
+                'indexer-icon-item': true, 
+                'active': indexer.id === store.currentIndexId,
+                'dragging': index === draggingIndex 
+              }"
+              @click="selectIndexer(indexer.id)"
+              @contextmenu.prevent="reindexIndexer(indexer.id)"
+              :title="indexer.name + ' (右クリックで再インデックス)'"
+              :style="{ '--active-color': indexer.color || 'var(--color-accent)' }"
+              draggable="true"
+              @dragstart="handleDragStart(index)"
+              @dragover.prevent
+              @dragenter="handleDragEnter(index)"
+              @dragend="handleDragEnd"
+            >
+              <div class="indexer-icon" :style="{ background: indexer.color || '#666', color: getContrastColor(indexer.color) }">
+                {{ indexer.name.substring(0, 2).toUpperCase() }}
+              </div>
+              <div class="indexer-label">{{ indexer.name }}</div>
+              <!-- 進捗表示 -->
+              <div v-if="progressState && progressState.id === indexer.id" class="indexer-progress">
+                <div class="progress-bar" :style="{ width: `${(progressState.current / progressState.total) * 100}%`, background: indexer.color || 'var(--color-accent)' }"></div>
+              </div>
             </div>
-            <!-- 進捗表示 -->
-            <div v-if="progressState && progressState.id === indexer.id" class="indexer-progress">
-              <div class="progress-bar" :style="{ width: `${(progressState.current / progressState.total) * 100}%`, background: indexer.color || 'var(--color-accent)' }"></div>
-            </div>
-          </div>
-        </TransitionGroup>
-      </div>
+          </TransitionGroup>
+        </div>
 
-      <!-- 設定ボタン -->
-      <div class="sidebar-footer">
-        <div class="indexer-icon-item" @click="isSettingsOpen = true" title="Settings">
-          <div class="indexer-icon settings-icon">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-              <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.81,11.69,4.81,12c0,0.31,0.02,0.65,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.5c-1.93,0-3.5-1.57-3.5-3.5 s1.57-3.5,3.5-3.5s3.5,1.57,3.5,3.5S13.93,15.5,12,15.5z"/>
-            </svg>
+        <!-- 設定ボタン -->
+        <div class="sidebar-footer">
+          <div class="indexer-icon-item" @click="isSettingsOpen = true" title="Settings">
+            <div class="indexer-icon settings-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.81,11.69,4.81,12c0,0.31,0.02,0.65,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.5c-1.93,0-3.5-1.57-3.5-3.5 s1.57-3.5,3.5-3.5s3.5,1.57,3.5,3.5S13.93,15.5,12,15.5z"/>
+              </svg>
+            </div>
+            <div class="indexer-label">Settings</div>
           </div>
         </div>
       </div>
-    </div>
+    </aside>
 
     <!-- 中央: 検索バー + 結果列 -->
     <div
@@ -161,6 +170,7 @@ const isSettingsOpen = ref(false);
 const isIndexerSearchOpen = ref(false);
 const isIndexerMenuOpen = ref(false);
 const isFindOpen = ref(false);
+const isSidebarExpanded = ref(false);
 const draggingIndex = ref<number | null>(null);
 
 let resizeObserver: ResizeObserver | null = null;
@@ -465,17 +475,35 @@ function handleInputKeydown(e: KeyboardEvent) {
 }
 
 /* 左端: インデクサーアイコン列 */
+.sidebar-placeholder {
+  width: 72px;
+  height: 100vh;
+  position: relative;
+}
+
 .indexer-icons {
   display: flex;
   flex-direction: column;
   background: var(--color-sidebar-bg);
   border-right: 1px solid var(--color-border);
-  z-index: 10;
+  z-index: 50;
   height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 72px;
+  transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s;
+  overflow-x: hidden;
+}
+
+.indexer-icons.expanded {
+  width: 240px;
+  box-shadow: 4px 0 16px rgba(0, 0, 0, 0.2);
 }
 
 .sidebar-drag-region {
   height: 32px;
+  width: 100%;
   flex-shrink: 0;
   -webkit-app-region: drag;
 }
@@ -483,6 +511,7 @@ function handleInputKeydown(e: KeyboardEvent) {
 .icons-scroll {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 8px 0;
 }
 
@@ -493,16 +522,33 @@ function handleInputKeydown(e: KeyboardEvent) {
 .sidebar-footer {
   border-top: 1px solid var(--color-border);
   padding: 8px 0;
+  -webkit-app-region: no-drag;
 }
 
 .indexer-icon-item {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 12px 0;
+  padding: 12px 16px;
   cursor: pointer;
   position: relative;
   transition: background 0.2s;
+  gap: 16px;
+  white-space: nowrap;
+}
+
+.indexer-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+  opacity: 0;
+  transition: opacity 0.1s;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.indexer-icons.expanded .indexer-label {
+  opacity: 1;
+  transition: opacity 0.3s 0.1s;
 }
 
 .indexer-icon-item:hover {
