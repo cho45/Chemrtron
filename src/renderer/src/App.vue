@@ -96,6 +96,7 @@ onMounted(async () => {
       ? lastSelectedId
       : store.enabledIndexers[0].id;
     await store.loadIndex(indexToLoad);
+    handleSearch(); // 初期表示
   }
 
   // View の位置とサイズを監視
@@ -173,7 +174,20 @@ watch(() => store.searchResults, () => {
 
 function handleSearch() {
   if (!query.value.trim()) {
-    store.setSearchResults([]);
+    // クエリが空の場合は最初の50件を表示
+    const results = store.indexData
+      .split('\n')
+      .slice(0, 50)
+      .filter((line) => line.includes('\t'))
+      .map((line) => {
+        const item = line.split('\t') as any;
+        // urlTemplateがあればURLを変換
+        if (store.currentIndexer?.urlTemplate) {
+          item[1] = store.currentIndexer.urlTemplate.replace('${url}', item[1]);
+        }
+        return item;
+      });
+    store.setSearchResults(results);
     return;
   }
 
@@ -230,6 +244,9 @@ async function selectIndexer(id: string) {
 async function reindexIndexer(id: string) {
   if (confirm(`${id} インデクサーを再インデックスしますか？`)) {
     await store.loadIndex(id, true);
+    if (id === store.currentIndexId) {
+      handleSearch();
+    }
   }
 }
 
