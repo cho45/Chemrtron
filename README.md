@@ -60,12 +60,29 @@ The runner verifies:
 Architecture
 ============
 
-Chemrtron uses a modern Electron architecture:
+Chemrtron uses a modern Electron architecture leveraging `WebContentsView` for high-performance document rendering.
 
-*   **Main Process**: Handles window management, system settings, global shortcuts, and index creation.
-*   **Renderer Process (Vue 3 + Pinia)**: Provides the search interface, indexer management, and application UI.
-*   **WebContentsView**: A native-layer view used to render documentation independently from the search UI, ensuring high performance and correct scrolling behavior.
-*   **Communication**: All components communicate via secure IPC channels defined in TypeScript for type safety.
+![Architecture Diagram](docs/img/architecture.png)
+
+### Process Model
+
+*   **Main Process**: Handles window management, system settings, global shortcuts, and executes indexers. It also manages the `WebContentsView` lifecycle and bounds.
+*   **Renderer Process (Vue 3 + Pinia)**: Renders the application UI (sidebar, search panel, modals). It communicates user intent to the Main process.
+*   **Communication**: Strictly typed IPC channels defined in `src/shared/types.ts`.
+
+### WebContentsView Integration
+
+Chemrtron uses `WebContentsView` (the successor to `BrowserView`) to render external documentation. This ensures that heavy documentation pages do not affect the performance of the search UI and provides native scroll/navigation behavior.
+
+**Layout Strategy:**
+1.  **Placeholder Element**: The Vue renderer places a `<div class="view-placeholder">` element in the layout where the documentation should appear.
+2.  **Geometry Sync**: A `ResizeObserver` monitors this placeholder. Whenever its size or position changes, the renderer sends the new bounds to the Main process via IPC (`update-view-bounds`).
+3.  **Native Resizing**: The Main process resizes the `WebContentsView` to match the placeholder's coordinates exactly.
+
+**UI Design Implications:**
+Since `WebContentsView` is a native surface rendered *independently* of the HTML DOM, it is difficult to overlay HTML content (like a floating search bar) on top of it.
+*   **Sidebar Search**: To avoid z-index conflicts, the search interface is designed as a persistent sidebar that "pushes" the content view aside, rather than floating over it.
+*   **Modals**: When a full-screen modal (e.g., Settings) is opened, the application explicitly hides the `WebContentsView` to allow the HTML modal to be visible.
 
 Key Components:
 - `src/main`: Main process logic (settings, cache, indexers).
