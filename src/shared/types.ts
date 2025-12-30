@@ -108,6 +108,12 @@ export interface IndexerDefinition {
    * ドキュメント表示時に注入するCSS（オプション）
    */
   css?: string;
+
+  /**
+   * MCPなどでコンテンツを取得する際に、本文として抽出する要素のCSSセレクタ
+   * 指定がない場合は自動判定、またはbody全体
+   */
+  contentSelector?: string;
 }
 
 /**

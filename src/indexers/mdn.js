@@ -46,6 +46,8 @@ const mdnIndexer = {
    */
   urlTemplate: 'https://developer.mozilla.org/en-US/docs/${url}',
 
+  contentSelector: 'main',
+
   /**
    * カスタムCSS
    * MDNの雰囲気に合わせるための最小限のスタイル

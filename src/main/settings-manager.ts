@@ -2,12 +2,12 @@
  * Settings Manager - 設定ファイルの読み書き
  */
 
-import { app } from 'electron';
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
+import os from 'os';
 import type { Settings } from '../shared/types';
 
-const SETTINGS_DIR = join(app.getPath('home'), '.chemr');
+const SETTINGS_DIR = join(os.homedir(), '.chemr');
 const SETTINGS_FILE = join(SETTINGS_DIR, 'settings.json');
 
 const DEFAULT_SETTINGS: Settings = {
@@ -31,7 +31,7 @@ function ensureSettingsDir(): void {
 export function loadSettings(): Settings {
   ensureSettingsDir();
 
-  console.log('[SettingsManager] loadSettings file path:', SETTINGS_FILE);
+  console.error('[SettingsManager] loadSettings file path:', SETTINGS_FILE);
   if (!existsSync(SETTINGS_FILE)) {
     // 設定ファイルがない場合はデフォルトを返す
     return { ...DEFAULT_SETTINGS };
@@ -56,7 +56,7 @@ export function saveSettings(settings: Settings): void {
 
   try {
     writeFileSync(SETTINGS_FILE, JSON.stringify(settings, null, 2), 'utf-8');
-    console.log('[SettingsManager] Settings saved:', SETTINGS_FILE);
+    console.error('[SettingsManager] Settings saved:', SETTINGS_FILE);
   } catch (error) {
     console.error('[SettingsManager] Failed to save settings:', error);
     throw error;
