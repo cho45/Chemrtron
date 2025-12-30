@@ -138,7 +138,7 @@ function toggleIndexer(id: string) {
 }
 
 function handleShortcutKey(e: KeyboardEvent) {
-  const modifiers = [];
+  const modifiers: string[] = [];
   if (e.ctrlKey) modifiers.push('Control');
   if (e.altKey) modifiers.push('Alt');
   if (e.shiftKey) modifiers.push('Shift');
