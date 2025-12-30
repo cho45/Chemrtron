@@ -1,0 +1,38 @@
+appId: net.lowreal.chemrtron
+productName: Chemrtron
+directories:
+  buildResources: build
+  output: dist
+files:
+  - '!**/.vscode/*'
+  - '!src/*'
+  - '!electron.vite.config.{js,ts,mjs,cjs}'
+  - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
+  - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
+  - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+  - '!{dev,test,docs,assets,ref-old,test-results}/**'
+  - '!{Makefile,ChangeLog,VERSION,todo.md}'
+  - '!{check-env.js,absolute-minimal.js,minimal-electron.js,test-electron.js}'
+asarUnpack:
+  - resources/**
+win:
+  executableName: Chemrtron
+  target:
+    - nsis
+nsis:
+  artifactName: ${productName}-${version}-setup.${ext}
+  shortcutName: ${productName}
+  uninstallDisplayName: ${productName}
+  createDesktopShortcut: always
+mac:
+  target:
+    - dmg
+    - zip
+  artifactName: ${productName}-${version}.${ext}
+  notarize: false
+linux:
+  target:
+    - AppImage
+    - deb
+  category: Utility
+publish: null

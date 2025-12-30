@@ -1,5 +1,9 @@
-build/
+build/*
+!build/icon.icns
+!build/icon.ico
+!build/icon.png
 out/
+dist/
 .DS_Store
 node_modules/
 sketch/

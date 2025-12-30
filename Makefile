@@ -1,9 +1,22 @@
+.PHONY: package mac win linux clean dev build
 
+dev:
+	npm run dev
 
-.PHONY: package
+build:
+	npm run build
+
 package:
-	./dev/package.sh
+	npm run build:unpack
 
-.PHONY: release
-release: package
-	./dev/release.sh
+mac:
+	npm run build:mac
+
+win:
+	npm run build:win
+
+linux:
+	npm run build:linux
+
+clean:
+	rm -rf dist out
