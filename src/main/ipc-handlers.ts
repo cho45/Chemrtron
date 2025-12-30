@@ -10,13 +10,14 @@ import * as CacheManager from './cache-manager';
 import { getIndexerById, loadAllIndexers } from './indexer-loader';
 import { createIndexerContext } from './indexer-context';
 import * as SettingsManager from './settings-manager';
+import { handleIpc } from './ipc-utils';
 
 /**
  * IPC handlersを登録
  */
 export function setupIpcHandlers(): void {
   // 全インデクサーリストを取得
-  ipcMain.handle(IPC_CHANNELS.GET_ALL_INDEXERS, async () => {
+  handleIpc(IPC_CHANNELS.GET_ALL_INDEXERS, async () => {
     try {
       const indexers = await loadAllIndexers();
       return indexers.map(serializeIndexerMetadata);
@@ -27,7 +28,7 @@ export function setupIpcHandlers(): void {
   });
 
   // 設定を取得
-  ipcMain.handle(IPC_CHANNELS.GET_SETTINGS, async () => {
+  handleIpc(IPC_CHANNELS.GET_SETTINGS, async () => {
     try {
       return SettingsManager.loadSettings();
     } catch (error) {
@@ -37,7 +38,7 @@ export function setupIpcHandlers(): void {
   });
 
   // 設定を更新
-  ipcMain.handle(IPC_CHANNELS.UPDATE_SETTINGS, async (_event, settings: Settings) => {
+  handleIpc(IPC_CHANNELS.UPDATE_SETTINGS, async (_event, settings: Settings) => {
     try {
       SettingsManager.saveSettings(settings);
       console.log('[IPC] Settings updated:', settings);
@@ -51,7 +52,7 @@ export function setupIpcHandlers(): void {
   });
 
   // クレジット情報を取得
-  ipcMain.handle(IPC_CHANNELS.GET_ABOUT_INFO, async () => {
+  handleIpc(IPC_CHANNELS.GET_ABOUT_INFO, async () => {
     try {
       const rootDir = join(__dirname, '../../');
       const contributors = existsSync(join(rootDir, 'CONTRIBUTORS'))
@@ -79,7 +80,7 @@ export function setupIpcHandlers(): void {
   });
 
   // インデックスデータを取得
-  ipcMain.handle(IPC_CHANNELS.GET_INDEX, async (event, args: { id: string; reindex?: boolean }) => {
+  handleIpc(IPC_CHANNELS.GET_INDEX, async (event, args: { id: string; reindex?: boolean }) => {
     const { id, reindex } = args;
 
     try {

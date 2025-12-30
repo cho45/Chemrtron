@@ -194,6 +194,34 @@ export const IPC_CHANNELS = {
 } as const;
 
 /**
+ * IPC interaction definitions
+ */
+export interface IpcInvokeEvents {
+  [IPC_CHANNELS.GET_INDEX]: (args: { id: string; reindex?: boolean }) => Promise<{ 
+    data: string; 
+    metadata: CacheMetadata | null; 
+    indexerMetadata: SerializableIndexerMetadata;
+  }>;
+  [IPC_CHANNELS.GET_ALL_INDEXERS]: () => Promise<SerializableIndexerMetadata[]>;
+  [IPC_CHANNELS.GET_SETTINGS]: () => Promise<Settings>;
+  [IPC_CHANNELS.UPDATE_SETTINGS]: (settings: Settings) => Promise<boolean>;
+  [IPC_CHANNELS.GET_ABOUT_INFO]: () => Promise<AboutInfo>;
+}
+
+export interface IpcRendererToMainEvents {
+  [IPC_CHANNELS.LOAD_DOCUMENT]: (url: string) => void;
+  [IPC_CHANNELS.UPDATE_VIEW_BOUNDS]: (bounds: { x: number; y: number; width: number; height: number }) => void;
+  [IPC_CHANNELS.FIND_IN_PAGE]: (text: string, options?: FindInPageOptions) => void;
+  [IPC_CHANNELS.STOP_FIND_IN_PAGE]: (action: 'clearSelection' | 'keepSelection' | 'activateSelection') => void;
+}
+
+export interface IpcMainToRendererEvents {
+  [IPC_CHANNELS.PROGRESS]: (progress: ProgressInfo) => void;
+  [IPC_CHANNELS.KEYBOARD_ACTION]: (action: KeyboardAction) => void;
+  [IPC_CHANNELS.URL_CHANGED]: (url: string) => void;
+}
+
+/**
  * Keyboard action types
  */
 export type KeyboardAction =

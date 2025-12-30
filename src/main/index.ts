@@ -4,7 +4,8 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import icon from '../../resources/icon.png?asset';
 import { setupIpcHandlers } from './ipc-handlers';
 import { loadSettings } from './settings-manager';
-import { IPC_CHANNELS, type KeyboardAction } from '../shared/types';
+import { IPC_CHANNELS, type KeyboardAction, type FindInPageOptions } from '../shared/types';
+import { onIpc } from './ipc-utils';
 
 let mainWindow: BrowserWindow | null = null;
 let documentView: WebContentsView | null = null;
@@ -381,7 +382,7 @@ app.whenReady().then(() => {
   });
 
   // LOAD_DOCUMENT IPCハンドラー
-  ipcMain.on(IPC_CHANNELS.LOAD_DOCUMENT, (_event, url: string) => {
+  onIpc(IPC_CHANNELS.LOAD_DOCUMENT, (_event, url: string) => {
     if (documentView) {
       documentView.webContents.loadURL(url);
       // フォーカスは did-finish-load イベントで戻す
@@ -389,7 +390,7 @@ app.whenReady().then(() => {
   });
 
   // UPDATE_VIEW_BOUNDS IPCハンドラー
-  ipcMain.on(IPC_CHANNELS.UPDATE_VIEW_BOUNDS, (_event, bounds: { x: number; y: number; width: number; height: number }) => {
+  onIpc(IPC_CHANNELS.UPDATE_VIEW_BOUNDS, (_event, bounds: { x: number; y: number; width: number; height: number }) => {
     if (documentView) {
       documentView.setBounds(bounds);
       // サイズがある場合のみ表示する
@@ -399,14 +400,14 @@ app.whenReady().then(() => {
   });
 
   // FIND_IN_PAGE IPCハンドラー
-  ipcMain.on(IPC_CHANNELS.FIND_IN_PAGE, (_event, text: string, options?: any) => {
+  onIpc(IPC_CHANNELS.FIND_IN_PAGE, (_event, text: string, options?: FindInPageOptions) => {
     if (documentView) {
       documentView.webContents.findInPage(text, options);
     }
   });
 
   // STOP_FIND_IN_PAGE IPCハンドラー
-  ipcMain.on(IPC_CHANNELS.STOP_FIND_IN_PAGE, (_event, action: 'clearSelection' | 'keepSelection' | 'activateSelection') => {
+  onIpc(IPC_CHANNELS.STOP_FIND_IN_PAGE, (_event, action: 'clearSelection' | 'keepSelection' | 'activateSelection') => {
     if (documentView) {
       documentView.webContents.stopFindInPage(action);
     }
