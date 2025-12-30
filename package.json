@@ -1,6 +1,6 @@
 {
   "name": "chemrtron",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "A document viewer with fuzzy match incremental search",
   "main": "./out/main/index.js",
   "author": "cho45 <cho45@lowreal.net> (http://www.lowreal.net/)",
