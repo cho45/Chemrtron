@@ -1,84 +1,90 @@
-Chemr
-=====
+Chemrtron
+=========
 
-A document viewer; fuzzy match incremental search.
+A document viewer with fuzzy match incremental search, built on Electron.
 
-<img src="https://lh3.googleusercontent.com/By0PBtaUWg_JYeBDlSKKtl34gRuL_ac3Xm-qqhXvIfSbTMh-jv1E77a4ehgk3n7Tp97doSTE8J0oSi-ft-8xLbfinG51GWwrPkeRzhQ5oMSKXyz6Jo1F_VwBxYsamN85JAdysWGm9WKtm73rcB-hUtJGCkCtrStEHJW4LmfjbcGix_E7Z9EIt-Ew-Fni1QAkgcs6_-KZ9goztbx3rRJOlQO9GPGKViS8xE-O6_8kTqpQY31JP4mYoJ9SpqEKrdeNIKwLly1yZoqe9jQoYAuBM5afzpoo_64wslLnlETdnLC0MeV4O4-4Iby1TAzOpY-vYy_pb5CCxvoI8sBU0Zt4rqH5_JT53DfY2jF1mtDxjXsAnyI6SMWbpz77luL7qMWxW-RNEFy0JsFrvhh5X6J0VeX2UVit7VJtSxwxG_9rTp53VtgkoB4L4G6dPDfiUJVninYewsUCNY0dngcS1K7Tfbe955Y0XdctHq038D6tV3QdvW5hNkGuI3qPlTj1VNjJhRfb-MnExy_fwr_oIaXm9-8Pkp9d7W6tu9Vy30ANj8fa=w600-h419-no"/>
-
-Chemrtron is Chemr on Electron.
-
+Chemrtron is the modern implementation of Chemr, designed for high-speed documentation access with a unified interface.
 
 Features
 ========
 
- * Create index on-demand
- * Same incremental search user interface to all document
+*   **On-demand Indexing**: Create and update search indexes for various documentation sets.
+*   **Incremental Search**: Fast, fuzzy-match search across all your enabled documents.
+*   **Unified UI**: A consistent experience whether you're browsing MDN, Node.js docs, or custom sets.
+*   **System Integration**: Supports system light/dark modes and global shortcuts.
+*   **WebContentsView**: Uses Electron's modern view system for seamless document rendering alongside the search UI.
 
 Development
 ===========
 
-### Install Electron
+### Requirements
 
-Chemrtron is built with Electron.
+*   [Node.js](https://nodejs.org/) (Latest LTS recommended)
+*   npm or yarn
 
-	npm -g install electron-prebuilt
+### Setup
 
-### Clone Repository
+```bash
+# Clone the repository
+git clone https://github.com/cho45/Chemrtron.git
+cd Chemrtron
 
-	git clone https://github.com/cho45/Chemrtron.git
+# Install dependencies
+npm install
+```
 
-### Launch
+### Run in Development
 
-	cd Chemrtron
-	electron .
+```bash
+npm run dev
+```
 
-
-Create New Indexer
-==================
-
-See <a href="http://cho45.github.io/Chemrtron/#create-indexer">Create New Indexer</a>
-
-CONTRIBUTING
+Architecture
 ============
 
-See <a href="CONTRIBUTING.md">CONTRIBUTING.md</a>
+Chemrtron uses a modern Electron architecture:
 
+*   **Main Process**: Handles window management, system settings, global shortcuts, and index creation.
+*   **Renderer Process (Vue 3 + Pinia)**: Provides the search interface, indexer management, and application UI.
+*   **WebContentsView**: A native-layer view used to render documentation independently from the search UI, ensuring high performance and correct scrolling behavior.
+*   **Communication**: All components communicate via secure IPC channels defined in TypeScript for type safety.
 
-ARCHITECTURE
-============
+Key Components:
+- `src/main`: Main process logic (settings, cache, indexers).
+- `src/renderer`: Vue-based search and settings UI.
+- `src/shared`: Shared types and the fuzzy search algorithm.
+- `src/indexers`: Built-in indexer definitions.
 
-Chemrtron has 2 browser window (by Electron).
-One of them is main viewer window and another one is for indexing window which is hidden.
+Build
+=====
 
-The indexing window is shown under development mode which is switched by settings or menu (View -> Toggle Developer Tools).
+To build the application for your current platform:
 
-A main window and an indexing window is communicate with IPC via Electron main process. (there is no direct connection between them)
+```bash
+npm run build
+```
 
-BUILD Chemr YOURSELF
-====================
+This uses `electron-builder` to generate production-ready packages in the `out` directory.
 
-Install requirements:
+Creating New Indexers
+=====================
 
-	npm install -g electron-packager
-	npm install -g electron-builder
+Indexers are simple JavaScript files that define how to crawl and index a documentation site. Custom indexers can be placed in `~/.chemr/indexers/`.
 
-Build:
+Example indexer structure:
 
-	./dev/package.sh 
+```javascript
+export default {
+  id: 'my-docs',
+  name: 'My Documentation',
+  color: '#42b883',
+  async index(ctx) {
+    // Use ctx.fetchDocument, ctx.pushIndex, etc.
+  }
+}
+```
 
-output to ./build/releases
-
-
-RELEASING
-=========
-
- 1. Updaste `ChangeLog`
- 2. Edit `VERSION` file to increment version
- 3. `git commit -a` and `git push` to uploaded to github
- 4. `make release` creates packages, tag origin/master and upload packages to github releases.
-
-LICENSE
+License
 =======
 
-MIT: http://cho45.github.com/mit-license
-
+MIT
