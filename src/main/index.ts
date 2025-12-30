@@ -3,6 +3,7 @@ import { join } from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import icon from '../../resources/icon.png?asset';
 import { setupIpcHandlers } from './ipc-handlers';
+import { loadSettings } from './settings-manager';
 import { IPC_CHANNELS, type KeyboardAction } from '../shared/types';
 
 let mainWindow: BrowserWindow | null = null;
@@ -169,6 +170,44 @@ function createDocumentView(): WebContentsView {
   view.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url);
     return { action: 'deny' };
+  });
+
+  // コンテキストメニューの実装
+  view.webContents.on('context-menu', (_event, params) => {
+    const settings = loadSettings();
+    const menu = Menu.buildFromTemplate([
+      {
+        label: 'Back',
+        enabled: view.webContents.navigationHistory.canGoBack(),
+        click: () => view.webContents.navigationHistory.goBack()
+      },
+      {
+        label: 'Forward',
+        enabled: view.webContents.navigationHistory.canGoForward(),
+        click: () => view.webContents.navigationHistory.goForward()
+      },
+      { type: 'separator' },
+      { role: 'copy' },
+      { type: 'separator' },
+      {
+        label: 'Open in Browser...',
+        click: () => {
+          shell.openExternal(params.linkURL || params.pageURL);
+        }
+      },
+      ...(settings.developerMode
+        ? [
+            { type: 'separator' as const },
+            {
+              label: 'Inspect Element',
+              click: () => {
+                view.webContents.inspectElement(params.x, params.y);
+              }
+            }
+          ]
+        : [])
+    ]);
+    menu.popup();
   });
 
   // ドキュメントロード完了後にフォーカスを mainWindow に戻す
