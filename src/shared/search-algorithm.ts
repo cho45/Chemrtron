@@ -116,7 +116,7 @@ export function fuzzySearch(
       item[2] = formatted;
       item.score = score;
     } else {
-      item[2] = str;
+      item[2] = escapeHTML(str);
       item.score = str.length * 100;
     }
 

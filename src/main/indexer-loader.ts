@@ -71,10 +71,16 @@ async function loadIndexersFromDirectory(dirPath: string): Promise<IndexerDefini
 /**
  * 単一のインデクサーファイルを読み込む (ESM)
  */
-async function loadIndexerFromFile(filePath: string): Promise<IndexerDefinition | null> {
+async function loadIndexerFromFile(filePath: string, forceReload = false): Promise<IndexerDefinition | null> {
   try {
     // dynamic import を使用して ESM をロード
-    const fileUrl = pathToFileURL(filePath).href;
+    let fileUrl = pathToFileURL(filePath).href;
+    
+    // 強制リロードの場合はクエリパラメータを追加してキャッシュを回避
+    if (forceReload) {
+      fileUrl += `?t=${Date.now()}`;
+    }
+    
     const module = await import(fileUrl);
 
     // デフォルトエクスポートを取得
@@ -95,7 +101,28 @@ async function loadIndexerFromFile(filePath: string): Promise<IndexerDefinition 
 /**
  * 特定のIDのインデクサーを取得
  */
-export async function getIndexerById(id: string): Promise<IndexerDefinition | null> {
+export async function getIndexerById(id: string, forceReload = false): Promise<IndexerDefinition | null> {
+  // forceReload が true の場合は、個別にファイルを読み直す必要があるため、
+  // ディレクトリをスキャンして該当ファイルを探す
+  if (forceReload) {
+    const builtInIndexersPath = join(__dirname, 'indexers');
+    const userIndexersPath = join(app.getPath('home'), '.chemr', 'indexers');
+    
+    const paths = [builtInIndexersPath, userIndexersPath];
+    for (const dirPath of paths) {
+      if (!existsSync(dirPath)) continue;
+      const files = readdirSync(dirPath);
+      for (const file of files) {
+        if (!file.endsWith('.js')) continue;
+        const filePath = join(dirPath, file);
+        const indexer = await loadIndexerFromFile(filePath, true);
+        if (indexer && indexer.id === id) {
+          return indexer;
+        }
+      }
+    }
+  }
+
   const indexers = await loadAllIndexers();
   return indexers.find(indexer => indexer.id === id) || null;
 }

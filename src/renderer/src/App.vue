@@ -279,6 +279,8 @@ function handleSearch() {
       .filter((line) => line.includes('\t'))
       .map((line) => {
         const item = line.split('\t') as any;
+        // タイトルをエスケープして item[2] にセット
+        item[2] = item[0].replace(/[&<>]/g, (m: string) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
         // urlTemplateがあればURLを変換
         if (store.currentIndexer?.urlTemplate) {
           item[1] = store.currentIndexer.urlTemplate.replace('${url}', item[1]);

@@ -51,7 +51,8 @@ export function setupIpcHandlers(): void {
 
     try {
       // インデクサーをロードしてメタデータを作成
-      const indexer = await getIndexerById(id);
+      // reindex が true の場合はファイルをディスクから読み直す
+      const indexer = await getIndexerById(id, reindex);
       if (!indexer) {
         throw new Error(`Indexer not found: ${id}`);
       }

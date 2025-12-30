@@ -75,7 +75,11 @@ function getIndexersData() {
 
 function handleSearch() {
   if (!query.value.trim()) {
-    results.value = store.enabledIndexers.map(i => [i.name, i.id, i.name] as SearchResultItem);
+    results.value = store.enabledIndexers.map(i => [
+      i.name,
+      i.id,
+      i.name.replace(/[&<>]/g, (m: string) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m))
+    ] as SearchResultItem);
     selectedIndex.value = 0;
     return;
   }
