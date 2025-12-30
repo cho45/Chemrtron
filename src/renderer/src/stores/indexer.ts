@@ -4,7 +4,7 @@
 
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { IndexerDefinition, SearchResultItem, CacheMetadata, SerializableIndexerMetadata, Settings } from '../../../shared/types';
+import type { SearchResultItem, CacheMetadata, SerializableIndexerMetadata, Settings } from '../../../shared/types';
 
 export const useIndexerStore = defineStore('indexer', () => {
   // State
@@ -20,7 +20,7 @@ export const useIndexerStore = defineStore('indexer', () => {
   const searchQuery = ref<string>('');
   const searchResults = ref<SearchResultItem[]>([]);
   const isLoading = ref<boolean>(false);
-  const currentIndexer = ref<Pick<IndexerDefinition, 'id' | 'name' | 'color' | 'icon' | 'urlTemplate' | 'css'> | null>(null);
+  const currentIndexer = ref<SerializableIndexerMetadata | null>(null);
 
   // Computed
   const enabledIndexers = computed(() => {

@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { electronAPI } from '@electron-toolkit/preload';
-import { IPC_CHANNELS, type KeyboardAction } from '../shared/types';
+import { IPC_CHANNELS, type KeyboardAction, type Settings, type ProgressInfo, type FindInPageOptions, type AboutInfo } from '../shared/types';
 
 // Custom APIs for renderer
 const api = {
@@ -17,11 +17,11 @@ const api = {
     ipcRenderer.invoke(IPC_CHANNELS.GET_SETTINGS),
 
   // 設定を更新
-  updateSettings: (settings: any) =>
+  updateSettings: (settings: Settings) =>
     ipcRenderer.invoke(IPC_CHANNELS.UPDATE_SETTINGS, settings),
 
   // クレジット情報を取得
-  getAboutInfo: () =>
+  getAboutInfo: (): Promise<AboutInfo> =>
     ipcRenderer.invoke(IPC_CHANNELS.GET_ABOUT_INFO),
 
   // ドキュメントをロード
@@ -30,7 +30,7 @@ const api = {
   },
 
   // 進捗通知のリスナー登録
-  onProgress: (callback: (progress: { id: string; state: string; current: number; total: number }) => void) => {
+  onProgress: (callback: (progress: ProgressInfo) => void) => {
     ipcRenderer.on(IPC_CHANNELS.PROGRESS, (_event, progress) => callback(progress));
   },
 
@@ -50,7 +50,7 @@ const api = {
   },
 
   // ページ内検索を開始
-  findInPage: (text: string, options?: any) => {
+  findInPage: (text: string, options?: FindInPageOptions) => {
     ipcRenderer.send(IPC_CHANNELS.FIND_IN_PAGE, text, options);
   },
 

@@ -52,6 +52,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import appIcon from '../../../../resources/icon.png';
+import type { AboutInfo } from '../../../shared/types';
 
 const props = defineProps<{
   isOpen: boolean;
@@ -61,11 +62,8 @@ const emit = defineEmits(['close']);
 
 const activeTab = ref<'contributors' | 'credits' | 'indexers'>('contributors');
 const version = ref('');
-const info = ref<{
-  contributors: string;
-  credits: string;
-  indexerCopyrights: Array<{ id: string; name: string; copyright: string }>;
-}>({
+const info = ref<AboutInfo>({
+  version: '',
   contributors: '',
   credits: '',
   indexerCopyrights: []

@@ -63,8 +63,8 @@ export function setupIpcHandlers(): void {
 
       const indexers = await loadAllIndexers();
       const indexerCopyrights = indexers
-        .filter((i) => (i as any).copyright)
-        .map((i) => ({ id: i.id, name: i.name, copyright: (i as any).copyright }));
+        .filter((i) => i.copyright)
+        .map((i) => ({ id: i.id, name: i.name, copyright: i.copyright! }));
 
       return { 
         version: app.getVersion(),
@@ -125,6 +125,7 @@ function serializeIndexerMetadata(indexer: IndexerDefinition): SerializableIndex
     name: indexer.name,
     color: indexer.color,
     icon: indexer.icon,
+    copyright: indexer.copyright,
     urlTemplate: indexer.urlTemplate,
     css: indexer.css
   };

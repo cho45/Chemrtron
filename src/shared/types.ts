@@ -84,6 +84,11 @@ export interface IndexerDefinition {
   index(ctx: IndexerContext): Promise<void>;
 
   /**
+   * 著作権情報（オプション）
+   */
+  copyright?: string;
+
+  /**
    * テスト用の期待値（オプション）
    */
   testSpec?: {
@@ -133,10 +138,41 @@ export interface SerializableIndexerMetadata {
   name: string;
   color?: string;
   icon?: string;
+  /** 著作権情報 */
+  copyright?: string;
   /** URLテンプレート文字列 */
   urlTemplate?: string;
   /** CSS文字列 */
   css?: string;
+}
+
+/**
+ * Progress information
+ */
+export interface ProgressInfo {
+  id: string;
+  state: string;
+  current: number;
+  total: number;
+}
+
+/**
+ * Find in page options
+ */
+export interface FindInPageOptions {
+  forward?: boolean;
+  findNext?: boolean;
+  matchCase?: boolean;
+}
+
+/**
+ * About information
+ */
+export interface AboutInfo {
+  version: string;
+  contributors: string;
+  credits: string;
+  indexerCopyrights: Array<{ id: string; name: string; copyright: string }>;
 }
 
 /**
