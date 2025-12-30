@@ -2,20 +2,33 @@
   <div class="chemrtron">
     <!-- 左端: インデクサーアイコン列 -->
     <div class="indexer-icons" :class="{ 'is-mac': isMac }">
-      <div
-        v-for="indexer in store.enabledIndexers"
-        :key="indexer.id"
-        :class="{ 'indexer-icon-item': true, 'active': indexer.id === store.currentIndexId }"
-        @click="selectIndexer(indexer.id)"
-        @contextmenu.prevent="reindexIndexer(indexer.id)"
-        :title="indexer.name + ' (右クリックで再インデックス)'"
-      >
-        <div class="indexer-icon" :style="{ background: indexer.color || '#666' }">
-          {{ indexer.name.substring(0, 2).toUpperCase() }}
+      <div class="icons-scroll">
+        <div
+          v-for="indexer in store.enabledIndexers"
+          :key="indexer.id"
+          :class="{ 'indexer-icon-item': true, 'active': indexer.id === store.currentIndexId }"
+          @click="selectIndexer(indexer.id)"
+          @contextmenu.prevent="reindexIndexer(indexer.id)"
+          :title="indexer.name + ' (右クリックで再インデックス)'"
+        >
+          <div class="indexer-icon" :style="{ background: indexer.color || '#666' }">
+            {{ indexer.name.substring(0, 2).toUpperCase() }}
+          </div>
+          <!-- 進捗表示 -->
+          <div v-if="progressState && progressState.id === indexer.id" class="indexer-progress">
+            <div class="progress-bar" :style="{ width: `${(progressState.current / progressState.total) * 100}%` }"></div>
+          </div>
         </div>
-        <!-- 進捗表示 -->
-        <div v-if="progressState && progressState.id === indexer.id" class="indexer-progress">
-          <div class="progress-bar" :style="{ width: `${(progressState.current / progressState.total) * 100}%` }"></div>
+      </div>
+
+      <!-- 設定ボタン -->
+      <div class="sidebar-footer">
+        <div class="indexer-icon-item" @click="isSettingsOpen = true" title="Settings">
+          <div class="indexer-icon settings-icon">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+              <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.81,11.69,4.81,12c0,0.31,0.02,0.65,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.5c-1.93,0-3.5-1.57-3.5-3.5 s1.57-3.5,3.5-3.5s3.5,1.57,3.5,3.5S13.93,15.5,12,15.5z"/>
+            </svg>
+          </div>
         </div>
       </div>
     </div>
@@ -75,15 +88,18 @@
         <div class="url-text">{{ currentUrl || 'No document loaded' }}</div>
       </div>
       <!-- WebContentsView が重なるプレースホルダー -->
-      <div ref="viewPlaceholder" class="view-placeholder"></div>
+      <div ref="viewPlaceholder" class="view-placeholder" v-show="!isSettingsOpen"></div>
     </div>
+
+    <SettingsModal :is-open="isSettingsOpen" @close="isSettingsOpen = false" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, nextTick, onUnmounted } from 'vue';
+import { ref, onMounted, watch, nextTick } from 'vue';
 import { useIndexerStore } from './stores/indexer';
 import { fuzzySearch } from '../../shared/search-algorithm';
+import SettingsModal from './components/SettingsModal.vue';
 
 const store = useIndexerStore();
 const query = ref('');
@@ -95,6 +111,7 @@ const progressState = ref<{ id: string; state: string; current: number; total: n
 const indexingLogs = ref<string[]>([]);
 
 const isMac = navigator.userAgent.indexOf('Mac') !== -1;
+const isSettingsOpen = ref(false);
 
 let resizeObserver: ResizeObserver | null = null;
 
@@ -145,6 +162,9 @@ onMounted(async () => {
   // Main process からのキーボードアクションを受け取る
   window.api.onKeyboardAction((action) => {
     switch (action) {
+      case 'open-settings':
+        isSettingsOpen.value = true;
+        break;
       case 'focus-search':
         searchInput.value?.focus();
         break;
@@ -354,13 +374,23 @@ function handleInputKeydown(e: KeyboardEvent) {
   flex-direction: column;
   background: var(--color-sidebar-bg);
   border-right: 1px solid var(--color-border);
-  overflow-y: auto;
-  padding: 8px 0;
   z-index: 10;
+  height: 100vh;
 }
 
-.indexer-icons.is-mac {
+.icons-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.indexer-icons.is-mac .icons-scroll {
   padding-top: 32px;
+}
+
+.sidebar-footer {
+  border-top: 1px solid var(--color-border);
+  padding: 8px 0;
 }
 
 .indexer-icon-item {
@@ -403,6 +433,15 @@ function handleInputKeydown(e: KeyboardEvent) {
   color: white;
   flex-shrink: 0;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.settings-icon {
+  background: var(--color-background-mute);
+  color: var(--color-text-mute);
+}
+
+.indexer-icon-item:hover .settings-icon {
+  color: var(--color-text);
 }
 
 .indexer-progress {

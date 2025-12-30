@@ -61,6 +61,12 @@ function createApplicationMenu(): void {
             submenu: [
               { role: 'about' as const },
               { type: 'separator' as const },
+              {
+                label: 'Preferences...',
+                accelerator: 'CmdOrCtrl+,',
+                click: () => handleKeyboardAction('open-settings')
+              },
+              { type: 'separator' as const },
               { role: 'hide' as const },
               { role: 'hideOthers' as const },
               { role: 'unhide' as const },
@@ -87,7 +93,17 @@ function createApplicationMenu(): void {
           label: 'Focus Search',
           accelerator: 'CmdOrCtrl+L',
           click: () => handleKeyboardAction('focus-search')
-        }
+        },
+        ...(!isMac
+          ? [
+              { type: 'separator' as const },
+              {
+                label: 'Settings',
+                accelerator: 'CmdOrCtrl+,',
+                click: () => handleKeyboardAction('open-settings')
+              }
+            ]
+          : [])
       ]
     },
 
@@ -254,6 +270,9 @@ app.whenReady().then(() => {
   ipcMain.on(IPC_CHANNELS.UPDATE_VIEW_BOUNDS, (_event, bounds: { x: number; y: number; width: number; height: number }) => {
     if (documentView) {
       documentView.setBounds(bounds);
+      // サイズがある場合のみ表示する
+      const isVisible = bounds.width > 0 && bounds.height > 0;
+      documentView.setVisible(isVisible);
     }
   });
 

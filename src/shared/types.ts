@@ -157,4 +157,5 @@ export type KeyboardAction =
   | 'autocomplete'
   | 'select-result'
   | 'go-back'
-  | 'go-forward';
+  | 'go-forward'
+  | 'open-settings';
