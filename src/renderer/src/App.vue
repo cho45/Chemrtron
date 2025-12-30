@@ -131,6 +131,20 @@
     <!-- URL表示バー（documentView用） -->
     <div class="main-content">
       <div class="url-bar drag-region">
+        <div 
+          v-if="documentLoadingStatus === 'start'" 
+          class="loading-spinner"
+          title="Loading..."
+        ></div>
+        <div 
+          v-if="documentLoadingStatus === 'error'" 
+          class="status-icon error"
+          title="Loading failed"
+        >
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+          </svg>
+        </div>
         <div class="url-text">{{ currentUrl || 'No document loaded' }}</div>
       </div>
       <FindInPage :is-open="isFindOpen" @close="isFindOpen = false" />
@@ -157,6 +171,7 @@ import IndexerSearchModal from './components/IndexerSearchModal.vue';
 import FindInPage from './components/FindInPage.vue';
 import AboutModal from './components/AboutModal.vue';
 import { getContrastColor } from './utils/color';
+import type { DocumentLoadingStatus, SearchResultItem } from '../../shared/types';
 
 const store = useIndexerStore();
 const query = ref('');
@@ -164,6 +179,7 @@ const searchInput = ref<HTMLInputElement>();
 const viewPlaceholder = ref<HTMLElement>();
 const selectedIndex = ref(-1);
 const currentUrl = ref<string>('');
+const documentLoadingStatus = ref<DocumentLoadingStatus | null>(null);
 const progressState = ref<{ id: string; state: string; current: number; total: number } | null>(null);
 const indexingLogs = ref<string[]>([]);
 
@@ -297,6 +313,11 @@ onMounted(async () => {
   window.api.onUrlChanged((url) => {
     currentUrl.value = url;
   });
+
+  // ドキュメント読み込み状態を受け取る
+  window.api.onDocumentLoadingStatus((status) => {
+    documentLoadingStatus.value = status;
+  });
 });
 
 onUnmounted(() => {
@@ -311,7 +332,7 @@ watch(() => store.searchResults, () => {
 function handleSearch() {
   if (!query.value.trim()) {
     // クエリが空の場合は最初の50件を表示
-    const results: import('../../shared/types').SearchResultItem[] = store.indexData
+    const results: SearchResultItem[] = store.indexData
       .split('\n')
       .slice(0, 50)
       .filter((line) => line.includes('\t'))
@@ -324,7 +345,7 @@ function handleSearch() {
           ? store.currentIndexer.urlTemplate.replace('${url}', url)
           : url;
         
-        return [title, finalUrl, formattedTitle] as import('../../shared/types').SearchResultItem;
+        return [title, finalUrl, formattedTitle] as SearchResultItem;
       });
     store.setSearchResults(results);
     return;
@@ -880,6 +901,32 @@ function handleInputKeydown(e: KeyboardEvent) {
   align-items: center;
   padding: 0 16px;
   z-index: 10;
+  gap: 8px;
+}
+
+.loading-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--color-text-mute);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  flex-shrink: 0;
+}
+
+.status-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.status-icon.error {
+  color: #f44336;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 .url-text {

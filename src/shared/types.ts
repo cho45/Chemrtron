@@ -157,6 +157,11 @@ export interface ProgressInfo {
 }
 
 /**
+ * Document loading status
+ */
+export type DocumentLoadingStatus = 'start' | 'stop' | 'error' | 'finish';
+
+/**
  * Find in page options
  */
 export interface FindInPageOptions {
@@ -188,6 +193,7 @@ export const IPC_CHANNELS = {
   PROGRESS: 'progress',
   KEYBOARD_ACTION: 'keyboard-action',
   URL_CHANGED: 'url-changed',
+  DOCUMENT_LOADING_STATUS: 'document-loading-status',
   UPDATE_VIEW_BOUNDS: 'update-view-bounds',
   FIND_IN_PAGE: 'find-in-page',
   STOP_FIND_IN_PAGE: 'stop-find-in-page'
@@ -219,6 +225,7 @@ export interface IpcMainToRendererEvents {
   [IPC_CHANNELS.PROGRESS]: (progress: ProgressInfo) => void;
   [IPC_CHANNELS.KEYBOARD_ACTION]: (action: KeyboardAction) => void;
   [IPC_CHANNELS.URL_CHANGED]: (url: string) => void;
+  [IPC_CHANNELS.DOCUMENT_LOADING_STATUS]: (status: DocumentLoadingStatus) => void;
 }
 
 /**

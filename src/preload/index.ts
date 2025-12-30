@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { electronAPI } from '@electron-toolkit/preload';
-import { IPC_CHANNELS, type KeyboardAction, type Settings, type ProgressInfo, type FindInPageOptions, type AboutInfo, type IpcInvokeEvents, type IpcRendererToMainEvents, type IpcMainToRendererEvents } from '../shared/types';
+import { IPC_CHANNELS, type KeyboardAction, type Settings, type ProgressInfo, type FindInPageOptions, type AboutInfo, type IpcInvokeEvents, type IpcRendererToMainEvents, type IpcMainToRendererEvents, type DocumentLoadingStatus } from '../shared/types';
 
 /**
  * Type-safe invoke wrapper
@@ -72,6 +72,11 @@ const api = {
   // URL変更のリスナー登録
   onUrlChanged: (callback: (url: string) => void) => {
     on(IPC_CHANNELS.URL_CHANGED, (_event, url) => callback(url));
+  },
+
+  // ドキュメントの読み込み状態リスナー登録
+  onDocumentLoadingStatus: (callback: (status: DocumentLoadingStatus) => void) => {
+    on(IPC_CHANNELS.DOCUMENT_LOADING_STATUS, (_event, status) => callback(status));
   },
 
   // ビューのサイズ更新を通知

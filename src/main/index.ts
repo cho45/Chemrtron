@@ -276,6 +276,25 @@ function createDocumentView(): WebContentsView {
   view.webContents.on('did-finish-load', () => {
     if (mainWindow) {
       mainWindow.webContents.focus();
+      mainWindow.webContents.send(IPC_CHANNELS.DOCUMENT_LOADING_STATUS, 'finish');
+    }
+  });
+
+  view.webContents.on('did-start-loading', () => {
+    if (mainWindow) {
+      mainWindow.webContents.send(IPC_CHANNELS.DOCUMENT_LOADING_STATUS, 'start');
+    }
+  });
+
+  view.webContents.on('did-stop-loading', () => {
+    if (mainWindow) {
+      mainWindow.webContents.send(IPC_CHANNELS.DOCUMENT_LOADING_STATUS, 'stop');
+    }
+  });
+
+  view.webContents.on('did-fail-load', () => {
+    if (mainWindow) {
+      mainWindow.webContents.send(IPC_CHANNELS.DOCUMENT_LOADING_STATUS, 'error');
     }
   });
 

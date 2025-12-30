@@ -1,5 +1,5 @@
 import { ElectronAPI } from '@electron-toolkit/preload';
-import type { CacheMetadata, KeyboardAction, Settings, SerializableIndexerMetadata, ProgressInfo, FindInPageOptions, AboutInfo } from '../shared/types';
+import type { CacheMetadata, KeyboardAction, Settings, SerializableIndexerMetadata, ProgressInfo, FindInPageOptions, AboutInfo, DocumentLoadingStatus } from '../shared/types';
 
 interface ChemrtronAPI {
   getIndex: (id: string, reindex?: boolean) => Promise<{ 
@@ -15,6 +15,7 @@ interface ChemrtronAPI {
   onProgress: (callback: (progress: ProgressInfo) => void) => void;
   onKeyboardAction: (callback: (action: KeyboardAction) => void) => void;
   onUrlChanged: (callback: (url: string) => void) => void;
+  onDocumentLoadingStatus: (callback: (status: DocumentLoadingStatus) => void) => void;
   updateViewBounds: (bounds: { x: number; y: number; width: number; height: number }) => void;
   findInPage: (text: string, options?: FindInPageOptions) => void;
   stopFindInPage: (action: 'clearSelection' | 'keepSelection' | 'activateSelection') => void;
