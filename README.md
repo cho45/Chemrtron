@@ -89,7 +89,7 @@ Release
 
 Releases are automated via GitHub Actions when a version tag is pushed.
 
-1.  Update the version in `package.json` and the `VERSION` file.
+1.  Update the version in `package.json`.
 2.  Commit and push the changes.
 3.  Create and push a git tag:
 
