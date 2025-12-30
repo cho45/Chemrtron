@@ -351,6 +351,7 @@ function createDocumentView(): WebContentsView {
 function createWindow(): void {
   // Create the browser window.
   mainWindow = new BrowserWindow({
+    title: 'Chemr',
     width: 1440,
     height: 900,
     show: false,
@@ -390,7 +391,7 @@ function createWindow(): void {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   // Set app user model id for windows
-  electronApp.setAppUserModelId('com.electron');
+  electronApp.setAppUserModelId('net.lowreal.Chemr');
 
   // Setup IPC handlers
   setupIpcHandlers();
