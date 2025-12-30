@@ -48,7 +48,7 @@ export function createIndexerContext(
     /**
      * URLからJSONを取得
      */
-    async fetchJSON<T = any>(url: string): Promise<T> {
+    async fetchJSON<T = unknown>(url: string): Promise<T> {
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`Failed to fetch JSON from ${url}: ${response.statusText}`);
