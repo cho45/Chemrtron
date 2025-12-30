@@ -89,10 +89,15 @@
         <div class="url-text">{{ currentUrl || 'No document loaded' }}</div>
       </div>
       <!-- WebContentsView が重なるプレースホルダー -->
-      <div ref="viewPlaceholder" class="view-placeholder" v-show="!isSettingsOpen"></div>
+      <div ref="viewPlaceholder" class="view-placeholder" v-show="!isSettingsOpen && !isIndexerSearchOpen"></div>
     </div>
 
     <SettingsModal :is-open="isSettingsOpen" @close="isSettingsOpen = false" />
+    <IndexerSearchModal
+      :is-open="isIndexerSearchOpen"
+      @close="isIndexerSearchOpen = false"
+      @select="selectIndexer"
+    />
   </div>
 </template>
 
@@ -101,6 +106,7 @@ import { ref, onMounted, watch, nextTick } from 'vue';
 import { useIndexerStore } from './stores/indexer';
 import { fuzzySearch } from '../../shared/search-algorithm';
 import SettingsModal from './components/SettingsModal.vue';
+import IndexerSearchModal from './components/IndexerSearchModal.vue';
 
 const store = useIndexerStore();
 const query = ref('');
@@ -113,6 +119,7 @@ const indexingLogs = ref<string[]>([]);
 
 const isMac = navigator.userAgent.indexOf('Mac') !== -1;
 const isSettingsOpen = ref(false);
+const isIndexerSearchOpen = ref(false);
 
 let resizeObserver: ResizeObserver | null = null;
 
@@ -191,6 +198,9 @@ onMounted(async () => {
     switch (action) {
       case 'open-settings':
         isSettingsOpen.value = true;
+        break;
+      case 'open-indexer-search':
+        isIndexerSearchOpen.value = true;
         break;
       case 'focus-search':
         searchInput.value?.focus();
@@ -348,7 +358,9 @@ function handleInputKeydown(e: KeyboardEvent) {
   // Enter: 選択された結果を開く
   else if (key === 'Enter') {
     e.preventDefault();
-    if (selectedIndex.value >= 0 && store.searchResults[selectedIndex.value]) {
+    if (!query.value.trim()) {
+      isIndexerSearchOpen.value = true;
+    } else if (selectedIndex.value >= 0 && store.searchResults[selectedIndex.value]) {
       selectResult(selectedIndex.value);
     } else if (store.searchResults.length > 0) {
       selectResult(0);

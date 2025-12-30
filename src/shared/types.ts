@@ -158,4 +158,5 @@ export type KeyboardAction =
   | 'select-result'
   | 'go-back'
   | 'go-forward'
-  | 'open-settings';
+  | 'open-settings'
+  | 'open-indexer-search';

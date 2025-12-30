@@ -66,6 +66,11 @@ function createApplicationMenu(): void {
                 accelerator: 'CmdOrCtrl+,',
                 click: () => handleKeyboardAction('open-settings')
               },
+              {
+                label: 'Select Indexer...',
+                accelerator: 'CmdOrCtrl+Enter',
+                click: () => handleKeyboardAction('open-indexer-search')
+              },
               { type: 'separator' as const },
               { role: 'hide' as const },
               { role: 'hideOthers' as const },
@@ -101,6 +106,11 @@ function createApplicationMenu(): void {
                 label: 'Settings',
                 accelerator: 'CmdOrCtrl+,',
                 click: () => handleKeyboardAction('open-settings')
+              },
+              {
+                label: 'Select Indexer...',
+                accelerator: 'CmdOrCtrl+Enter',
+                click: () => handleKeyboardAction('open-indexer-search')
               }
             ]
           : [])
