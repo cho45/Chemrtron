@@ -1,23 +1,11 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Chemr [Chemrtron]: An Online Documentation Browser with Indexers.</title>
+		<title>Chemr: An Online Documentation Browser with Indexers.</title>
 		<meta charset="utf-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-		<script src="bower_components/js-polyfills/polyfill.min.js"></script>
 		<link rel="shortcut icon" href="img/icon_256x256.png" />
 		<link rel="stylesheet" href="styles.css">
-
-		<script>
-		  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-		  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-		  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-		  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-		  ga('create', 'UA-7079167-13', 'auto');
-		  ga('send', 'pageview');
-
-		</script>
 	</head>
 	<body>
 		<header>
@@ -63,8 +51,8 @@
 						<h3>Built on Electron</h3>
 						<img src="img/builtonelectron.png"/>
 						<p>
-							Chemr is developed with standard web technologies: HTML, CSS, JavaScript.
-							So you can modify this very easily.
+							Chemr is developed with modern web technologies: Vue 3, TypeScript, and Electron.
+							Extending and modifying is very easy.
 						</p>
 					</section>
 				</div>
@@ -74,7 +62,7 @@
 				<h2>Screenshots</h2>
 				<div class="list">
 					<section>
-						<h3>OS X</h3>
+						<h3>macOS</h3>
 						<img src="img/osx.png"/>
 					</section>
 					<section>
@@ -89,16 +77,20 @@
 
 				<div class="list">
 					<section>
+						<h3>Packaged release</h3>
+						<p>Download pre-built binaries for Windows, macOS, and Linux from GitHub Releases.</p>
+						<div style="text-align: center;">
+							<a href="https://github.com/cho45/Chemrtron/releases">
+								<img src="img/GitHub_Logo.png" alt="Download on GitHub" width="135" height="55"/>
+							</a>
+						</div>
+					</section>
+					<section>
 						<h3>Build from source</h3>
 						<p>Or create your own build with following:</p>
 
 						<section>
-							<h4>Install Development Tools</h4>
-							<p>You must install <a href="https://nodejs.org/">node.js</a> and <a href="https://help.github.com/articles/set-up-git/">git</a>.</p>
-						</section>
-
-						<section>
-							<h4>Clone Repository and Install Dependencies</h4>
+							<h4>Clone and Install</h4>
 							<p>
 								<kbd>git clone https://github.com/cho45/Chemrtron.git</kbd><br/>
 								<kbd>cd Chemrtron</kbd><br/>
@@ -107,22 +99,13 @@
 						</section>
 
 						<section>
-							<h4>Package</h4>
+							<h4>Run / Build</h4>
 							<p>
-								<kbd>make mac</kbd> (for macOS)<br/>
-								<kbd>make win</kbd> (for Windows)
+								<kbd>npm run dev</kbd> (Development)<br/>
+								<kbd>npm run build</kbd> (Build)
 							</p>
 							<p>Packaged application is located under <kbd>dist/</kbd></p>
 						</section>
-					</section>
-					<section>
-						<h3>Packaged release</h3>
-						<h4>For Windows or Mac</h4>
-						<div style="text-align: center;">
-							<a href="https://github.com/cho45/Chemrtron/releases">
-								<img src="img/GitHub_Logo.png" alt="Download on GitHub" width="135" height="55"/>
-							</a>
-						</div>
 					</section>
 				</div>
 			</section>
@@ -205,7 +188,7 @@
 
 						</tr>
 						<tr>
-							<th>&#8984;[Numer]<br/>
+							<th>&#8984;[Number]<br/>
 								Control + [Number]</th>
 							<td>Select index by index.</td>
 						</tr>
@@ -224,37 +207,48 @@
 			<section id="indexers">
 				<h2>Including Indexers</h2>
 				<div class="list">
-					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/android.js">Android</a>
-					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/arduino.js">Arduino</a>
-					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/cpan.js">CPAN</a>
-					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/ecma-262-3rd-ja.js">ECMAScript 3rd JA</a>
-					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/elasticsearch.js">Elasticsearch</a>
-					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/electron.js">Electron</a>
-					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/golang.js">Go</a>
-					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/html.js">HTML Standard</a>
-					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/ios.js">iOS Developer Library</a>
-					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/java.js">Java SE</a>
-					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/mac.js">Mac Developer Library</a>
-					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/mdn.js">MDN</a>
-					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/mysql.js">MySQL</a>
-					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/nodejs.js">Node.js</a>
-					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/opengl.js">OpenGL</a>
-					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/perl6.js">Perl6</a>
-					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/php.js">PHP</a>
-					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/polymer.js">Polymer Elements</a>
-					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/ruby.js">Ruby</a>
-					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/sqlite.js">SQLite</a>
-					<a href="https://github.com/cho45/Chemrtron/tree/master/indexers/syoboi.js">しょぼいカレンダー</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/android.js">Android</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/arduino.js">Arduino</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/clojure.js">Clojure</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/cmake.js">CMake</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/cpp.js">C++</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/docker.js">Docker</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/elixir.js">Elixir</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/ghc.js">GHC</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/git.js">Git</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/golang.js">Go</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/html.js">HTML Standard</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/java.js">Java SE</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/k8s.js">Kubernetes</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/kotlin.js">Kotlin</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/lua.js">Lua</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/man.js">Man Pages</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/mdn.js">MDN</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/mysql.js">MySQL</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/nodejs.js">Node.js</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/opengl.js">OpenGL</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/pandas.js">Pandas</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/php.js">PHP</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/postgresql.js">PostgreSQL</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/python3.js">Python 3</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/raku.js">Raku</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/redis.js">Redis</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/ruby.js">Ruby</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/rust.js">Rust</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/sqlite.js">SQLite</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/terraform.js">Terraform</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/typescript.js">TypeScript</a>
+					<a href="https://github.com/cho45/Chemrtron/tree/master/src/indexers/vim.js">Vim</a>
 				</div>
 				<p>Or <a href="#create-indexer">you can write new indexer easily</a>.</p>
 			</section>
 
 			<section id="create-indexer">
 				<h2>Create New Indexer</h2>
-				<p>The indexer definition files is written in JavaScript and load from following paths:</p>
+				<p>Indexer definition files are written in JavaScript and loaded from following paths:</p>
 				<ol>
 					<li><kbd>$HOME/.chemr/indexers/*.js</kbd></li>
-					<li><kbd>$APP_ROOT/indexers/*.js</kbd></li>
+					<li><kbd>src/indexers/*.js</kbd> (Built-in)</li>
 				</ol>
 				<p>You can put your own indexer to <kbd>$HOME/.chemr/indexers/</kbd>.</p>
 
@@ -262,20 +256,26 @@
 					<h3>Indexer definition file</h3>
 					<p>This is a sample indexer definition for PHP:</p>
 					<pre><code class="javascript">
-indexer = {
-	id: 'php',
-	name: 'PHP',
+export default {
+  id: 'php',
+  name: 'PHP',
+  color: '#4F5B93',
 
-	index : function (ctx) {
-		return ctx.fetchDocument('http://www.php.net/manual/en/indexes.functions.php', { srcdoc: true }).then(function (document) {
-			console.log(document);
+  async index(ctx) {
+    const url = 'https://www.php.net/manual/en/indexes.functions.php';
+    const doc = await ctx.fetchDocument(url);
 
-			var links = document.querySelectorAll('a.index');
-			for (var i = 0, it; (it = links[i]); i++) {
-				ctx.pushIndex(it.textContent, it.href);
-			}
-		});
-	}
+    const links = doc.querySelectorAll('ul.gen-index a');
+    for (const link of links) {
+      const text = link.textContent.trim();
+      const href = link.getAttribute('href');
+      if (href) {
+        ctx.pushIndex(text, href);
+      }
+    }
+  },
+
+  urlTemplate: 'https://www.php.net/manual/en/${url}'
 };
 </code></pre>
 					<dl>
@@ -285,25 +285,19 @@ indexer = {
 						</dd>
 						<dt><code>name : string</code></dt>
 						<dd>
-							Display name. This is also used for indexer search.
+							Display name.
 						</dd>
-						<dt><code>index : function(ctx: IndexerContext):Promise&lt;string | null&gt;</code></dt>
+						<dt><code>async index(ctx: IndexerContext): Promise&lt;void&gt;</code></dt>
 						<dd>
-							A function for creating index. Index data is following format:
-							<pre>
-[Search string]\t[URI]
-[Search string]\t[URI]
-...
-</pre>
-							<p>Or you can use <kbd>pushIndex()</kbd> on IndexerContext instead of returning string.</p>
+							A function for creating index. Use <code>ctx.pushIndex(name, url)</code> to add entries.
 						</dd>
-						<dt><code>beforeSearch : function(query : string): string</code></dt>
+						<dt><code>urlTemplate : string</code></dt>
 						<dd>
-							A function for query translator.
+							Template for generating final URLs. <code>${url}</code> will be replaced by the URL passed to <code>pushIndex</code>.
 						</dd>
-						<dt><code>item : function(item: Item):Item</code></dt>
+						<dt><code>css : string</code></dt>
 						<dd>
-							Callback of item called when item will be shown.
+							Custom CSS to be injected into the document view.
 						</dd>
 					</dl>
 				</section>
@@ -314,44 +308,27 @@ indexer = {
 					<dl>
 						<dt><code>pushIndex(name: string, url: string)</code></dt>
 						<dd>
-							Add specified index to current context index.
-							You do not return any value from a promise returned from <code>index()</code>. Chemr will generate index string from current context index.
+							Add specified index entry.
 						</dd>
 
-						<dt><code>fetchDocument(url: string: opts: Object):Promise&lt;HTMLDocument&gt;</code></dt>
+						<dt><code>fetchDocument(url: string): Promise&lt;Document&gt;</code></dt>
 						<dd>
-							<p>Fetche a URL and create HTMLDocument.</p>
-
-							<p>Specified URL is loaded to sandboxed iframe (scripting is disabled).</p>
-
-							<p>You may encounter with error when the target URL issues <code>X-Frame-Options</code> header.
-							This is restriction of iframe. You can ignore that error with specifing <code>srcdoc: true</code> option to <code>opts</code>.</p>
-
-							<p>With <code>srcdoc: true</code> option, <code>fetchDocument()</code> fetches a URL by <code>fetchText()</code> and set its result to iframe's <code>srcdoc</code> attribute and
-							append <code>&lt;base&gt;</code> element with target URL to <code>document.head</code>.
-							This means <code>document.URL</code> is not more usable (this may be <code>about:srcdoc</code>). But you can load URLs which uses <code>X-Frame-Options</code>.</p>
+							<p>Fetches a URL and returns a DOM Document object (parsed via linkedom).</p>
 						</dd>
 
-						<dt><code>fetchJSON(url: string):Promise&lt;any&gt;</code></dt>
+						<dt><code>fetchJSON(url: string): Promise&lt;any&gt;</code></dt>
 						<dd>
-							Fetch a URL by <code>fetchText()</code> and parse with <code>JSON.parse</code>.
+							Fetches a URL and parses it as JSON.
 						</dd>
 
-						<dt><code>fetchText(url: string):Promise&lt;string&gt;</code></dt>
+						<dt><code>fetchText(url: string): Promise&lt;string&gt;</code></dt>
 						<dd>
-							Fetche a URL and just resolves with its <code>responseText</code>.
+							Fetches a URL and returns its text content.
 						</dd>
 
-						<dt><code>fetchAsXHR(opts: Object):Promise&lt;XMLHttpRequest&gt;</code></dt>
+						<dt><code>crawl(urls: string[], callback: (url, doc): void): Promise&lt;void&gt;</code></dt>
 						<dd>
-							This is raw method for <code>fetch*</code>.
-						</dd>
-
-						<dt><code>crawl(list: Array<string | object>, callback: function (url, doc: HTMLDocument):void):Promise&lt;any&gt;</code></dt>
-						<dd>
-							<p><code>crawl</code> can crawl specified <code>list</code> which is array of URLs and call <code>callback</code> with its document.</p>
-
-							<p><code>callback</code> function is called with special <code>this</code> object which has <code>pushPage(url)</code> method. <code>pushPage(url)</code> adds to <code>url</code> to current crawl queue.</p>
+							Crawl specified URLs and call <code>callback</code> for each document.
 						</dd>
 					</dl>
 				</section>
@@ -359,41 +336,25 @@ indexer = {
 
 			<section id="contrib">
 				<h2>Contributing</h2>
-				<p>Chemr is open source project. You can read whole code and submit patch any time.</p>
-				<p>If you can contribute to Chemr, see also <a href="https://github.com/cho45/Chemrtron/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a>.</p>
+				<p>Chemr is an open source project. You can read the code and submit patches anytime.</p>
+				<p>If you want to contribute, see <a href="https://github.com/cho45/Chemrtron/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a>.</p>
 			</section>
 
 			<section id="support">
 				<h2>Supports</h2>
-				<p>Report to <a href="https://github.com/cho45/Chemrtron/issues">github issue</a>.</p>
+				<p>Report issues to <a href="https://github.com/cho45/Chemrtron/issues">GitHub Issues</a>.</p>
 			</section>
 
 			<section id="privacy">
 				<h2>Privacy Policy</h2>
-				<p>Chemr does not collect any privacy information of users.</p>
+				<p>Chemr does not collect any personal information.</p>
 			</section>
 
-
-			<!-- section>
-				<h2>Contributors</h2>
-
-				<script src="githubapi.js" data-api="repos/cho45/Chemrtron/contributors?">
-					<div class="contributors">
-						<% for (var i = 0, it; (it = data[i]); i++) { %>
-						<a href="http://github.com/<%= it.login %>" class="contributor">
-							<img src="<%= it.avatar_url %>" width="24" height="24"/>
-							<%= it.login %>
-						</a>
-						<% } %>
-					</div>
-				</script>
-			</section -->
 		</main>
 
 		<footer>
-			by cho45 &lt;<a href="http://www.lowreal.net">cho45@lowreal.net</a>&gt;
+			by cho45 &lt;<a href="https://www.lowreal.net">cho45@lowreal.net</a>&gt;
 		</footer>
-
 
 		<script src="script.js"></script>
 		<a href="https://github.com/cho45/Chemrtron"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
