@@ -1,7 +1,7 @@
 <template>
   <div class="chemrtron">
     <!-- 左端: インデクサーアイコン列 -->
-    <div class="indexer-icons">
+    <div class="indexer-icons" :class="{ 'is-mac': isMac }">
       <div
         v-for="indexer in store.enabledIndexers"
         :key="indexer.id"
@@ -39,7 +39,17 @@
         />
       </div>
 
-      <div v-if="store.isLoading" class="loading">Loading index...</div>
+      <div v-if="store.isLoading" class="loading-panel">
+        <div class="loading-content">
+          <div class="loading-title">Indexing: {{ store.currentIndexer?.name }}</div>
+          <div v-if="indexingLogs.length > 0" class="indexing-logs">
+            <div v-for="(log, i) in indexingLogs.slice().reverse()" :key="i" class="log-entry">
+              {{ log }}
+            </div>
+          </div>
+          <div v-else class="loading-subtext">Preparing to index...</div>
+        </div>
+      </div>
 
       <div class="results-container">
         <div v-if="store.searchResults.length > 0" class="results">
@@ -82,8 +92,25 @@ const viewPlaceholder = ref<HTMLElement>();
 const selectedIndex = ref(-1);
 const currentUrl = ref<string>('');
 const progressState = ref<{ id: string; state: string; current: number; total: number } | null>(null);
+const indexingLogs = ref<string[]>([]);
+
+const isMac = navigator.userAgent.indexOf('Mac') !== -1;
 
 let resizeObserver: ResizeObserver | null = null;
+
+// 進捗状態をメッセージに変換
+function getProgressMessage(progress: { state: string; current: number; total: number }): string {
+  const percent = Math.round((progress.current / progress.total) * 100);
+  switch (progress.state) {
+    case 'init': return 'Initializing indexer...';
+    case 'fetch.start': return `Fetching resources... (${percent}%)`;
+    case 'fetch.done': return `Resources fetched. (${percent}%)`;
+    case 'crawl.start': return `Starting to crawl ${progress.total} pages...`;
+    case 'crawl.progress': return `Crawling pages: ${progress.current} / ${progress.total} (${percent}%)`;
+    case 'done': return 'Indexing completed.';
+    default: return `${progress.state}: ${progress.current} / ${progress.total}`;
+  }
+}
 
 onMounted(async () => {
   // 初期化（全インデクサーと設定を読み込み）
@@ -156,6 +183,19 @@ onMounted(async () => {
   // 進捗通知を受け取る
   window.api.onProgress((progress) => {
     progressState.value = progress;
+
+    // 現在選択中のインデクサーの再インデックスならログに追加
+    if (progress.id === store.currentIndexId) {
+      if (progress.state === 'init') {
+        indexingLogs.value = [];
+      }
+      indexingLogs.value.push(getProgressMessage(progress));
+      // 最新のログが上に来るように後で reverse するので、ここでは単に追加
+      if (indexingLogs.value.length > 100) {
+        indexingLogs.value.shift();
+      }
+    }
+
     // 完了したら3秒後にクリア
     if (progress.state === 'done') {
       setTimeout(() => {
@@ -302,38 +342,43 @@ function handleInputKeydown(e: KeyboardEvent) {
   width: 100vw;
   height: 100vh;
   display: grid;
-  grid-template-columns: 60px 400px 1fr;
+  grid-template-columns: 72px 320px 1fr;
   grid-template-rows: 1fr;
-  background: #1e1e1e;
-  color: #d4d4d4;
+  background: var(--color-background);
+  color: var(--color-text);
 }
 
 /* 左端: インデクサーアイコン列 */
 .indexer-icons {
   display: flex;
   flex-direction: column;
-  background: #252526;
-  border-right: 1px solid #3e3e42;
+  background: var(--color-sidebar-bg);
+  border-right: 1px solid var(--color-border);
   overflow-y: auto;
   padding: 8px 0;
+  z-index: 10;
+}
+
+.indexer-icons.is-mac {
+  padding-top: 32px;
 }
 
 .indexer-icon-item {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 8px;
+  padding: 12px 0;
   cursor: pointer;
   position: relative;
   transition: background 0.2s;
 }
 
 .indexer-icon-item:hover {
-  background: #2a2d2e;
+  background: var(--color-background-soft);
 }
 
 .indexer-icon-item.active {
-  background: #094771;
+  background: var(--color-background);
 }
 
 .indexer-icon-item.active::before {
@@ -342,21 +387,22 @@ function handleInputKeydown(e: KeyboardEvent) {
   left: 0;
   top: 0;
   bottom: 0;
-  width: 3px;
-  background: #007acc;
+  width: 4px;
+  background: var(--color-accent);
 }
 
 .indexer-icon {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
   color: white;
   flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .indexer-progress {
@@ -364,14 +410,14 @@ function handleInputKeydown(e: KeyboardEvent) {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 3px;
-  background: #3e3e42;
+  height: 4px;
+  background: var(--color-border);
   overflow: hidden;
 }
 
 .progress-bar {
   height: 100%;
-  background: #007acc;
+  background: var(--color-accent);
   transition: width 0.3s ease;
 }
 
@@ -379,48 +425,91 @@ function handleInputKeydown(e: KeyboardEvent) {
 .search-panel {
   display: flex;
   flex-direction: column;
-  background: #1e1e1e;
-  border-right: 1px solid #3e3e42;
+  background: var(--color-background);
+  border-right: 1px solid var(--color-border);
+  overflow: hidden;
 }
 
 .header {
-  padding: 12px 16px;
-  background: #252526;
-  border-bottom: 1px solid #3e3e42;
+  padding: 16px;
+  background: var(--color-background-soft);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .header h1 {
   margin: 0;
-  font-size: 16px;
-  font-weight: 600;
-  color: #cccccc;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .search-container {
   padding: 12px 16px;
-  background: #252526;
-  border-bottom: 1px solid #3e3e42;
+  background: var(--color-background);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .search-input {
   width: 100%;
-  padding: 8px 12px;
-  font-size: 14px;
-  background: #3c3c3c;
-  border: 1px solid #3e3e42;
+  padding: 10px 12px;
+  font-size: 16px;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
   border-radius: 4px;
-  color: #cccccc;
+  color: var(--color-text);
   outline: none;
+  transition: border-color 0.2s;
 }
 
 .search-input:focus {
-  border-color: #007acc;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.2);
 }
 
-.loading {
-  padding: 16px;
-  text-align: center;
-  color: #858585;
+.loading-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-background);
+  overflow: hidden;
+}
+
+.loading-content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.loading-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--color-accent);
+}
+
+.indexing-logs {
+  flex: 1;
+  background: #000000;
+  border-radius: 4px;
+  padding: 12px;
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  font-size: 11px;
+  color: #4ec9b0;
+  overflow-y: auto;
+  line-height: 1.4;
+}
+
+.log-entry {
+  margin-bottom: 2px;
+  border-bottom: 1px solid #1a1a1a;
+}
+
+.loading-subtext {
+  color: var(--color-text-mute);
+  font-style: italic;
 }
 
 .results-container {
@@ -429,70 +518,92 @@ function handleInputKeydown(e: KeyboardEvent) {
 }
 
 .results {
-  padding: 8px;
+  display: flex;
+  flex-direction: column;
 }
 
 .result-item {
-  padding: 12px;
-  margin-bottom: 4px;
-  background: #252526;
-  border-radius: 4px;
+  padding: 10px 16px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.1s;
+  border-bottom: 1px solid var(--color-background-soft);
+}
+
+.result-item:nth-child(odd) {
+  background: var(--color-background-soft);
 }
 
 .result-item:hover {
-  background: #2a2d2e;
+  background: var(--color-background-mute);
 }
 
 .result-item.selected {
-  background: #094771;
-  border-left: 3px solid #007acc;
+  background: var(--color-accent);
+  color: white;
 }
 
 .result-title {
   font-size: 14px;
-  margin-bottom: 4px;
-  color: #cccccc;
-}
-
-.result-title :deep(b) {
-  color: #4ec9b0;
-  font-weight: 600;
-}
-
-.result-url {
-  font-size: 12px;
-  color: #858585;
+  margin-bottom: 2px;
+  color: inherit;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+.result-item.selected .result-title {
+  color: white;
+}
+
+.result-title :deep(b) {
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+.result-item.selected .result-title :deep(b) {
+  color: white;
+  text-decoration: underline;
+}
+
+.result-url {
+  font-size: 11px;
+  color: var(--color-text-mute);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.result-item.selected .result-url {
+  color: rgba(255, 255, 255, 0.8);
+}
+
 .no-results {
-  padding: 16px;
+  padding: 32px 16px;
   text-align: center;
-  color: #858585;
+  color: var(--color-text-mute);
+  font-style: italic;
 }
 
 .main-content {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  background: var(--color-background-mute);
 }
 
 .url-bar {
-  height: 40px;
-  background: #2d2d30;
-  border-bottom: 1px solid #3e3e42;
+  height: 32px;
+  background: var(--color-background-soft);
+  border-bottom: 1px solid var(--color-border);
   display: flex;
   align-items: center;
   padding: 0 16px;
+  z-index: 10;
 }
 
 .url-text {
-  font-size: 13px;
-  color: #cccccc;
+  font-size: 11px;
+  color: var(--color-text-mute);
   font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -501,6 +612,6 @@ function handleInputKeydown(e: KeyboardEvent) {
 
 .view-placeholder {
   flex: 1;
-  background: #000;
+  background: #fff;
 }
 </style>

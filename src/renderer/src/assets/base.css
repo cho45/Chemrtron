@@ -7,28 +7,31 @@
   --ev-c-black-soft: #222222;
   --ev-c-black-mute: #282828;
 
-  --ev-c-gray-1: #515c67;
-  --ev-c-gray-2: #414853;
-  --ev-c-gray-3: #32363f;
+  --ev-c-gray-1: #888888;
+  --ev-c-gray-2: #e0e0e0;
+  --ev-c-gray-3: #f0f0f0;
 
-  --ev-c-text-1: rgba(255, 255, 245, 0.86);
-  --ev-c-text-2: rgba(235, 235, 245, 0.6);
-  --ev-c-text-3: rgba(235, 235, 245, 0.38);
-
-  --ev-button-alt-border: transparent;
-  --ev-button-alt-text: var(--ev-c-text-1);
-  --ev-button-alt-bg: var(--ev-c-gray-3);
-  --ev-button-alt-hover-border: transparent;
-  --ev-button-alt-hover-text: var(--ev-c-text-1);
-  --ev-button-alt-hover-bg: var(--ev-c-gray-2);
+  --color-background: #ffffff;
+  --color-background-soft: #f8f8f8;
+  --color-background-mute: #f2f2f2;
+  --color-text: #333333;
+  --color-text-mute: #666666;
+  --color-border: #e0e0e0;
+  --color-accent: #007acc;
+  --color-sidebar-bg: #eceff1;
 }
 
-:root {
-  --color-background: var(--ev-c-black);
-  --color-background-soft: var(--ev-c-black-soft);
-  --color-background-mute: var(--ev-c-black-mute);
-
-  --color-text: var(--ev-c-text-1);
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: #1e1e1e;
+    --color-background-soft: #252526;
+    --color-background-mute: #3c3c3c;
+    --color-text: #cccccc;
+    --color-text-mute: #858585;
+    --color-border: #3e3e42;
+    --color-accent: #007acc;
+    --color-sidebar-bg: #252526;
+  }
 }
 
 *,
@@ -49,17 +52,12 @@ body {
   background: var(--color-background);
   line-height: 1.6;
   font-family:
-    Inter,
     -apple-system,
     BlinkMacSystemFont,
     'Segoe UI',
     Roboto,
-    Oxygen,
-    Ubuntu,
-    Cantarell,
-    'Fira Sans',
-    'Droid Sans',
-    'Helvetica Neue',
+    Helvetica,
+    Arial,
     sans-serif;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
