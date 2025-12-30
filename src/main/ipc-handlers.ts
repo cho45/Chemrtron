@@ -39,6 +39,8 @@ export function setupIpcHandlers(): void {
     try {
       SettingsManager.saveSettings(settings);
       console.log('[IPC] Settings updated:', settings);
+      // main process 内の他のリスナーに通知
+      ipcMain.emit('settings-updated');
       return true;
     } catch (error) {
       console.error('[IPC] Error updating settings:', error);

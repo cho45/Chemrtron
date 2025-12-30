@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, WebContentsView, ipcMain, Menu } from 'electron';
+import { app, shell, BrowserWindow, WebContentsView, ipcMain, Menu, globalShortcut } from 'electron';
 import { join } from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import icon from '../../resources/icon.png?asset';
@@ -45,6 +45,41 @@ function handleKeyboardAction(action: KeyboardAction): void {
 
   // それ以外のアクションは renderer に転送
   sendKeyboardAction(action);
+}
+
+/**
+ * グローバルショートカットを登録
+ */
+function registerGlobalShortcut(): void {
+  const settings = loadSettings();
+  const shortcut = settings.globalShortcut;
+
+  // 既存のショートカットをすべて解除
+  globalShortcut.unregisterAll();
+
+  if (shortcut) {
+    try {
+      const success = globalShortcut.register(shortcut, () => {
+        if (mainWindow) {
+          if (mainWindow.isMinimized()) {
+            mainWindow.restore();
+          }
+          mainWindow.show();
+          mainWindow.focus();
+          // 検索フィールドにフォーカスを当てる
+          sendKeyboardAction('focus-search');
+        }
+      });
+
+      if (success) {
+        console.log(`[Main] Global shortcut registered: ${shortcut}`);
+      } else {
+        console.warn(`[Main] Failed to register global shortcut: ${shortcut}`);
+      }
+    } catch (error) {
+      console.error(`[Main] Error registering global shortcut: ${error}`);
+    }
+  }
 }
 
 /**
@@ -320,6 +355,11 @@ app.whenReady().then(() => {
   // Setup IPC handlers
   setupIpcHandlers();
 
+  // 設定更新の通知を受け取ってショートカットを再登録
+  ipcMain.on('settings-updated', () => {
+    registerGlobalShortcut();
+  });
+
   // LOAD_DOCUMENT IPCハンドラー
   ipcMain.on(IPC_CHANNELS.LOAD_DOCUMENT, (_event, url: string) => {
     if (documentView) {
@@ -366,6 +406,7 @@ app.whenReady().then(() => {
   ipcMain.on('ping', () => console.log('pong'));
 
   createWindow();
+  registerGlobalShortcut();
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
