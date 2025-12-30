@@ -2,8 +2,11 @@ name: Release
 
 on:
   push:
+    branches:
+      - main
     tags:
       - "v*"
+  workflow_dispatch:
 
 jobs:
   build:
@@ -24,7 +27,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build Electron App
         run: |
