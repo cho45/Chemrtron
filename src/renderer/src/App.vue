@@ -64,7 +64,7 @@
         </div>
       </div>
 
-      <div class="results-container">
+      <div class="results-container" v-else>
         <div v-if="store.searchResults.length > 0" class="results">
           <div
             v-for="(result, index) in store.searchResults"
@@ -130,6 +130,32 @@ function getProgressMessage(progress: { state: string; current: number; total: n
 }
 
 onMounted(async () => {
+  // 進捗通知を受け取る (最優先で登録)
+  window.api.onProgress((progress) => {
+    progressState.value = progress;
+
+    // 現在選択中のインデクサーの再インデックスならログに追加
+    if (progress.id === store.currentIndexId) {
+      if (progress.state === 'init') {
+        indexingLogs.value = [];
+      }
+      indexingLogs.value.push(getProgressMessage(progress));
+      // 最新のログが上に来るように後で reverse するので、ここでは単に追加
+      if (indexingLogs.value.length > 100) {
+        indexingLogs.value.shift();
+      }
+    }
+
+    // 完了したら3秒後にクリア
+    if (progress.state === 'done') {
+      setTimeout(() => {
+        if (progressState.value?.id === progress.id && progressState.value?.state === 'done') {
+          progressState.value = null;
+        }
+      }, 3000);
+    }
+  });
+
   // 初期化（全インデクサーと設定を読み込み）
   await store.initialize();
 
@@ -199,32 +225,6 @@ onMounted(async () => {
   window.api.onUrlChanged((url) => {
     currentUrl.value = url;
   });
-
-  // 進捗通知を受け取る
-  window.api.onProgress((progress) => {
-    progressState.value = progress;
-
-    // 現在選択中のインデクサーの再インデックスならログに追加
-    if (progress.id === store.currentIndexId) {
-      if (progress.state === 'init') {
-        indexingLogs.value = [];
-      }
-      indexingLogs.value.push(getProgressMessage(progress));
-      // 最新のログが上に来るように後で reverse するので、ここでは単に追加
-      if (indexingLogs.value.length > 100) {
-        indexingLogs.value.shift();
-      }
-    }
-
-    // 完了したら3秒後にクリア
-    if (progress.state === 'done') {
-      setTimeout(() => {
-        if (progressState.value?.id === progress.id && progressState.value?.state === 'done') {
-          progressState.value = null;
-        }
-      }, 3000);
-    }
-  });
 });
 
 // 検索結果が変わったら選択をリセット
@@ -291,6 +291,7 @@ function scrollToSelected() {
 }
 
 async function selectIndexer(id: string) {
+  indexingLogs.value = []; // ログをクリア
   await store.loadIndex(id);
   // 選択したインデクサーを設定に保存
   await store.updateSettings({ lastSelected: id });
@@ -303,6 +304,7 @@ async function selectIndexer(id: string) {
 
 async function reindexIndexer(id: string) {
   if (confirm(`${id} インデクサーを再インデックスしますか？`)) {
+    indexingLogs.value = []; // ログをクリア
     await store.loadIndex(id, true);
     if (id === store.currentIndexId) {
       handleSearch();

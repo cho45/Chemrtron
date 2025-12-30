@@ -44,13 +44,20 @@ export const useIndexerStore = defineStore('indexer', () => {
 
   async function loadIndex(id: string, reindex = false) {
     isLoading.value = true;
+    currentIndexId.value = id; // 先にIDを設定しておく
+
+    // インデックス作成開始前にメタデータを即座に反映
+    const indexer = allIndexers.value.find((i) => i.id === id);
+    if (indexer) {
+      currentIndexer.value = indexer;
+    }
+
     try {
       const result = await window.api.getIndex(id, reindex);
       indexData.value = result.data;
       metadata.value = result.metadata;
-      currentIndexId.value = id;
 
-      // indexerMetadataをそのまま設定
+      // 最新のメタデータがあれば上書き（アイコンパスの解決など）
       if (result.indexerMetadata) {
         currentIndexer.value = result.indexerMetadata;
       }
