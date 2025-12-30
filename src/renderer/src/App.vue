@@ -311,19 +311,20 @@ watch(() => store.searchResults, () => {
 function handleSearch() {
   if (!query.value.trim()) {
     // クエリが空の場合は最初の50件を表示
-    const results = store.indexData
+    const results: import('../../shared/types').SearchResultItem[] = store.indexData
       .split('\n')
       .slice(0, 50)
       .filter((line) => line.includes('\t'))
       .map((line) => {
-        const item = line.split('\t') as any;
-        // タイトルをエスケープして item[2] にセット
-        item[2] = item[0].replace(/[&<>]/g, (m: string) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
+        const [title, url] = line.split('\t');
+        // タイトルをエスケープ
+        const formattedTitle = title.replace(/[&<>]/g, (m: string) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
         // urlTemplateがあればURLを変換
-        if (store.currentIndexer?.urlTemplate) {
-          item[1] = store.currentIndexer.urlTemplate.replace('${url}', item[1]);
-        }
-        return item;
+        const finalUrl = store.currentIndexer?.urlTemplate
+          ? store.currentIndexer.urlTemplate.replace('${url}', url)
+          : url;
+        
+        return [title, finalUrl, formattedTitle] as import('../../shared/types').SearchResultItem;
       });
     store.setSearchResults(results);
     return;
