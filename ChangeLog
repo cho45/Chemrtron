@@ -1,11 +1,11 @@
 2025-12-30  SATOH Hiroh <cho45@lowreal.net>
 
+	* Complete rewrite from scratch using modern Electron, Vite, Vue 3, and TypeScript.
 	* Migrate build system to electron-builder and update Makefile.
 	* Remove Mac App Store related configurations and legacy build scripts.
-	* Refactor IPC communication with full TypeScript type safety.
-	* Improve code quality by eliminating 'any' and consolidating type definitions.
-	* Clean up obsolete Implementation (ref-old) and scaffolds.
-	* Update documentation for new build process.
+	* Implement type-safe IPC communication and enhanced core logic.
+	* Clean up obsolete implementation (ref-old) and legacy assets.
+	* Update documentation for the new architecture and build process.
 
 2016-04-23  SATOH Hiroh <cho45@lowreal.net>
 
