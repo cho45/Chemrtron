@@ -2,6 +2,7 @@
   <div class="chemrtron">
     <!-- 左端: インデクサーアイコン列 -->
     <div class="indexer-icons" :class="{ 'is-mac': isMac }">
+      <div v-if="isMac" class="sidebar-drag-region"></div>
       <div class="icons-scroll">
         <div
           v-for="indexer in store.enabledIndexers"
@@ -35,7 +36,7 @@
 
     <!-- 中央: 検索バー + 結果列 -->
     <div class="search-panel">
-      <header class="header">
+      <header class="header drag-region">
         <h1>{{ store.currentIndexer?.name || 'Chemrtron' }}</h1>
       </header>
 
@@ -84,7 +85,7 @@
 
     <!-- URL表示バー（documentView用） -->
     <div class="main-content">
-      <div class="url-bar">
+      <div class="url-bar drag-region">
         <div class="url-text">{{ currentUrl || 'No document loaded' }}</div>
       </div>
       <!-- WebContentsView が重なるプレースホルダー -->
@@ -380,14 +381,20 @@ function handleInputKeydown(e: KeyboardEvent) {
   height: 100vh;
 }
 
+.sidebar-drag-region {
+  height: 32px;
+  flex-shrink: 0;
+  -webkit-app-region: drag;
+}
+
 .icons-scroll {
   flex: 1;
   overflow-y: auto;
   padding: 8px 0;
 }
 
-.indexer-icons.is-mac .icons-scroll {
-  padding-top: 32px;
+.drag-region {
+  -webkit-app-region: drag;
 }
 
 .sidebar-footer {
