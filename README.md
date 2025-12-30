@@ -87,15 +87,11 @@ This uses `electron-builder` to generate production-ready packages in the `dist`
 Release
 =======
 
-Releases are automated via GitHub Actions when a version tag is pushed.
-
-1.  Update the version in `package.json`.
-2.  Commit and push the changes.
-3.  Create and push a git tag:
+Releases are automated via GitHub Actions. To publish a new version:
 
 ```bash
-git tag v2.0.1
-git push origin v2.0.1
+# This will bump the patch version, create a git tag, and push to GitHub
+npm run release
 ```
 
 The GitHub Action will automatically:
