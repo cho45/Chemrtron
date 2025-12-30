@@ -17,23 +17,59 @@ const python3Indexer = {
     const url = 'https://docs.python.org/3/genindex-all.html';
     const doc = await ctx.fetchDocument(url);
 
-    const data = doc.querySelectorAll('table.indextable td > dl > *');
-    let currentDt = '';
-
-    for (const it of data) {
-      if (it.tagName === 'DT') {
-        // Remove trailing (parentheses) like "(module)"
-        currentDt = it.textContent.replace(/\(.+\)\s*$/, '').trim();
-        const a = it.querySelector('a');
-        if (a && a.getAttribute('href')) {
-          ctx.pushIndex(currentDt, a.getAttribute('href'));
+    const tables = doc.querySelectorAll('table.indextable');
+    for (const table of tables) {
+      const lis = table.querySelectorAll('td > ul > li');
+      for (const li of lis) {
+        // The main term is the text/links in this LI before any nested UL
+        const termNodes = [];
+        let subUl = null;
+        for (const child of li.childNodes) {
+          if (child.nodeName === 'UL') {
+            subUl = child;
+            break;
+          }
+          termNodes.push(child);
         }
-      } else if (it.tagName === 'DD') {
-        const links = it.querySelectorAll('a');
-        for (const link of links) {
-          const href = link.getAttribute('href');
-          if (href) {
-            ctx.pushIndex(`${currentDt} ${link.textContent.trim()}`, href);
+
+        const mainText = termNodes.map(n => n.textContent).join('').trim().replace(/\s+/g, ' ');
+        // Remove trailing (parentheses) like "(module)" and reference markers like "[1]"
+        const cleanMainText = mainText.replace(/\s*\(.+\)\s*$/, '').replace(/,?\s*\[\d+\]/g, '').trim() || mainText;
+
+        // Collect links for the main term
+        for (const node of termNodes) {
+          const links = node.nodeName === 'A' ? [node] : (node.querySelectorAll ? node.querySelectorAll('a') : []);
+          for (const a of links) {
+            const href = a.getAttribute('href');
+            if (href && !a.textContent.match(/^\[\d+\]$/)) {
+              ctx.pushIndex(cleanMainText, href);
+            }
+          }
+        }
+
+        // Handle sub-entries in nested UL
+        if (subUl) {
+          const subLis = subUl.querySelectorAll('li');
+          for (const subLi of subLis) {
+            // Get text of this sub-LI excluding any deeper UL (though rare)
+            const subTermNodes = [];
+            for (const child of subLi.childNodes) {
+              if (child.nodeName === 'UL') break;
+              subTermNodes.push(child);
+            }
+            const subText = subTermNodes.map(n => n.textContent).join('').trim().replace(/\s+/g, ' ');
+            const cleanSubText = subText.replace(/\s*\(.+\)\s*$/, '').replace(/,?\s*\[\d+\]/g, '').trim();
+            const fullText = cleanSubText ? `${cleanMainText} ${cleanSubText}` : cleanMainText;
+
+            for (const node of subTermNodes) {
+              const links = node.nodeName === 'A' ? [node] : (node.querySelectorAll ? node.querySelectorAll('a') : []);
+              for (const a of links) {
+                const href = a.getAttribute('href');
+                if (href && !a.textContent.match(/^\[\d+\]$/)) {
+                  ctx.pushIndex(fullText, href);
+                }
+              }
+            }
           }
         }
       }

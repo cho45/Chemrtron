@@ -18,7 +18,7 @@ const phpIndexer = {
     const doc = await ctx.fetchDocument(url);
 
     // リスト内のすべての a タグを取得（関数名が含まれる）
-    const links = doc.querySelectorAll('ul.genindex a');
+    const links = doc.querySelectorAll('ul.gen-index a');
     for (const link of links) {
       const text = link.textContent.trim();
       const href = link.getAttribute('href');
