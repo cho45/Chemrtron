@@ -4,6 +4,10 @@ export default {
   id: 'ruby',
   name: 'Ruby',
   color: '#cc342d',
+  testSpec: {
+    expectedSymbols: ['Array', 'Enumerable', 'reduce'],
+    minEntries: 1000
+  },
   urlTemplate: 'https://ruby-doc.org/3.4.1/${url}',
   async index(ctx) {
     const baseUrl = 'https://ruby-doc.org/3.4.1/';

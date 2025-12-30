@@ -3,6 +3,10 @@ export default {
   id: 'k8s',
   name: 'Kubernetes',
   color: '#326ce5',
+  testSpec: {
+    expectedSymbols: ['kubectl', 'Pod', 'Architecture'],
+    minEntries: 50
+  },
   urlTemplate: 'https://kubernetes.io${url}',
   async index(ctx) {
     const baseUrl = 'https://kubernetes.io';

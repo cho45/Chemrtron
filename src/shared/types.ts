@@ -84,6 +84,14 @@ export interface IndexerDefinition {
   index(ctx: IndexerContext): Promise<void>;
 
   /**
+   * テスト用の期待値（オプション）
+   */
+  testSpec?: {
+    expectedSymbols: string[];
+    minEntries?: number;
+  };
+
+  /**
    * URLテンプレート文字列（オプション）
    * インデックスに保存された相対URLを完全なURLに変換する
    * 例: "https://example.com/docs/${url}"

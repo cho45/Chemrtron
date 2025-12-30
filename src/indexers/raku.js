@@ -4,6 +4,10 @@ export default {
   id: 'raku',
   name: 'Raku',
   color: '#ffffff',
+  testSpec: {
+    expectedSymbols: ['absolute', 'Array', 'operators'],
+    minEntries: 500
+  },
   urlTemplate: 'https://docs.raku.org${url}',
   async index(ctx) {
     const baseUrl = 'https://docs.raku.org/';

@@ -7,6 +7,10 @@ const htmlIndexer = {
   id: 'html',
   name: 'HTML Standard',
   color: '#E34F26',
+  testSpec: {
+    expectedSymbols: ['HTML elements', 'Introduction', 'Canvas'],
+    minEntries: 500
+  },
 
   /**
    * インデックスを作成

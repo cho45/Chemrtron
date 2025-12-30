@@ -7,6 +7,10 @@ const javaIndexer = {
   id: 'java',
   name: 'Java SE',
   color: '#5382A1',
+  testSpec: {
+    expectedSymbols: ['String', 'ArrayList', 'HashMap', 'Thread'],
+    minEntries: 1000
+  },
 
   /**
    * インデックスを作成

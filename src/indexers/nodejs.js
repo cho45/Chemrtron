@@ -8,6 +8,10 @@ const nodejsIndexer = {
   id: 'nodejs',
   name: 'Node.js',
   color: '#339933',
+  testSpec: {
+    expectedSymbols: ['fs', 'http', 'process', 'Buffer'],
+    minEntries: 500
+  },
 
   /**
    * インデックスを作成

@@ -7,6 +7,10 @@ const ghcIndexer = {
   id: 'ghc',
   name: 'Haskell (GHC)',
   color: '#5e5086',
+  testSpec: {
+    expectedSymbols: ['Prelude', 'Data.List', 'Control.Monad'],
+    minEntries: 1000
+  },
 
   /**
    * インデックスを作成

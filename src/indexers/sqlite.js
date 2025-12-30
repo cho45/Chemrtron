@@ -4,6 +4,10 @@ export default {
   id: 'sqlite',
   name: 'SQLite',
   color: '#003b57',
+  testSpec: {
+    expectedSymbols: ['SELECT', 'CREATE TABLE', 'sqlite3_open'],
+    minEntries: 200
+  },
   async index(ctx) {
     const baseUrl = 'https://www.sqlite.org/';
 

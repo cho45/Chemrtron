@@ -8,6 +8,10 @@ const phpIndexer = {
   id: 'php',
   name: 'PHP',
   color: '#4F5B93',
+  testSpec: {
+    expectedSymbols: ['strlen', 'array_map', 'json_encode'],
+    minEntries: 1000
+  },
 
   /**
    * インデックスを作成

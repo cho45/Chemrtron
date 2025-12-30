@@ -7,6 +7,10 @@ const androidIndexer = {
   id: 'android',
   name: 'Android',
   color: '#3DDC84',
+  testSpec: {
+    expectedSymbols: ['android.app', 'Activity', 'View'],
+    minEntries: 1000
+  },
 
   /**
    * インデックスを作成

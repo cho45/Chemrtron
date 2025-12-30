@@ -4,6 +4,10 @@ export default {
   id: 'postgresql',
   name: 'PostgreSQL',
   color: '#336791',
+  testSpec: {
+    expectedSymbols: ['SELECT', 'CREATE TABLE', 'JSON', 'vacuum'],
+    minEntries: 500
+  },
   urlTemplate: 'https://www.postgresql.org/docs/current/${url}',
   async index(ctx) {
     const baseUrl = 'https://www.postgresql.org/docs/current/';

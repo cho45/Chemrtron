@@ -7,6 +7,10 @@ const golangIndexer = {
   id: 'golang',
   name: 'Go',
   color: '#00ADD8',
+  testSpec: {
+    expectedSymbols: ['Go Spec: Types', 'std: fmt', 'std: net/http'],
+    minEntries: 200
+  },
 
   /**
    * インデックスを作成

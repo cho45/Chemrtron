@@ -4,6 +4,10 @@ export default {
   id: 'mysql',
   name: 'MySQL',
   color: '#F29111',
+  testSpec: {
+    expectedSymbols: ['SELECT', 'UPDATE', 'ABS', 'JOIN'],
+    minEntries: 200
+  },
   urlTemplate: 'https://dev.mysql.com/doc/refman/8.4/en/${url}',
   async index(ctx) {
     const baseUrl = 'https://dev.mysql.com/doc/refman/8.4/en/';

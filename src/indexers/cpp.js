@@ -4,6 +4,10 @@ export default {
   id: 'cpp',
   name: 'C++',
   color: '#004482',
+  testSpec: {
+    expectedSymbols: ['vector', 'unique_ptr', 'constexpr'],
+    minEntries: 300
+  },
   urlTemplate: 'https://en.cppreference.com/w/cpp/${url}',
   async index(ctx) {
     const baseUrl = 'https://en.cppreference.com/w/cpp/';

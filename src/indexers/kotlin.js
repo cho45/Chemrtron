@@ -4,6 +4,10 @@ export default {
   id: 'kotlin',
   name: 'Kotlin Standard Library',
   color: '#7F52FF',
+  testSpec: {
+    expectedSymbols: ['String', 'Collections', 'ranges'],
+    minEntries: 500
+  },
   urlTemplate: 'https://kotlinlang.org/api/core/kotlin-stdlib/${url}',
   async index(ctx) {
     const baseUrl = 'https://kotlinlang.org/api/core/kotlin-stdlib/';

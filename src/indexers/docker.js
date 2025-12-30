@@ -4,6 +4,10 @@ export default {
   id: 'docker',
   name: 'Docker',
   color: '#2496ed',
+  testSpec: {
+    expectedSymbols: ['docker build', 'docker run', 'Dockerfile'],
+    minEntries: 100
+  },
   urlTemplate: 'https://docs.docker.com${url}',
   async index(ctx) {
     const baseUrl = 'https://docs.docker.com';

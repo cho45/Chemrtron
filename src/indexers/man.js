@@ -4,6 +4,10 @@ export default {
   id: 'man',
   name: 'Man Pages',
   color: '#000000',
+  testSpec: {
+    expectedSymbols: ['abort(3)', 'grep(1)', 'systemd(1)'],
+    minEntries: 1000
+  },
   urlTemplate: 'https://man7.org/linux/man-pages/${url}',
   async index(ctx) {
     const baseUrl = 'https://man7.org/linux/man-pages/';

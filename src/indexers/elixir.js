@@ -4,6 +4,10 @@ export default {
   id: 'elixir',
   name: 'Elixir',
   color: '#4e2a8e',
+  testSpec: {
+    expectedSymbols: ['Kernel.abs', 'Enum.map', 'String.trim'],
+    minEntries: 500
+  },
   urlTemplate: 'https://hexdocs.pm/elixir/${url}',
   async index(ctx) {
     const baseUrl = 'https://hexdocs.pm/elixir/';

@@ -7,6 +7,10 @@ const clojureIndexer = {
   id: 'clojure',
   name: 'Clojure',
   color: '#5881d8',
+  testSpec: {
+    expectedSymbols: ['map', 'reduce', 'filter', 'defn'],
+    minEntries: 500
+  },
 
   /**
    * インデックスを作成

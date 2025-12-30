@@ -8,6 +8,10 @@ const mdnIndexer = {
   id: 'mdn',
   name: 'MDN Web Docs',
   color: '#212121',
+  testSpec: {
+    expectedSymbols: ['JavaScript', 'HTML', 'CSS', 'fetch'],
+    minEntries: 5000
+  },
 
   /**
    * インデックスを作成

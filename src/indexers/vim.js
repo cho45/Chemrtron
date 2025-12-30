@@ -4,6 +4,10 @@ export default {
   id: 'vim',
   name: 'Vim',
   color: '#19912b',
+  testSpec: {
+    expectedSymbols: ['help', 'motion', 'visual'],
+    minEntries: 1000
+  },
   urlTemplate: 'https://vimhelp.org/${url}',
   async index(ctx) {
     const baseUrl = 'https://vimhelp.org/';

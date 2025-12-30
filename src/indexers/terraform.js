@@ -4,6 +4,10 @@ export default {
   id: 'terraform',
   name: 'Terraform',
   color: '#7b42bc',
+  testSpec: {
+    expectedSymbols: ['Language', 'CLI', 'HCP Terraform'],
+    minEntries: 50
+  },
   urlTemplate: 'https://developer.hashicorp.com${url}',
   async index(ctx) {
     const baseUrl = 'https://developer.hashicorp.com';

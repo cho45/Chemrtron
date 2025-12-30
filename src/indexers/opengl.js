@@ -7,6 +7,10 @@ const openglIndexer = {
   id: 'opengl',
   name: 'OpenGL',
   color: '#5586A4',
+  testSpec: {
+    expectedSymbols: ['glDrawArrays', 'glClear', 'glTexImage2D'],
+    minEntries: 400
+  },
 
   /**
    * インデックスを作成

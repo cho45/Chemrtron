@@ -7,6 +7,10 @@ const arduinoIndexer = {
   id: 'arduino',
   name: 'Arduino',
   color: '#00979C',
+  testSpec: {
+    expectedSymbols: ['digitalRead', 'pinMode', 'Serial'],
+    minEntries: 50
+  },
 
   /**
    * インデックスを作成

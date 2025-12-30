@@ -3,6 +3,10 @@ export default {
   id: 'git',
   name: 'Git',
   color: '#f05032',
+  testSpec: {
+    expectedSymbols: ['add', 'commit', 'rev-parse'],
+    minEntries: 50
+  },
   urlTemplate: 'https://git-scm.com${url}',
   async index(ctx) {
     const baseUrl = 'https://git-scm.com/docs';

@@ -3,6 +3,10 @@ export default {
   id: 'lua',
   name: 'Lua',
   color: '#000080',
+  testSpec: {
+    expectedSymbols: ['print', 'assert', 'lua_newstate'],
+    minEntries: 100
+  },
   urlTemplate: 'https://www.lua.org/manual/5.4/${url}',
   async index(ctx) {
     const baseUrl = 'https://www.lua.org/manual/5.4/';

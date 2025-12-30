@@ -8,6 +8,10 @@ const python3Indexer = {
   id: 'python3',
   name: 'Python 3',
   color: '#3776AB',
+  testSpec: {
+    expectedSymbols: ['list', 'dict', 'json', 'sys.path'],
+    minEntries: 1000
+  },
 
   /**
    * インデックスを作成

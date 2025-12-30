@@ -4,6 +4,10 @@ export default {
   id: 'redis',
   name: 'Redis',
   color: '#d82c20',
+  testSpec: {
+    expectedSymbols: ['GET', 'SET', 'HGET', 'PUBLISH'],
+    minEntries: 200
+  },
   urlTemplate: 'https://redis.io${url}',
   async index(ctx) {
     const baseUrl = 'https://redis.io/commands/';

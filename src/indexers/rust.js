@@ -3,6 +3,10 @@ export default {
   id: 'rust',
   name: 'Rust',
   color: '#ce412b',
+  testSpec: {
+    expectedSymbols: ['unsafe', 'keyword', 'Vec', 'Expressions'],
+    minEntries: 500
+  },
   urlTemplate: 'https://doc.rust-lang.org/${url}',
   async index(ctx) {
     // 1. Standard Library Items

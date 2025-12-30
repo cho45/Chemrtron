@@ -3,6 +3,10 @@ export default {
   id: 'cmake',
   name: 'CMake',
   color: '#064f8c',
+  testSpec: {
+    expectedSymbols: ['add_executable', 'target_link_libraries', 'PROJECT_SOURCE_DIR'],
+    minEntries: 500
+  },
   urlTemplate: 'https://cmake.org/cmake/help/latest/${url}',
   async index(ctx) {
     const baseUrl = 'https://cmake.org/cmake/help/latest/';

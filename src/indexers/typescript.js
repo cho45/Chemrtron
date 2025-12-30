@@ -4,6 +4,10 @@ export default {
   id: 'typescript',
   name: 'TypeScript',
   color: '#3178c6',
+  testSpec: {
+    expectedSymbols: ['Utility Types', 'Partial', 'tsconfig'],
+    minEntries: 50
+  },
   urlTemplate: 'https://www.typescriptlang.org${url}',
   async index(ctx) {
     const baseUrl = 'https://www.typescriptlang.org';

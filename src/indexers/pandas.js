@@ -7,6 +7,10 @@ const pandasIndexer = {
   id: 'pandas',
   name: 'pandas',
   color: '#150458',
+  testSpec: {
+    expectedSymbols: ['DataFrame', 'Series', 'read_csv'],
+    minEntries: 1000
+  },
 
   /**
    * インデックスを作成
