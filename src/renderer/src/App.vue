@@ -4,23 +4,34 @@
     <div class="indexer-icons" :class="{ 'is-mac': isMac }">
       <div v-if="isMac" class="sidebar-drag-region"></div>
       <div class="icons-scroll">
-        <div
-          v-for="indexer in store.enabledIndexers"
-          :key="indexer.id"
-          :class="{ 'indexer-icon-item': true, 'active': indexer.id === store.currentIndexId }"
-          @click="selectIndexer(indexer.id)"
-          @contextmenu.prevent="reindexIndexer(indexer.id)"
-          :title="indexer.name + ' (右クリックで再インデックス)'"
-          :style="{ '--active-color': indexer.color || 'var(--color-accent)' }"
-        >
-          <div class="indexer-icon" :style="{ background: indexer.color || '#666', color: getContrastColor(indexer.color) }">
-            {{ indexer.name.substring(0, 2).toUpperCase() }}
+        <TransitionGroup name="icons-list" tag="div" class="icons-container">
+          <div
+            v-for="(indexer, index) in store.enabledIndexers"
+            :key="indexer.id"
+            :class="{ 
+              'indexer-icon-item': true, 
+              'active': indexer.id === store.currentIndexId,
+              'dragging': index === draggingIndex 
+            }"
+            @click="selectIndexer(indexer.id)"
+            @contextmenu.prevent="reindexIndexer(indexer.id)"
+            :title="indexer.name + ' (右クリックで再インデックス)'"
+            :style="{ '--active-color': indexer.color || 'var(--color-accent)' }"
+            draggable="true"
+            @dragstart="handleDragStart(index)"
+            @dragover.prevent
+            @dragenter="handleDragEnter(index)"
+            @dragend="handleDragEnd"
+          >
+            <div class="indexer-icon" :style="{ background: indexer.color || '#666', color: getContrastColor(indexer.color) }">
+              {{ indexer.name.substring(0, 2).toUpperCase() }}
+            </div>
+            <!-- 進捗表示 -->
+            <div v-if="progressState && progressState.id === indexer.id" class="indexer-progress">
+              <div class="progress-bar" :style="{ width: `${(progressState.current / progressState.total) * 100}%`, background: indexer.color || 'var(--color-accent)' }"></div>
+            </div>
           </div>
-          <!-- 進捗表示 -->
-          <div v-if="progressState && progressState.id === indexer.id" class="indexer-progress">
-            <div class="progress-bar" :style="{ width: `${(progressState.current / progressState.total) * 100}%`, background: indexer.color || 'var(--color-accent)' }"></div>
-          </div>
-        </div>
+        </TransitionGroup>
       </div>
 
       <!-- 設定ボタン -->
@@ -128,7 +139,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, nextTick } from 'vue';
+import { ref, onMounted, watch, nextTick, onUnmounted } from 'vue';
 import { useIndexerStore } from './stores/indexer';
 import { fuzzySearch } from '../../shared/search-algorithm';
 import SettingsModal from './components/SettingsModal.vue';
@@ -150,6 +161,7 @@ const isSettingsOpen = ref(false);
 const isIndexerSearchOpen = ref(false);
 const isIndexerMenuOpen = ref(false);
 const isFindOpen = ref(false);
+const draggingIndex = ref<number | null>(null);
 
 let resizeObserver: ResizeObserver | null = null;
 
@@ -271,6 +283,10 @@ onMounted(async () => {
   });
 });
 
+onUnmounted(() => {
+  resizeObserver?.disconnect();
+});
+
 // 検索結果が変わったら選択をリセット
 watch(() => store.searchResults, () => {
   selectedIndex.value = -1;
@@ -362,6 +378,30 @@ function reindexCurrentIndexer() {
   if (store.currentIndexId) {
     reindexIndexer(store.currentIndexId);
   }
+}
+
+// ドラッグ&ドロップのハンドラ
+function handleDragStart(index: number) {
+  draggingIndex.value = index;
+}
+
+function handleDragEnter(index: number) {
+  if (draggingIndex.value === null || draggingIndex.value === index) return;
+
+  // store.settings.enabled を直接操作して順序を入れ替える
+  const enabled = [...store.settings.enabled];
+  const item = enabled.splice(draggingIndex.value, 1)[0];
+  enabled.splice(index, 0, item);
+  
+  // ストアの状態を更新（これによりTransitionGroupがアニメーションを発火させる）
+  store.settings.enabled = enabled;
+  draggingIndex.value = index;
+}
+
+function handleDragEnd() {
+  draggingIndex.value = null;
+  // 最終的な順序を保存
+  store.updateSettings({ enabled: store.settings.enabled });
 }
 
 function handleInputKeydown(e: KeyboardEvent) {
@@ -518,6 +558,19 @@ function handleInputKeydown(e: KeyboardEvent) {
 .progress-bar {
   height: 100%;
   transition: width 0.3s ease;
+}
+
+/* 並べ替えアニメーション */
+.icons-container {
+  position: relative;
+}
+
+.icons-list-move {
+  transition: transform 0.3s ease;
+}
+
+.indexer-icon-item.dragging {
+  opacity: 0.2;
 }
 
 /* 中央: 検索パネル */
