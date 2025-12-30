@@ -100,7 +100,13 @@ The GitHub Action will automatically:
 - Upload the installers and binaries to the release.
 - Generate release notes based on commit history.
 
-**Note for macOS users:** Since the app is not signed with an Apple Developer certificate, you may see a warning when opening it for the first time. To open it, **Right-click (or Control-click) the app icon and select "Open"** from the menu.
+**Note for macOS users:** Since the app is not signed with an Apple Developer certificate, macOS may report that the app "is damaged and can't be opened" after downloading. To fix this, move the app to your `/Applications` folder and run the following command in your terminal:
+
+```bash
+sudo xattr -rd com.apple.quarantine /Applications/Chemrtron.app
+```
+
+Then you can open the app normally (you may still need to **Right-click and select "Open"** for the first time).
 
 Creating New Indexers
 =====================
