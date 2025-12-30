@@ -39,6 +39,24 @@ npm install
 npm run dev
 ```
 
+### Testing Indexers
+
+You can run a live health check for built-in indexers. This script connects to the actual documentation sites to verify that the indexing logic still works against the current remote content.
+
+```bash
+# Test all indexers
+npx tsx test/indexers/live-runner.ts
+
+# Test a specific indexer (less load on remote sites)
+npx tsx test/indexers/live-runner.ts lua
+```
+
+The runner verifies:
+- Connection and retrieval of documentation pages.
+- Minimum number of extracted entries.
+- Presence of essential symbols (e.g., `print` for Lua).
+- Validity of generated URLs (no double slashes, starts with `https://`).
+
 Architecture
 ============
 
@@ -78,6 +96,10 @@ export default {
   id: 'my-docs',
   name: 'My Documentation',
   color: '#42b883',
+  testSpec: {
+    expectedSymbols: ['MyMainFunction'],
+    minEntries: 10
+  },
   async index(ctx) {
     // Use ctx.fetchDocument, ctx.pushIndex, etc.
   }
