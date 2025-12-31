@@ -6,9 +6,19 @@ on:
       - master
     paths-ignore:
       - 'docs/**'
+      - 'test/**'
       - 'README.md'
       - 'CONTRIBUTING.md'
+      - 'GEMINI.md'
+      - 'CLAUDE.md'
+      - 'README-mcp.md'
       - 'ChangeLog'
+      - 'Makefile'
+      - '.github/workflows/ci.yml'
+      - '.github/workflows/static.yml'
+      - 'eslint.config.mjs'
+      - '.gitignore'
+      - '.claude/**'
     tags:
       - "v*"
   workflow_dispatch:
