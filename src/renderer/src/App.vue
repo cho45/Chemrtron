@@ -292,13 +292,14 @@ onMounted(async () => {
         query.value = '';
         handleSearch();
         break;
-      case 'autocomplete':
+      case 'autocomplete': {
         const firstResult = store.searchResults[0];
         if (firstResult) {
           query.value = firstResult[0];
           handleSearch();
         }
         break;
+      }
       case 'select-result':
         if (selectedIndex.value >= 0 && store.searchResults[selectedIndex.value]) {
           selectResult(selectedIndex.value);
