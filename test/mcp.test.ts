@@ -9,7 +9,7 @@ import os from 'os';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const MCP_SERVER_PATH = path.resolve(__dirname, '../out/main/mcp.js');
+const MCP_SERVER_PATH = path.resolve(__dirname, '../out/mcp/mcp.js');
 
 // Test Configuration
 const TEST_PORT = 39393;

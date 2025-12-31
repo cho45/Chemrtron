@@ -13,7 +13,8 @@
     "typecheck": "npm run typecheck:node && npm run typecheck:web",
     "start": "electron-vite preview",
     "dev": "electron-vite dev",
-    "build": "npm run typecheck && electron-vite build",
+    "build:mcp": "vite build -c mcp.vite.config.ts",
+    "build": "npm run typecheck && npm run build:mcp && electron-vite build",
     "start:mcp": "node out/main/mcp.js",
     "test": "tsx test/search-algorithm.test.ts",
     "test:mcp": "npm run build && tsx test/mcp.test.ts",
@@ -27,6 +28,7 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
+    "@mixmark-io/domino": "^2.2.0",
     "@modelcontextprotocol/sdk": "^1.25.1",
     "linkedom": "^0.18.12",
     "pinia": "^3.0.4",
