@@ -4,6 +4,8 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import icon from '../../resources/icon.png?asset';
 import { setupIpcHandlers } from './ipc-handlers';
 import { loadSettings } from './settings-manager';
+import { syncBuiltinIndexers } from './indexer-loader';
+import { exportMcpServer } from './mcp-exporter';
 import { IPC_CHANNELS, type KeyboardAction, type FindInPageOptions } from '../shared/types';
 import { onIpc } from './ipc-utils';
 
@@ -390,6 +392,10 @@ function createWindow(): void {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
+  // 環境の初期化
+  syncBuiltinIndexers();
+  exportMcpServer();
+
   // Set app user model id for windows
   electronApp.setAppUserModelId('net.lowreal.Chemr');
 

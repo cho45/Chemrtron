@@ -8,10 +8,6 @@ export default defineConfig({
   main: {
     build: {
       rollupOptions: {
-        input: {
-          index: resolve(__dirname, 'src/main/index.ts'),
-          mcp: resolve(__dirname, 'src/mcp/index.ts')
-        },
         // ビルド後にindexersディレクトリをコピー
         output: {
           plugins: [

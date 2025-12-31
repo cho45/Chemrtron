@@ -2,11 +2,57 @@
  * Indexer Loader - インデクサーの動的読み込み (ESM)
  */
 
-import { readdirSync, existsSync } from 'fs';
+import { readdirSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { pathToFileURL } from 'url';
 import os from 'os';
 import type { IndexerDefinition } from '../shared/types';
+
+const CHEM_DIR = join(os.homedir(), '.chemr');
+const BUILTIN_INDEXERS_PATH = join(CHEM_DIR, 'builtin-indexers');
+const USER_INDEXERS_PATH = join(CHEM_DIR, 'indexers');
+
+/**
+ * アプリ内蔵のインデクサーを ~/.chemr/builtin-indexers/ に同期する
+ */
+export function syncBuiltinIndexers(): void {
+  // 同期先ディレクトリの確保
+  if (!existsSync(BUILTIN_INDEXERS_PATH)) {
+    mkdirSync(BUILTIN_INDEXERS_PATH, { recursive: true });
+  }
+
+  // アプリケーション内のインデクサーを探す (ビルド後は out/main/indexers/)
+  let sourceDir = '';
+  let currentSearchDir = __dirname;
+  for (let i = 0; i < 3; i++) {
+    const target = join(currentSearchDir, 'indexers');
+    if (existsSync(target)) {
+      sourceDir = target;
+      break;
+    }
+    currentSearchDir = join(currentSearchDir, '..');
+  }
+
+  if (!sourceDir) {
+    console.error(`[IndexerLoader] Built-in indexers source directory not found near ${__dirname}`);
+    return;
+  }
+
+  try {
+    const files = readdirSync(sourceDir);
+    let count = 0;
+    for (const file of files) {
+      if (file.endsWith('.js')) {
+        const content = readFileSync(join(sourceDir, file));
+        writeFileSync(join(BUILTIN_INDEXERS_PATH, file), content);
+        count++;
+      }
+    }
+    console.error(`[IndexerLoader] Synchronized ${count} builtin indexers to ${BUILTIN_INDEXERS_PATH}`);
+  } catch (error) {
+    console.error(`[IndexerLoader] Failed to synchronize builtin indexers:`, error);
+  }
+}
 
 /**
  * 利用可能なインデクサーをすべて読み込む
@@ -14,36 +60,23 @@ import type { IndexerDefinition } from '../shared/types';
 export async function loadAllIndexers(): Promise<IndexerDefinition[]> {
   const indexers: IndexerDefinition[] = [];
 
-  // アプリケーション内の indexers/ ディレクトリ（ビルド後は out/main/indexers/）
-  let builtInIndexersPath = join(__dirname, 'indexers');
-  if (!existsSync(builtInIndexersPath)) {
-    // Viteのチャンク化対策: 1つ上のディレクトリも探す
-    builtInIndexersPath = join(__dirname, '..', 'indexers');
-  }
-
-  // ユーザーディレクトリの ~/.chemr/indexers/
-  const userIndexersPath = join(os.homedir(), '.chemr', 'indexers');
-
-  // ビルトインインデクサーを読み込み
-  if (existsSync(builtInIndexersPath)) {
-    const builtInIndexers = await loadIndexersFromDirectory(builtInIndexersPath);
+  // 1. 同期済みのビルトインインデクサーを読み込み
+  if (existsSync(BUILTIN_INDEXERS_PATH)) {
+    const builtInIndexers = await loadIndexersFromDirectory(BUILTIN_INDEXERS_PATH);
     indexers.push(...builtInIndexers);
-    console.error(`[IndexerLoader] Loaded ${builtInIndexers.length} built-in indexers`);
   }
 
-  // ユーザーインデクサーを読み込み（存在する場合）
-  if (existsSync(userIndexersPath)) {
-    const userIndexers = await loadIndexersFromDirectory(userIndexersPath);
+  // 2. ユーザーインデクサーを読み込み
+  if (existsSync(USER_INDEXERS_PATH)) {
+    const userIndexers = await loadIndexersFromDirectory(USER_INDEXERS_PATH);
     indexers.push(...userIndexers);
-    console.error(`[IndexerLoader] Loaded ${userIndexers.length} user indexers`);
   }
 
-  // 環境変数指定のパスから読み込み（テスト用など）
+  // 3. 環境変数指定のパスから読み込み（テスト用など）
   const extraPath = process.env.CHEMR_EXTRA_INDEXERS_PATH;
   if (extraPath && existsSync(extraPath)) {
     const extraIndexers = await loadIndexersFromDirectory(extraPath);
     indexers.push(...extraIndexers);
-    console.error(`[IndexerLoader] Loaded ${extraIndexers.length} extra indexers form ${extraPath}`);
   }
 
   return indexers;
@@ -67,7 +100,6 @@ async function loadIndexersFromDirectory(dirPath: string): Promise<IndexerDefini
         const indexer = await loadIndexerFromFile(filePath);
         if (indexer) {
           indexers.push(indexer);
-          console.error(`[IndexerLoader] Loaded indexer: ${indexer.id} (${indexer.name})`);
         }
       } catch (error) {
         console.error(`[IndexerLoader] Failed to load ${file}:`, error);
@@ -117,10 +149,7 @@ export async function getIndexerById(id: string, forceReload = false): Promise<I
   // forceReload が true の場合は、個別にファイルを読み直す必要があるため、
   // ディレクトリをスキャンして該当ファイルを探す
   if (forceReload) {
-    const builtInIndexersPath = join(__dirname, 'indexers');
-    const userIndexersPath = join(os.homedir(), '.chemr', 'indexers');
-    
-    const paths = [builtInIndexersPath, userIndexersPath];
+    const paths = [BUILTIN_INDEXERS_PATH, USER_INDEXERS_PATH];
     for (const dirPath of paths) {
       if (!existsSync(dirPath)) continue;
       const files = readdirSync(dirPath);
