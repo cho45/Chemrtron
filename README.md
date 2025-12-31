@@ -21,6 +21,31 @@ Features
 *   **System Integration**: Supports system light/dark modes and global shortcuts.
 *   **WebContentsView**: Uses Electron's modern view system for seamless document rendering alongside the search UI.
 
+Creating New Indexers
+=====================
+
+Indexers are simple JavaScript files that define how to crawl and index a documentation site.
+
+*   **Built-in Indexers**: Located in `src/indexers/`. These are bundled with the application and synchronized to `~/.chemr/builtin-indexers/` at runtime.
+*   **User Indexers**: Can be placed in `~/.chemr/indexers/` for personal use.
+
+Example indexer structure:
+
+```javascript
+export default {
+  id: 'my-docs',
+  name: 'My Documentation',
+  color: '#42b883',
+  testSpec: {
+    expectedSymbols: ['MyMainFunction'],
+    minEntries: 10
+  },
+  async index(ctx) {
+    // Use ctx.fetchDocument, ctx.pushIndex, etc.
+  }
+}
+```
+
 Development
 ===========
 
@@ -141,28 +166,6 @@ sudo xattr -rd com.apple.quarantine /Applications/Chemrtron.app
 ```
 
 Then you can open the app normally (you may still need to **Right-click and select "Open"** for the first time).
-
-Creating New Indexers
-=====================
-
-Indexers are simple JavaScript files that define how to crawl and index a documentation site. Custom indexers can be placed in `~/.chemr/indexers/`.
-
-Example indexer structure:
-
-```javascript
-export default {
-  id: 'my-docs',
-  name: 'My Documentation',
-  color: '#42b883',
-  testSpec: {
-    expectedSymbols: ['MyMainFunction'],
-    minEntries: 10
-  },
-  async index(ctx) {
-    // Use ctx.fetchDocument, ctx.pushIndex, etc.
-  }
-}
-```
 
 License
 =======
