@@ -4,10 +4,10 @@
 
 import fs from 'fs';
 import path from 'path';
-import { app } from 'electron';
+import os from 'os';
 import type { CacheMetadata } from '../shared/types';
 
-const CACHE_DIR = path.join(app.getPath('home'), '.chemr', 'cache');
+const CACHE_DIR = path.join(os.homedir(), '.chemr', 'cache');
 
 /**
  * キャッシュディレクトリを初期化
@@ -46,7 +46,7 @@ export function saveIndex(id: string, data: string, metadata: CacheMetadata): vo
   const content = `\x01${metaString}\n${data}`;
 
   fs.writeFileSync(cachePath, content, 'utf-8');
-  console.log(`[CacheManager] Saved index for ${id}: ${data.length} bytes`);
+  console.error(`[CacheManager] Saved index for ${id}: ${data.length} bytes`);
 }
 
 /**
@@ -82,6 +82,6 @@ export function deleteCache(id: string): void {
   const cachePath = getCachePath(id);
   if (fs.existsSync(cachePath)) {
     fs.unlinkSync(cachePath);
-    console.log(`[CacheManager] Deleted cache for ${id}`);
+    console.error(`[CacheManager] Deleted cache for ${id}`);
   }
 }

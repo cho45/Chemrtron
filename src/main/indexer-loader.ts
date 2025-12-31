@@ -5,7 +5,7 @@
 import { readdirSync, existsSync } from 'fs';
 import { join } from 'path';
 import { pathToFileURL } from 'url';
-import { app } from 'electron';
+import os from 'os';
 import type { IndexerDefinition } from '../shared/types';
 
 /**
@@ -15,23 +15,35 @@ export async function loadAllIndexers(): Promise<IndexerDefinition[]> {
   const indexers: IndexerDefinition[] = [];
 
   // アプリケーション内の indexers/ ディレクトリ（ビルド後は out/main/indexers/）
-  const builtInIndexersPath = join(__dirname, 'indexers');
+  let builtInIndexersPath = join(__dirname, 'indexers');
+  if (!existsSync(builtInIndexersPath)) {
+    // Viteのチャンク化対策: 1つ上のディレクトリも探す
+    builtInIndexersPath = join(__dirname, '..', 'indexers');
+  }
 
   // ユーザーディレクトリの ~/.chemr/indexers/
-  const userIndexersPath = join(app.getPath('home'), '.chemr', 'indexers');
+  const userIndexersPath = join(os.homedir(), '.chemr', 'indexers');
 
   // ビルトインインデクサーを読み込み
   if (existsSync(builtInIndexersPath)) {
     const builtInIndexers = await loadIndexersFromDirectory(builtInIndexersPath);
     indexers.push(...builtInIndexers);
-    console.log(`[IndexerLoader] Loaded ${builtInIndexers.length} built-in indexers`);
+    console.error(`[IndexerLoader] Loaded ${builtInIndexers.length} built-in indexers`);
   }
 
   // ユーザーインデクサーを読み込み（存在する場合）
   if (existsSync(userIndexersPath)) {
     const userIndexers = await loadIndexersFromDirectory(userIndexersPath);
     indexers.push(...userIndexers);
-    console.log(`[IndexerLoader] Loaded ${userIndexers.length} user indexers`);
+    console.error(`[IndexerLoader] Loaded ${userIndexers.length} user indexers`);
+  }
+
+  // 環境変数指定のパスから読み込み（テスト用など）
+  const extraPath = process.env.CHEMR_EXTRA_INDEXERS_PATH;
+  if (extraPath && existsSync(extraPath)) {
+    const extraIndexers = await loadIndexersFromDirectory(extraPath);
+    indexers.push(...extraIndexers);
+    console.error(`[IndexerLoader] Loaded ${extraIndexers.length} extra indexers form ${extraPath}`);
   }
 
   return indexers;
@@ -55,7 +67,7 @@ async function loadIndexersFromDirectory(dirPath: string): Promise<IndexerDefini
         const indexer = await loadIndexerFromFile(filePath);
         if (indexer) {
           indexers.push(indexer);
-          console.log(`[IndexerLoader] Loaded indexer: ${indexer.id} (${indexer.name})`);
+          console.error(`[IndexerLoader] Loaded indexer: ${indexer.id} (${indexer.name})`);
         }
       } catch (error) {
         console.error(`[IndexerLoader] Failed to load ${file}:`, error);
@@ -106,7 +118,7 @@ export async function getIndexerById(id: string, forceReload = false): Promise<I
   // ディレクトリをスキャンして該当ファイルを探す
   if (forceReload) {
     const builtInIndexersPath = join(__dirname, 'indexers');
-    const userIndexersPath = join(app.getPath('home'), '.chemr', 'indexers');
+    const userIndexersPath = join(os.homedir(), '.chemr', 'indexers');
     
     const paths = [builtInIndexersPath, userIndexersPath];
     for (const dirPath of paths) {
