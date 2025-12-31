@@ -46,6 +46,16 @@ npm install
 npm run dev
 ```
 
+### Updating Indexers
+
+Built-in indexers (in `src/indexers/`) are synchronized to `~/.chemr/builtin-indexers/` when the application starts.
+
+If you modify files in `src/indexers/` and want to apply the changes immediately during development without restarting the app, run the following command:
+
+```bash
+npm run sync-indexers
+```
+
 ### Testing Indexers
 
 You can run a live health check for built-in indexers. This script connects to the actual documentation sites to verify that the indexing logic still works against the current remote content.

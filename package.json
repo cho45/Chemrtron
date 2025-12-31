@@ -14,6 +14,7 @@
     "start": "electron-vite preview",
     "dev": "electron-vite dev",
     "build:mcp": "vite build -c mcp.vite.config.ts",
+    "sync-indexers": "tsx src/main/sync-builtin-indexers.ts",
     "build": "npm run typecheck && npm run build:mcp && electron-vite build",
     "start:mcp": "node out/main/mcp.js",
     "test": "tsx test/search-algorithm.test.ts",
