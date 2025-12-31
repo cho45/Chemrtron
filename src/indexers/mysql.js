@@ -15,7 +15,7 @@ export default {
     // 1. SQL Statements
     const statementsDoc = await ctx.fetchDocument(baseUrl + 'sql-statements.html');
     statementsDoc.querySelectorAll('.toc a').forEach(a => {
-      let title = a.textContent.trim().replace(/^\d+(\.\d+)*\s+/, '');
+      const title = a.textContent.trim().replace(/^\d+(\.\d+)*\s+/, '');
       const href = a.getAttribute('href');
       if (title && href && href !== 'index.html') {
         ctx.pushIndex(title, href);

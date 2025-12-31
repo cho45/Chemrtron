@@ -17,7 +17,7 @@ export default {
     // Example: <a href="./man3/abort.3.html">abort(3)</a>
     doc.querySelectorAll('pre a').forEach(a => {
       const title = a.textContent.trim();
-      let href = a.getAttribute('href');
+      const href = a.getAttribute('href');
       
       // Filter out jump links like "top"
       if (title && href && !href.startsWith('#')) {

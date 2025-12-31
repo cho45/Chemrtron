@@ -32,6 +32,7 @@
               >
                 {{ getIndexerInitial(result[1]) }}
               </div>
+              <!-- eslint-disable-next-line vue/no-v-html -->
               <div class="result-title" v-html="result[2] || result[0]"></div>
             </div>
           </div>

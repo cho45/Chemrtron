@@ -21,7 +21,7 @@ export default {
       const href = a.getAttribute('href');
       if (!href || href === '#') return;
 
-      let title = a.textContent.trim();
+      const title = a.textContent.trim();
       
       // If the link is inside a nested list, it might be a sub-item.
       // We can check the parent <li>'s text to get more context if needed,

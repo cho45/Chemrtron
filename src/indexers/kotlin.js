@@ -16,7 +16,7 @@ export default {
     doc.querySelectorAll('a.toc--link').forEach(a => {
       // Clean up the title from <span> and <wbr> tags
       const title = a.textContent.replace(/\s+/g, ' ').trim();
-      let href = a.getAttribute('href');
+      const href = a.getAttribute('href');
       
       if (title && href) {
         // Most links in navigation.html are relative to navigation.html itself.

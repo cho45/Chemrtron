@@ -120,7 +120,7 @@ async function main() {
     async ({ query, indexerId }) => {
       const indexers = await loadAllIndexers();
       const targets = indexerId ? indexers.filter(i => i.id === indexerId) : indexers;
-      let allResults: any[] = [];
+      const allResults: any[] = [];
 
       for (const idx of targets) {
         if (!hasCache(idx.id)) continue;
