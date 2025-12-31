@@ -21,13 +21,27 @@ const nodejsIndexer = {
     const data = await ctx.fetchJSON('https://nodejs.org/api/all.json');
 
     // 補助関数: 再帰的に要素をスキャン
-    const scan = (obj, filename) => {
+    const scan = (obj, parentFilename) => {
       if (!obj) return;
 
-      if (obj.textRaw && filename) {
+      // Determine the filename for this object.
+      // If it has a 'source', that defines the filename.
+      // Otherwise, use the parent's filename.
+      let currentFilename = parentFilename;
+      if (obj.source) {
+        currentFilename = obj.source.replace(/^doc\/api\//, '').replace(/\.md$/, '.html');
+      }
+
+      if (obj.textRaw && currentFilename) {
         const name = obj.textRaw.replace(/<[^>]*>/g, '');
-        const anchor = obj.name ? obj.name.toLowerCase().replace(/[^a-z0-9]/g, '_') : '';
-        const url = anchor ? `${filename}#${anchor}` : filename;
+        // Modern Node.js anchor generation:
+        const anchor = name.toLowerCase()
+          .replace(/[^\w\s-]/g, '')
+          .trim()
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-');
+
+        const url = anchor ? `${currentFilename}#${anchor}` : currentFilename;
         ctx.pushIndex(name, url);
       }
 
@@ -36,16 +50,19 @@ const nodejsIndexer = {
       for (const key of childrenKeys) {
         if (Array.isArray(obj[key])) {
           for (const item of obj[key]) {
-            scan(item, filename || (obj.name ? `${obj.name}.html` : ''));
+            scan(item, currentFilename);
           }
         }
       }
     };
 
     // ルートレベルの要素をスキャン
+    // globals, miscs, modules などの最上位要素は source を持っているため、
+    // scan 内部で正しいファイル名が決定される。
     if (data.globals) data.globals.forEach(item => scan(item, 'globals.html'));
     if (data.miscs) data.miscs.forEach(item => scan(item, 'documentation.html'));
-    if (data.modules) data.modules.forEach(item => scan(item, item.name ? `${item.name}.html` : ''));
+    if (data.modules) data.modules.forEach(item => scan(item, ''));
+    if (data.classes) data.classes.forEach(item => scan(item, ''));
   },
 
   /**
