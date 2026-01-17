@@ -5,10 +5,10 @@
 import { readdirSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { pathToFileURL } from 'url';
-import os from 'os';
 import type { IndexerDefinition } from '../shared/types';
+import { getDataDir } from './data-path-resolver';
 
-const CHEM_DIR = join(os.homedir(), '.chemr');
+const CHEM_DIR = getDataDir();
 const BUILTIN_INDEXERS_PATH = join(CHEM_DIR, 'builtin-indexers');
 const USER_INDEXERS_PATH = join(CHEM_DIR, 'indexers');
 

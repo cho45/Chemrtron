@@ -4,10 +4,10 @@
 
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
-import os from 'os';
 import type { Settings } from '../shared/types';
+import { getDataDir } from './data-path-resolver';
 
-const SETTINGS_DIR = join(os.homedir(), '.chemr');
+const SETTINGS_DIR = getDataDir();
 const SETTINGS_FILE = join(SETTINGS_DIR, 'settings.json');
 
 const DEFAULT_SETTINGS: Settings = {

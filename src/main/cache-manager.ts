@@ -4,10 +4,10 @@
 
 import fs from 'fs';
 import path from 'path';
-import os from 'os';
 import type { CacheMetadata } from '../shared/types';
+import { getDataDir } from './data-path-resolver';
 
-const CACHE_DIR = path.join(os.homedir(), '.chemr', 'cache');
+const CACHE_DIR = path.join(getDataDir(), 'cache');
 
 /**
  * キャッシュディレクトリを初期化

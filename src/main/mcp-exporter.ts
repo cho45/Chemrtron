@@ -1,10 +1,10 @@
 
 import fs from 'fs';
 import { join } from 'path';
-import os from 'os';
 import { app } from 'electron';
+import { getDataDir } from './data-path-resolver';
 
-const CHEM_DIR = join(os.homedir(), '.chemr');
+const CHEM_DIR = getDataDir();
 const MCP_DIR = join(CHEM_DIR, 'mcp');
 
 /**
